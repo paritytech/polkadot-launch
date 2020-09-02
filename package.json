@@ -1,0 +1,16 @@
+{
+  "name": "polkadot-launch",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "babel --presets es2015 -d dist/ src",
+    "start": "npm run build && node dist/index.js"
+  },
+  "dependencies": {
+    "@polkadot/api": "^1.31.2",
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1"
+  }
+}
