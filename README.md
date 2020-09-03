@@ -34,9 +34,9 @@ These variable are fed directly into the Polkadot binary and used to spawn a nod
 <bin> \
 	--chain=<spec> \
 	--tmp \
-	--ws-port=<wsPort>
-	--port=<port>
-	--<name>
+	--ws-port=<wsPort> \
+	--port=<port> \
+	--<name> \
 ```
 
 #### `parachains`
@@ -52,13 +52,13 @@ These variables are fed directly into the collator binary and used to spawn a no
 
 ```bash
 <bin> \
-	--tmp
-	--ws-port=<wsPort>
-	--port=<port>
-	--parachain-id=<id>
-	--validator
-	--
-	--chain=<spec>
+	--tmp \
+	--ws-port=<wsPort> \
+	--port=<port> \
+	--parachain-id=<id> \
+	--validator \
+	-- \
+	--chain=<spec> \
 ```
 
 The `spec` value will come from the `relaychain` configuration above.
