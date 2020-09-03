@@ -41,9 +41,27 @@ These variable are fed directly into the Polkadot binary and used to spawn a nod
 
 #### `parachains`
 
-The `parachains` object is an array that consists of:
+`parachains` is an array of objects that consists of:
 
+* `bin`: The path of the collator node binary used to create blocks for your parachain. For example `<path/to/cumulus-node-template>/target/release/polkadot-collator`.
+* `id`: The id to assign to this parachain. Must be unique.
+* `wsPort`: The websocket port for this node.
+* `port`: The TCP port for this node.
 
+These variables are fed directly into the collator binary and used to spawn a node:
+
+```bash
+<bin> \
+	--tmp
+	--ws-port=<wsPort>
+	--port=<port>
+	--parachain-id=<id>
+	--validator
+	--
+	--chain=<spec>
+```
+
+The `spec` value will come from the `relaychain` configuration above.
 
 ## How Does It Work?
 
