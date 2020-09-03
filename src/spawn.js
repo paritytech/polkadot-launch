@@ -1,6 +1,17 @@
 const p = {};
 
 const { spawn } = require("child_process");
+const chalk = require('chalk');
+
+let availableColors = [
+	chalk.red,
+	chalk.green,
+	chalk.blue,
+	chalk.yellow,
+	chalk.cyan,
+]
+
+let colorUsed = 0;
 
 export function startNode(bin, name, wsPort, port, spec, show) {
 	let args = [
@@ -54,14 +65,17 @@ export function startCollator(bin, id, wsPort, port, spec, show) {
 	p[id] = spawn(bin, args);
 
 	if (show) {
+		let color = availableColors[colorUsed % 5];
+		colorUsed += 1;
+
 		p[id].stdout.on('data', function (chunk) {
 			let message = chunk.toString();
-			console.log("P", id, message);
+			console.log(color("P", id, message));
 		});
 
 		p[id].stderr.on('data', function (chunk) {
 			let message = chunk.toString();
-			console.log("P", id, message);
+			console.log(color("P", id, message));
 		});
 	}
 }

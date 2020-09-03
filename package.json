@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@polkadot/api": "^1.31.2",
+    "chalk": "^4.1.0",
     "esm": "^3.2.25"
   },
   "bin": {
