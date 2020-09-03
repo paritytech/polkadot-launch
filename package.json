@@ -9,8 +9,9 @@
   },
   "dependencies": {
     "@polkadot/api": "^1.31.2",
-    "babel-cli": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
     "esm": "^3.2.25"
+  },
+  "bin": {
+    "polkadot-launch": "src/index.js"
   }
 }

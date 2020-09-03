@@ -1,9 +1,18 @@
-import { startNode, startCollator, purgeChain } from './spawn';
-import { connect, follow, registerParachain, getHeader } from './rpc';
+#!/usr/bin/env node
+
+import { startNode, startCollator } from './spawn';
+import { connect, registerParachain, getHeader } from './rpc';
 import { wasmHex } from './wasm';
 import { checkConfig } from './check';
 
-let config = require("../config.json");
+const fs = require('fs');
+
+let config;
+try {
+	config = require('../config.json')
+} catch {
+	console.log("Missing Config File")
+}
 
 function sleep(ms) {
 	return new Promise((resolve) => {
@@ -26,8 +35,9 @@ async function main() {
 		const show = false;
 
 		startNode(bin, name, wsPort, port, spec, show);
+		const api = await connect(wsPort);
 		console.log(`Launched ${name}`);
-		await sleep(2000);
+		//await sleep(2000);
 	}
 
 	let header;

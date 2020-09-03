@@ -1,4 +1,8 @@
 export function checkConfig(config) {
+	if (!config) {
+		return false
+	}
+
 	if (!config.relaychain) {
 		console.error("Missing `relaychain` object")
 		return false
