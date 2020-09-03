@@ -43,10 +43,6 @@ export async function registerParachain(api, id, wasm, header) {
 	const keyring = new Keyring({ type: 'sr25519' });
 	const alice = keyring.addFromUri('//Alice');
 
-	const nonce = await api.rpc.system.accountNextIndex(alice);
-
-	console.log("NONCE IS ", nonce)
-
 	let always = "0x00";
 	const unsub = await api.tx.sudo
 		.sudo(
