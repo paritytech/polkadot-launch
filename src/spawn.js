@@ -1,6 +1,7 @@
 const p = {};
 
 const { spawn } = require("child_process");
+const { resolve, dirname } = require('path');
 const chalk = require('chalk');
 
 let availableColors = [
@@ -39,7 +40,9 @@ export function startNode(bin, name, wsPort, port, spec, show) {
 
 export function generateWasm(bin, id) {
 	const fs = require('fs');
-	let wasm = fs.createWriteStream(`${id}.wasm`);
+	let bin_path = dirname(bin);
+	let wasm_file = resolve(bin_path, `${id}.wasm`);
+	let wasm = fs.createWriteStream(wasm_file);
 	let outputWasm = spawn(bin, [
 		"export-genesis-wasm"
 	]);

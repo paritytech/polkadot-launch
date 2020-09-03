@@ -52,7 +52,8 @@ async function main() {
 		console.log(`Launched Parachain ${id} (${wsPort}):`, api.genesisHash.toHex());
 
 		let header = await getHeader(api);
-		let wasm = wasmHex(`./${id}.wasm`);
+		let bin_path = dirname(bin);
+		let wasm = wasmHex(resolve(bin_path, `${id}.wasm`));
 		let relayChainApi = await connect(config.relaychain.nodes[0].wsPort);
 		await registerParachain(relayChainApi, id, wasm, header)
 		// Allow time for the TX to complete
