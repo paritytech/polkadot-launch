@@ -5,14 +5,16 @@ import { connect, registerParachain, getHeader } from './rpc';
 import { wasmHex } from './wasm';
 import { checkConfig } from './check';
 
-const fs = require('fs');
+const { resolve, relative, dirname } = require('path');
 
 const config_file = process.argv[2];
+
 if (!config_file) {
 	console.error("Missing config file argument...");
-	process.exit()
+	process.exit();
 }
-let config = require('../' + config_file)
+let config_path = resolve(process.cwd(), config_file);
+let config = require(config_path);
 
 function sleep(ms) {
 	return new Promise((resolve) => {
@@ -28,7 +30,7 @@ async function main() {
 	const spec = config.relaychain.spec;
 
 	for (const node of config.relaychain.nodes) {
-		const bin = "./" + config.relaychain.bin;
+		const bin = resolve(dirname(config_path), config.relaychain.bin);
 		const { name, wsPort, port } = node;
 		// Show Node output
 		const show = false;
@@ -40,7 +42,7 @@ async function main() {
 
 	for (const parachain of config.parachains) {
 		const { id, wsPort, port } = parachain;
-		const bin = "./" + parachain.bin;
+		const bin = resolve(dirname(config_path), parachain.bin);
 		// Show Node output
 		const show = true;
 		// This will also create an `<id>.wasm` file in the working directory.
