@@ -10,7 +10,7 @@ npm -i polkadot-launch -g
 ## Use
 
 ```bash
-polkadot-launch <config>
+polkadot-launch config.json
 ```
 
 ### Configuration File
