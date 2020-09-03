@@ -1,3 +1,5 @@
+// This function checks that the `config.json` file has all the expected properties.
+// It displays a unique error message and returns `false` for any detected issues.
 export function checkConfig(config) {
 	if (!config) {
 		return false

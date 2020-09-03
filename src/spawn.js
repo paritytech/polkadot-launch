@@ -1,9 +1,13 @@
+// This tracks all the processes that we spawn from this file.
+// Used to clean up processes when exiting this program.
 const p = {};
 
 const { spawn } = require("child_process");
 const { resolve, dirname } = require('path');
 const chalk = require('chalk');
 
+// This is a simple tracker to change the output color of different nodes we spawn.
+let colorUsed = 0;
 let availableColors = [
 	chalk.red,
 	chalk.green,
@@ -12,9 +16,10 @@ let availableColors = [
 	chalk.cyan,
 ]
 
-let colorUsed = 0;
-
+// Spawn a new relay chain node.
+// `name` must be `alice`, `bob`, `charlie`, etc... (hardcoded in Substrate).
 export function startNode(bin, name, wsPort, port, spec, show) {
+	// TODO: Make DB directory configurable rather than just `tmp`
 	let args = [
 		"--chain=" + spec,
 		"--tmp",
@@ -38,6 +43,8 @@ export function startNode(bin, name, wsPort, port, spec, show) {
 	}
 }
 
+// Export the genesis wasm for a parachain.
+// Used for registering the parachain on the relay chain.
 export function generateWasm(bin, id) {
 	const fs = require('fs');
 	let bin_path = dirname(bin);
@@ -51,10 +58,12 @@ export function generateWasm(bin, id) {
 	});
 }
 
+// Start a collator node for a parachain.
 export function startCollator(bin, id, wsPort, port, spec, show) {
 	// Generate a wasm file for the collator. Used in registration.
 	generateWasm(bin, id);
 
+	// TODO: Make DB directory configurable rather than just `tmp`
 	let args = [
 		"--tmp",
 		"--ws-port=" + wsPort,
@@ -68,6 +77,7 @@ export function startCollator(bin, id, wsPort, port, spec, show) {
 	p[id] = spawn(bin, args);
 
 	if (show) {
+		// Provide each node with a different color output in console.
 		let color = availableColors[colorUsed % 5];
 		colorUsed += 1;
 
@@ -83,7 +93,9 @@ export function startCollator(bin, id, wsPort, port, spec, show) {
 	}
 }
 
-
+// Purge the chain for any node.
+// You shouldn't need to use this function since every node starts with `--tmp`
+// TODO: Make DB directory configurable rather than just `tmp`
 export function purgeChain(bin, spec) {
 	console.log("Purging Chain...");
 	let args = ["purge-chain"];
@@ -92,6 +104,7 @@ export function purgeChain(bin, spec) {
 		args.push("--chain=" + spec);
 	}
 
+	// Avoid prompt to confirm.
 	args.push("-y");
 
 	p['purge'] = spawn(bin, args);
@@ -107,6 +120,7 @@ export function purgeChain(bin, spec) {
 	});
 }
 
+// Kill all processes spawned and tracked by this file.
 export function killAll() {
 	console.log("\nKilling all processes...")
 	for (const key of Object.keys(p)) {

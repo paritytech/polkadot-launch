@@ -6,6 +6,7 @@ const bufferToHex = buffer => {
 		.join('');
 };
 
+// Read the wasm file and convert it to its hex format for extrinsic submission.
 export function wasmHex(path) {
 	let buffer = fs.readFileSync(path);
 	let hex = bufferToHex(buffer);
