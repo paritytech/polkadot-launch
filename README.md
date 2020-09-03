@@ -43,7 +43,7 @@ These variable are fed directly into the Polkadot binary and used to spawn a nod
 
 `parachains` is an array of objects that consists of:
 
-* `bin`: The path of the [collator node binary](https://github.com/substrate-developer-hub/substrate-parachain-template) used to create blocks for your parachain. For example `<path/to/cumulus-node-template>/target/release/polkadot-collator`.
+* `bin`: The path of the [collator node binary](https://github.com/substrate-developer-hub/substrate-parachain-template) used to create blocks for your parachain. For example `<path/to/substrate-parachain-template>/target/release/polkadot-collator`.
 * `id`: The id to assign to this parachain. Must be unique.
 * `wsPort`: The websocket port for this node.
 * `port`: The TCP port for this node.
