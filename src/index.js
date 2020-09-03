@@ -39,23 +39,23 @@ async function main() {
 		await sleep(2000);
 	}
 
-	let header;
 	for (const parachain of config.parachains) {
 		const { id, wsPort, port } = parachain;
 		const bin = "./" + parachain.bin;
 		// Show Node output
 		const show = true;
+		// This will also create an `<id>.wasm` file in the working directory.
 		startCollator(bin, id, wsPort, port, spec, show)
 
 		await sleep(5000);
 		const api = await connect(wsPort);
-		header = await getHeader(api);
-	}
+		let header = await getHeader(api);
 
-	if (header) {
-		let wasm = wasmHex('./200.wasm');
-		let relayChainApi = await connect(config.relaychain.nodes[0].wsPort);
-		await registerParachain(relayChainApi, 200, wasm, header)
+		if (header) {
+			let wasm = wasmHex(`./${id}.wasm`);
+			let relayChainApi = await connect(config.relaychain.nodes[0].wsPort);
+			await registerParachain(relayChainApi, id, wasm, header)
+		}
 	}
 }
 
