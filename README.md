@@ -15,7 +15,7 @@ polkadot-launch config.json
 
 ### Configuration File
 
-The required configuration file defines the properties of network you want to set up.
+The required configuration file defines the properties of the network you want to set up.
 
 The file has two section: `relaychain` and `parachains`. You can see an example [here](config.json).
 
