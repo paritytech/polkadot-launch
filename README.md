@@ -1,5 +1,5 @@
 # polkadot-launch
- Simple CLI tool to launch a local Polkadot test network.
+ Simple CLI tool to launch a local [Polkadot](https://github.com/paritytech/polkadot/) test network.
 
 ## Install
 
@@ -21,7 +21,7 @@ The file has two section: `relaychain` and `parachains`. You can see an example 
 
 #### `relaychain`
 
-* `bin`: The path of the Polkadot relay chain binary used to setup your test network. For example `<path/to/polkadot>/target/release/polkadot`.
+* `bin`: The path of the [Polkadot relay chain binary](https://github.com/paritytech/polkadot/) used to setup your test network. For example `<path/to/polkadot>/target/release/polkadot`.
 * `spec`: The path to the chain specification used to start your relay chain.
 * `nodes`: An array of nodes that will be validators on the relay chain.
 	* `name`: Must be one of `alice`, `bob`, `charlie`, or `dave`.
@@ -43,7 +43,7 @@ These variable are fed directly into the Polkadot binary and used to spawn a nod
 
 `parachains` is an array of objects that consists of:
 
-* `bin`: The path of the collator node binary used to create blocks for your parachain. For example `<path/to/cumulus-node-template>/target/release/polkadot-collator`.
+* `bin`: The path of the [collator node binary](https://github.com/substrate-developer-hub/substrate-parachain-template) used to create blocks for your parachain. For example `<path/to/cumulus-node-template>/target/release/polkadot-collator`.
 * `id`: The id to assign to this parachain. Must be unique.
 * `wsPort`: The websocket port for this node.
 * `port`: The TCP port for this node.
