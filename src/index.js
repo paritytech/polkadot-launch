@@ -34,7 +34,7 @@ async function main() {
 		const show = false;
 
 		startNode(bin, name, wsPort, port, spec, show);
-		console.log(`Launched ${name}`);
+		console.log(`Launched ${name}. (${wsPort})`);
 		await sleep(2000);
 	}
 

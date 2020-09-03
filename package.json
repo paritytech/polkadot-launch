@@ -1,19 +1,22 @@
 {
   "name": "polkadot-launch",
   "version": "1.0.0",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "yarn build && node lib/index.js",
-    "build": "babel src -d lib"
+    "start": "yarn build && node dist/index.js",
+    "build": "babel src -d dist"
   },
   "dependencies": {
     "@polkadot/api": "^1.31.2",
     "chalk": "^4.1.0"
   },
+  "files": [
+    "dist"
+  ],
   "bin": {
-    "polkadot-launch": "lib/index.js"
+    "polkadot-launch": "dist/index.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.5",

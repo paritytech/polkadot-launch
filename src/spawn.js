@@ -105,7 +105,7 @@ export function purgeChain(bin, spec) {
 }
 
 export function killAll() {
-	console.log("Killing all processes...")
+	console.log("\nKilling all processes...")
 	for (const key of Object.keys(p)) {
 		p[key].kill();
 	}
