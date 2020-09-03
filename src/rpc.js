@@ -2,6 +2,15 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
+const filterConsole = require('filter-console');
+
+// Some warning messages that are coming from Polkadot JS API.
+filterConsole([
+	`code: '1006' reason: 'connection failed'`,
+	`Unhandled promise rejections`,
+	`UnhandledPromiseRejectionWarning:`
+]);
+
 export async function connect(port) {
 	const provider = new WsProvider('ws://127.0.0.1:' + port);
 	const api = new ApiPromise({ provider });
@@ -33,6 +42,10 @@ export async function registerParachain(api, id, wasm, header) {
 
 	const keyring = new Keyring({ type: 'sr25519' });
 	const alice = keyring.addFromUri('//Alice');
+
+	const nonce = await api.rpc.system.accountNextIndex(alice);
+
+	console.log("NONCE IS ", nonce)
 
 	let always = "0x00";
 	const unsub = await api.tx.sudo

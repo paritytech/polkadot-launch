@@ -8,7 +8,6 @@ import { checkConfig } from './check';
 const { resolve, dirname } = require('path');
 
 const config_file = process.argv[2];
-
 if (!config_file) {
 	console.error("Missing config file argument...");
 	process.exit();
@@ -37,8 +36,8 @@ async function main() {
 		const show = false;
 
 		startNode(bin, name, wsPort, port, spec, show);
-		console.log(`Launched ${name}. (${wsPort})`);
-		await sleep(2000);
+		let api = await connect(wsPort);
+		console.log(`Launched ${name} (${wsPort}):`, api.genesisHash.toHex());
 	}
 
 	for (const parachain of config.parachains) {
@@ -49,15 +48,15 @@ async function main() {
 		// This will also create an `<id>.wasm` file in the working directory.
 		startCollator(bin, id, wsPort, port, spec, show)
 
-		await sleep(5000);
 		const api = await connect(wsPort);
-		let header = await getHeader(api);
+		console.log(`Launched Parachain ${id} (${wsPort}):`, api.genesisHash.toHex());
 
-		if (header) {
-			let wasm = wasmHex(`./${id}.wasm`);
-			let relayChainApi = await connect(config.relaychain.nodes[0].wsPort);
-			await registerParachain(relayChainApi, id, wasm, header)
-		}
+		let header = await getHeader(api);
+		let wasm = wasmHex(`./${id}.wasm`);
+		let relayChainApi = await connect(config.relaychain.nodes[0].wsPort);
+		await registerParachain(relayChainApi, id, wasm, header)
+		// Allow time for the TX to complete
+		await sleep(6000);
 	}
 }
 
