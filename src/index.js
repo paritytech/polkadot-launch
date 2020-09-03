@@ -35,9 +35,8 @@ async function main() {
 		const show = false;
 
 		startNode(bin, name, wsPort, port, spec, show);
-		const api = await connect(wsPort);
 		console.log(`Launched ${name}`);
-		//await sleep(2000);
+		await sleep(2000);
 	}
 
 	let header;
