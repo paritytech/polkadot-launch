@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 
-import { startNode, startCollator } from './spawn';
+import { startNode, startCollator, killAll } from './spawn';
 import { connect, registerParachain, getHeader } from './rpc';
 import { wasmHex } from './wasm';
 import { checkConfig } from './check';
 
 const fs = require('fs');
 
-let config;
-try {
-	config = require('../config.json')
-} catch {
-	console.log("Missing Config File")
+const config_file = process.argv[2];
+if (!config_file) {
+	console.error("Missing config file argument...");
+	process.exit()
 }
+let config = require('../' + config_file)
 
 function sleep(ms) {
 	return new Promise((resolve) => {
@@ -21,7 +21,6 @@ function sleep(ms) {
 }
 
 async function main() {
-
 	if (!checkConfig(config)) {
 		return;
 	}
@@ -58,5 +57,15 @@ async function main() {
 		}
 	}
 }
+
+// Kill all processes when exiting
+process.on('exit', function () {
+	killAll();
+});
+
+// Handle ctrl+c
+process.on('SIGINT', function () {
+	process.exit(2);
+});
 
 main();

@@ -91,15 +91,22 @@ export function purgeChain(bin, spec) {
 
 	args.push("-y");
 
-	let temp = spawn(bin, args);
+	p['purge'] = spawn(bin, args);
 
-	temp.stdout.on('data', function (chunk) {
+	p['purge'].stdout.on('data', function (chunk) {
 		let message = chunk.toString();
 		console.log(message);
 	});
 
-	temp.stderr.on('data', function (chunk) {
+	p['purge'].stderr.on('data', function (chunk) {
 		let message = chunk.toString();
 		console.log(message);
 	});
+}
+
+export function killAll() {
+	console.log("Killing all processes...")
+	for (const key of Object.keys(p)) {
+		p[key].kill();
+	}
 }
