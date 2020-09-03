@@ -1,11 +1,11 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
-import { wasmHex } from './wasm';
 
 export async function connect(port) {
 	const provider = new WsProvider('ws://127.0.0.1:' + port);
-	const api = await ApiPromise.create({ provider });
+	const api = new ApiPromise({ provider });
+	await api.isReady;
 	return api;
 }
 
@@ -29,23 +29,18 @@ export async function getHeader(api) {
 }
 
 export async function registerParachain(api, id, wasm, header) {
-
 	await cryptoWaitReady();
 
 	const keyring = new Keyring({ type: 'sr25519' });
-
 	const alice = keyring.addFromUri('//Alice');
 
-	let wasmBytes = wasmHex(wasm);
-
-	// Make a transfer from Alice to BOB, waiting for inclusion
+	let always = "0x00";
 	const unsub = await api.tx.sudo
 		.sudo(
-			api.tx.registrar.registerPara(id, "Always", wasmBytes, header)
+			api.tx.registrar.registerPara(id, always, wasm, header)
 		)
 		.signAndSend(alice, (result) => {
 			console.log(`Current status is ${result.status}`);
-
 			if (result.status.isInBlock) {
 				console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
 			} else if (result.status.isFinalized) {

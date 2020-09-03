@@ -7,13 +7,7 @@ const bufferToHex = buffer => {
 };
 
 export function wasmHex(path) {
-	let hex;
-	fs.readFile(path, function (err, data) {
-		if (err) {
-			return console.log(err);
-		}
-		hex = bufferToHex(data);
-	});
-
+	let buffer = fs.readFileSync(path);
+	let hex = bufferToHex(buffer);
 	return "0x" + hex;
 }

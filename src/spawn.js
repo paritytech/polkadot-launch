@@ -1,7 +1,6 @@
 const p = {};
 
 const { spawn } = require("child_process");
-const fs = require('fs');
 
 export function startNode(bin, name, wsPort, port, spec, show) {
 	let args = [
@@ -14,12 +13,12 @@ export function startNode(bin, name, wsPort, port, spec, show) {
 
 	p[name] = spawn(bin, args);
 
-	p[name].stdout.on('data', function (chunk) {
-		let message = chunk.toString();
-		console.log(name, message);
-	});
-
 	if (show) {
+		p[name].stdout.on('data', function (chunk) {
+			let message = chunk.toString();
+			console.log(name, message);
+		});
+
 		p[name].stderr.on('data', function (chunk) {
 			let message = chunk.toString();
 			console.log(name, message);
@@ -28,19 +27,18 @@ export function startNode(bin, name, wsPort, port, spec, show) {
 }
 
 export function generateWasm(bin, id) {
+	const fs = require('fs');
 	let wasm = fs.createWriteStream(`${id}.wasm`);
-
 	let outputWasm = spawn(bin, [
 		"export-genesis-wasm"
 	]);
-
 	outputWasm.stdout.on('data', function (chunk) {
 		wasm.write(chunk);
 	});
 }
 
 export function startCollator(bin, id, wsPort, port, spec, show) {
-
+	// Generate a wasm file for the collator. Used in registration.
 	generateWasm(bin, id);
 
 	let args = [
@@ -54,15 +52,40 @@ export function startCollator(bin, id, wsPort, port, spec, show) {
 	];
 
 	p[id] = spawn(bin, args);
-	p[id].stdout.on('data', function (chunk) {
-		let message = chunk.toString();
-		console.log("P", id, message);
-	});
 
 	if (show) {
+		p[id].stdout.on('data', function (chunk) {
+			let message = chunk.toString();
+			console.log("P", id, message);
+		});
+
 		p[id].stderr.on('data', function (chunk) {
 			let message = chunk.toString();
 			console.log("P", id, message);
 		});
 	}
+}
+
+
+export function purgeChain(bin, spec) {
+	console.log("Purging Chain...");
+	let args = ["purge-chain"];
+
+	if (spec) {
+		args.push("--chain=" + spec);
+	}
+
+	args.push("-y");
+
+	let temp = spawn(bin, args);
+
+	temp.stdout.on('data', function (chunk) {
+		let message = chunk.toString();
+		console.log(message);
+	});
+
+	temp.stderr.on('data', function (chunk) {
+		let message = chunk.toString();
+		console.log(message);
+	});
 }

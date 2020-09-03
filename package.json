@@ -5,12 +5,12 @@
   "author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "babel --presets es2015 -d dist/ src",
-    "start": "npm run build && node dist/index.js"
+    "start": "node -r esm src/index.js"
   },
   "dependencies": {
     "@polkadot/api": "^1.31.2",
     "babel-cli": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1"
+    "babel-preset-es2015": "^6.24.1",
+    "esm": "^3.2.25"
   }
 }

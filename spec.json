@@ -4,7 +4,7 @@
   "chainType": "Local",
   "bootNodes": [],
   "telemetryEndpoints": null,
-  "protocolId": "dot3",
+  "protocolId": "dot4",
   "properties": null,
   "forkBlocks": null,
   "badBlocks": null,
