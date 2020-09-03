@@ -1,7 +1,7 @@
 {
 	"relaychain": {
 		"bin": "./bin/polkadot",
-		"spec": "spec.json",
+		"spec": "./bin/spec.json",
 		"nodes": [
 			{
 				"name": "alice",
