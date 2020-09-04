@@ -75,6 +75,33 @@ This tool just automates the steps needed to spin up multiple relay chain nodes 
 		* `wasm` is generated using the `<node> export-genesis-wasm` subcommand.
 		* `header` is retrieved by calling `api.rpc.chain.getHeader(genesis_hash)`.
 
+## Development
+
+To work on this project, you will need [`yarn`](https://yarnpkg.com/).
+
+Install all NodeJS dependencies with:
+
+```bash
+yarn
+```
+
+This project uses ES6 syntax, which means we need to transpile it to NodeJS compatible JavaScript with [`babel`](https://babeljs.io/).
+
+To do this, you just run:
+
+```bash
+yarn build
+```
+
+This will create a `dist` folder with JavaScript that you can run with `node`.
+
+These steps can be done for you automatically by running:
+
+```bash
+yarn start
+```
+
+When you have finished your changes, make a [pull request](https://github.com/shawntabrizi/polkadot-launch/pulls) to this repo.
 
 ## Get Help
 
