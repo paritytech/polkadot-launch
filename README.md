@@ -4,7 +4,7 @@
 ## Install
 
 ```bash
-npm -i polkadot-launch -g
+npm i polkadot-launch -g
 ```
 
 ## Use
