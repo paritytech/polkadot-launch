@@ -1,6 +1,6 @@
 {
 	"relaychain": {
-		"bin": "./bin/polkadot",
+		"bin": "./bin/polkadot-mac",
 		"spec": "./bin/spec.json",
 		"nodes": [
 			{
@@ -27,13 +27,13 @@
 	},
 	"parachains": [
 		{
-			"bin": "./bin/parachain-collator",
+			"bin": "./bin/parachain-mac",
 			"id": "200",
 			"wsPort": 9988,
 			"port": 30888
 		},
 		{
-			"bin": "./bin/parachain-collator",
+			"bin": "./bin/parachain-mac",
 			"id": "300",
 			"wsPort": 9999,
 			"port": 30999
