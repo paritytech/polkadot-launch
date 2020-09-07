@@ -5,6 +5,7 @@ const p = {};
 const { spawn } = require("child_process");
 const { resolve, dirname } = require('path');
 const chalk = require('chalk');
+const fs = require('fs');
 
 // This is a simple tracker to change the output color of different nodes we spawn.
 let colorUsed = 0;
@@ -46,7 +47,6 @@ export function startNode(bin, name, wsPort, port, spec, show) {
 // Export the genesis wasm for a parachain.
 // Used for registering the parachain on the relay chain.
 export function generateWasm(bin, id) {
-	const fs = require('fs');
 	let bin_path = dirname(bin);
 	let wasm_file = resolve(bin_path, `${id}.wasm`);
 	let wasm = fs.createWriteStream(wasm_file);
