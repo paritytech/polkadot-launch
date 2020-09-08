@@ -31,17 +31,23 @@ export function startNode(bin, name, wsPort, port, spec, show) {
 
 	p[name] = spawn(bin, args);
 
-	if (show) {
-		p[name].stdout.on('data', function (chunk) {
-			let message = chunk.toString();
-			console.log(name, message);
-		});
+	let log = fs.createWriteStream(`${name}.log`)
 
-		p[name].stderr.on('data', function (chunk) {
-			let message = chunk.toString();
+	p[name].stdout.on('data', function (chunk) {
+		let message = chunk.toString();
+		log.write(message);
+		if (show) {
 			console.log(name, message);
-		});
-	}
+		}
+	});
+
+	p[name].stderr.on('data', function (chunk) {
+		let message = chunk.toString();
+		log.write(message);
+		if (show) {
+			console.log(name, message);
+		}
+	});
 }
 
 // Export the genesis wasm for a parachain.
@@ -76,21 +82,27 @@ export function startCollator(bin, id, wsPort, port, spec, show) {
 
 	p[id] = spawn(bin, args);
 
-	if (show) {
-		// Provide each node with a different color output in console.
-		let color = availableColors[colorUsed % 5];
-		colorUsed += 1;
+	let log = fs.createWriteStream(`${id}.log`)
 
-		p[id].stdout.on('data', function (chunk) {
-			let message = chunk.toString();
-			console.log(color("P", id, message));
-		});
+	// Provide each node with a different color output in console.
+	let color = availableColors[colorUsed % 5];
+	colorUsed += 1;
 
-		p[id].stderr.on('data', function (chunk) {
-			let message = chunk.toString();
+	p[id].stdout.on('data', function (chunk) {
+		let message = chunk.toString();
+		log.write(message);
+		if (show) {
 			console.log(color("P", id, message));
-		});
-	}
+		}
+	});
+
+	p[id].stderr.on('data', function (chunk) {
+		let message = chunk.toString();
+		log.write(message);
+		if (show) {
+			console.log(color("P", id, message));
+		}
+	});
 }
 
 // Purge the chain for any node.

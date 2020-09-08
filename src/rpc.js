@@ -52,6 +52,7 @@ export async function registerParachain(api, id, wasm, header) {
 	const alice = keyring.addFromUri('//Alice');
 
 	let always = "0x00";
+	console.log(`--- Submitting extrinsic to register parachain ${id}. ---`)
 	const unsub = await api.tx.sudo
 		.sudo(
 			api.tx.registrar.registerPara(id, always, wasm, header)
