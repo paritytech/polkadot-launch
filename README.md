@@ -22,7 +22,7 @@ The file has two section: `relaychain` and `parachains`. You can see an example 
 #### `relaychain`
 
 * `bin`: The path of the [Polkadot relay chain binary](https://github.com/paritytech/polkadot/) used to setup your test network. For example `<path/to/polkadot>/target/release/polkadot`.
-* `spec`: The path to the chain specification used to start your relay chain.
+* `chain`: The chain you want to use to generate your spec (probably `rococo-local`).
 * `nodes`: An array of nodes that will be validators on the relay chain.
 	* `name`: Must be one of `alice`, `bob`, `charlie`, or `dave`.
 	* `wsPort`: The websocket port for this node.
@@ -32,7 +32,7 @@ These variable are fed directly into the Polkadot binary and used to spawn a nod
 
 ```bash
 <bin> \
-	--chain=<spec> \
+	--chain=<chain>-raw.json \
 	--tmp \
 	--ws-port=<wsPort> \
 	--port=<port> \
@@ -58,7 +58,7 @@ These variables are fed directly into the collator binary and used to spawn a no
 	--parachain-id=<id> \
 	--validator \
 	-- \
-	--chain=<spec> \
+	--chain=<chain>-raw.json \
 ```
 
 The `spec` value will come from the `relaychain` configuration above.
@@ -67,7 +67,14 @@ The `spec` value will come from the `relaychain` configuration above.
 
 This tool just automates the steps needed to spin up multiple relay chain nodes and parachain nodes in order to create a local test network.
 
-* [`child_process`](https://nodejs.org/api/child_process.html) is used to spawn new node instances using the information provided in your config.
+* [`child_process`](https://nodejs.org/api/child_process.html) is used to execute commands on your node:
+	* We build a fresh chain spec using the `chain` parameter specified in your config. This will include the authorities you specified. The final file is named `<chain>-raw.json`.
+	* We spawn new node instances using the information provided in your config. Each node produces a `<name>.log` file in your working directory that you can use to track the output. For example:
+		```bash
+		tail -f alice.log # Alice validator on the relay chain
+		# or
+		tail -f 200.log # Collator for Parachain ID 200
+		```
 * [`polkadot-js api`](https://polkadot.js.org/api/) is used to connect to these spawned nodes over their WebSocket endpoint.
 	* `api.rpc.system.localPeerId()` is used to retrieve the node's PeerId.
 	* `api.rpc.system.peers()` is used to retrieve connected peers to a node.
