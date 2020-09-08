@@ -15,8 +15,8 @@ export function checkConfig(config) {
 		return false
 	}
 
-	if (!config.relaychain.spec) {
-		console.error("Missing `relaychain.spec`")
+	if (!config.relaychain.chain) {
+		console.error("Missing `relaychain.chain`")
 		return false
 	}
 

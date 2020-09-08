@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
-import { startNode, startCollator, killAll } from './spawn';
+import { startNode, startCollator, killAll, generateChainSpec, generateChainSpecRaw } from './spawn';
 import { connect, registerParachain, getHeader } from './rpc';
 import { wasmHex } from './wasm';
 import { checkConfig } from './check';
+import { clearAuthorities, addAuthority } from './spec';
 
 const { resolve, dirname } = require('path');
 
@@ -36,17 +37,22 @@ async function main() {
 		return;
 	}
 
-	// TODO: We probably can generate a chainspec on the fly, and no have it be
-	// a file provided by the user.
-	const spec = resolve(config_dir, config.relaychain.spec);
+	const relay_chain_bin = resolve(config_dir, config.relaychain.bin);
+	const chain = config.relaychain.chain;
+	await generateChainSpec(relay_chain_bin, chain);
+	clearAuthorities(`${chain}.json`);
+	for (const node of config.relaychain.nodes) {
+		await addAuthority(`${chain}.json`, node.name);
+	}
+	await generateChainSpecRaw(relay_chain_bin, chain);
+	const spec = resolve(`${chain}-raw.json`);
 
 	// First we launch each of the validators for the relay chain.
 	for (const node of config.relaychain.nodes) {
-		const bin = resolve(config_dir, config.relaychain.bin);
 		const { name, wsPort, port } = node;
 		// We spawn a `child_process` starting a node, and then wait until we
 		// able to connect to it using PolkadotJS in order to know its running.
-		startNode(bin, name, wsPort, port, spec, show);
+		startNode(relay_chain_bin, name, wsPort, port, spec, show);
 		let api = await connect(wsPort);
 		console.log(`Launched ${name} (${wsPort}):`, api.genesisHash.toHex());
 	}

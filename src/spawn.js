@@ -17,6 +17,70 @@ let availableColors = [
 	chalk.cyan,
 ]
 
+// Output the chainspec of a node.
+export async function generateChainSpec(bin, chain) {
+	return new Promise(function (resolve) {
+		let args = [
+			"build-spec",
+			"--chain=" + chain,
+			"--disable-default-bootnode"
+		];
+
+		p['spec'] = spawn(bin, args);
+		let spec = fs.createWriteStream(`${chain}.json`);
+
+		p['spec'].stdout.on('data', function (chunk) {
+			let message = chunk.toString();
+			spec.write(message);
+		});
+
+		p['spec'].stderr.on('data', function (chunk) {
+			let message = chunk.toString();
+			console.error(message);
+		});
+
+		p['spec'].on('close', () => {
+			resolve();
+		});
+
+		p['spec'].on('error', (err) => {
+			reject(err);
+		});
+	})
+}
+
+// Output the chainspec of a node using `--raw` from a JSON file.
+export async function generateChainSpecRaw(bin, chain) {
+	return new Promise(function (resolve) {
+		let args = [
+			"build-spec",
+			"--chain=" + chain + '.json',
+			"--raw",
+		];
+
+		p['spec'] = spawn(bin, args);
+		let spec = fs.createWriteStream(`${chain}-raw.json`);
+
+		p['spec'].stdout.on('data', function (chunk) {
+			let message = chunk.toString();
+			spec.write(message);
+		});
+
+		p['spec'].stderr.on('data', function (chunk) {
+			let message = chunk.toString();
+			console.error(message);
+		});
+
+		p['spec'].on('close', () => {
+			resolve();
+		});
+
+		p['spec'].on('error', (err) => {
+			reject(err);
+		});
+	})
+}
+
 // Spawn a new relay chain node.
 // `name` must be `alice`, `bob`, `charlie`, etc... (hardcoded in Substrate).
 export function startNode(bin, name, wsPort, port, spec, show) {
