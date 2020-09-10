@@ -4,18 +4,7 @@ const p = {};
 
 const { spawn } = require("child_process");
 const { resolve, dirname } = require('path');
-const chalk = require('chalk');
 const fs = require('fs');
-
-// This is a simple tracker to change the output color of different nodes we spawn.
-let colorUsed = 0;
-let availableColors = [
-	chalk.red,
-	chalk.green,
-	chalk.blue,
-	chalk.yellow,
-	chalk.cyan,
-]
 
 // Output the chainspec of a node.
 export async function generateChainSpec(bin, chain) {
@@ -83,15 +72,20 @@ export async function generateChainSpecRaw(bin, chain) {
 
 // Spawn a new relay chain node.
 // `name` must be `alice`, `bob`, `charlie`, etc... (hardcoded in Substrate).
-export function startNode(bin, name, wsPort, port, spec, show) {
+export function startNode(bin, name, wsPort, port, spec, flags) {
 	// TODO: Make DB directory configurable rather than just `tmp`
 	let args = [
 		"--chain=" + spec,
 		"--tmp",
 		"--ws-port=" + wsPort,
 		"--port=" + port,
-		"--" + name.toLowerCase()
+		"--" + name.toLowerCase(),
 	];
+
+	if (flags) {
+		// Add any additional flags to the CLI
+		args = args.concat(flags);
+	}
 
 	p[name] = spawn(bin, args);
 
@@ -100,17 +94,11 @@ export function startNode(bin, name, wsPort, port, spec, show) {
 	p[name].stdout.on('data', function (chunk) {
 		let message = chunk.toString();
 		log.write(message);
-		if (show) {
-			console.log(name, message);
-		}
 	});
 
 	p[name].stderr.on('data', function (chunk) {
 		let message = chunk.toString();
 		log.write(message);
-		if (show) {
-			console.log(name, message);
-		}
 	});
 }
 
@@ -129,9 +117,13 @@ export function generateWasm(bin, id) {
 }
 
 // Start a collator node for a parachain.
-export function startCollator(bin, id, wsPort, port, spec, show) {
+export function startCollator(bin, id, wsPort, port, spec, flags) {
+	console.log("startapsdapdh")
 	// Generate a wasm file for the collator. Used in registration.
 	generateWasm(bin, id);
+
+	console.log("wasm made")
+
 
 	// TODO: Make DB directory configurable rather than just `tmp`
 	let args = [
@@ -140,32 +132,33 @@ export function startCollator(bin, id, wsPort, port, spec, show) {
 		"--port=" + port,
 		"--parachain-id=" + id,
 		"--validator",
+	];
+
+	if (flags) {
+		// Add any additional flags to the CLI
+		args = args.concat(flags);
+	}
+
+	// Arguments for the relay chain node part of the collator binary.
+	args = args.concat([
 		"--",
 		"--chain=" + spec
-	];
+	]);
+
+	console.log("Hi Shawn", args)
 
 	p[id] = spawn(bin, args);
 
 	let log = fs.createWriteStream(`${id}.log`)
 
-	// Provide each node with a different color output in console.
-	let color = availableColors[colorUsed % 5];
-	colorUsed += 1;
-
 	p[id].stdout.on('data', function (chunk) {
 		let message = chunk.toString();
 		log.write(message);
-		if (show) {
-			console.log(color("P", id, message));
-		}
 	});
 
 	p[id].stderr.on('data', function (chunk) {
 		let message = chunk.toString();
 		log.write(message);
-		if (show) {
-			console.log(color("P", id, message));
-		}
 	});
 }
 

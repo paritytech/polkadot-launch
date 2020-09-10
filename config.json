@@ -30,13 +30,15 @@
 			"bin": "./bin/parachain-mac",
 			"id": "200",
 			"wsPort": 9988,
-			"port": 30888
+			"port": 30888,
+			"balance": "1000000000000000000000"
 		},
 		{
 			"bin": "./bin/parachain-mac",
 			"id": "300",
 			"wsPort": 9999,
-			"port": 30999
+			"port": 30999,
+			"balance": "1000000000000000000000"
 		}
 	]
 }

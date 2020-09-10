@@ -67,3 +67,25 @@ export async function registerParachain(api, id, wasm, header) {
 			}
 		});
 }
+
+// Set the balance of an account on the relay chain.
+export async function setBalance(api, who, value) {
+	await cryptoWaitReady();
+
+	const keyring = new Keyring({ type: 'sr25519' });
+	const alice = keyring.addFromUri('//Alice');
+	console.log(`--- Submitting extrinsic to set balance of ${who} to ${value}. ---`)
+	const unsub = await api.tx.sudo
+		.sudo(
+			api.tx.balances.setBalance(who, value, 0)
+		)
+		.signAndSend(alice, (result) => {
+			console.log(`Current status is ${result.status}`);
+			if (result.status.isInBlock) {
+				console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
+			} else if (result.status.isFinalized) {
+				console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
+				unsub();
+			}
+		});
+}

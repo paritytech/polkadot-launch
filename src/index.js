@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 import { startNode, startCollator, killAll, generateChainSpec, generateChainSpecRaw } from './spawn';
-import { connect, registerParachain, getHeader } from './rpc';
+import { connect, registerParachain, getHeader, setBalance } from './rpc';
 import { wasmHex } from './wasm';
 import { checkConfig } from './check';
 import { clearAuthorities, addAuthority } from './spec';
+import { parachainAccount } from './parachain';
 
 const { resolve, dirname } = require('path');
 
@@ -21,9 +22,6 @@ if (!config_file) {
 let config_path = resolve(process.cwd(), config_file);
 let config_dir = dirname(config_path);
 let config = require(config_path);
-
-// Show CLI output to console.
-const show = argv.show ? true : false;
 
 function sleep(ms) {
 	return new Promise((resolve) => {
@@ -49,20 +47,23 @@ async function main() {
 
 	// First we launch each of the validators for the relay chain.
 	for (const node of config.relaychain.nodes) {
-		const { name, wsPort, port } = node;
+		const { name, wsPort, port, flags } = node;
+		console.log(`Starting ${name}...`);
 		// We spawn a `child_process` starting a node, and then wait until we
 		// able to connect to it using PolkadotJS in order to know its running.
-		startNode(relay_chain_bin, name, wsPort, port, spec, show);
+		startNode(relay_chain_bin, name, wsPort, port, spec, flags);
 		let api = await connect(wsPort);
 		console.log(`Launched ${name} (${wsPort}):`, api.genesisHash.toHex());
 	}
 
 	// Then launch each parachain and register it on the relay chain.
 	for (const parachain of config.parachains) {
-		const { id, wsPort, port } = parachain;
+		const { id, wsPort, port, flags, balance } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
+		let account = parachainAccount(id);
+		console.log(`Starting Parachain ${id}: ${account}...`);
 		// This will also create an `<id>.wasm` file in the same directory as `bin`.
-		startCollator(bin, id, wsPort, port, spec, show)
+		startCollator(bin, id, wsPort, port, spec, flags)
 		// Similarly to before, we wait until we can connect to the node to know
 		// that it has launched successfully.
 		const api = await connect(wsPort);
@@ -78,6 +79,10 @@ async function main() {
 		// Allow time for the TX to complete, avoiding nonce issues.
 		// TODO: Handle nonce directly instead of this.
 		await sleep(6000);
+		if (balance) {
+			await setBalance(relayChainApi, account, balance)
+			await sleep(6000);
+		}
 	}
 }
 
