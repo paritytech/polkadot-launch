@@ -13,7 +13,7 @@ export function clearAuthorities(spec) {
 	chainSpec.genesis.runtime.session.keys = [];
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);
-	console.log(`Cleared Authorities`);
+	console.log(`Starting with a fresh authority set:`);
 }
 
 // Add additional authorities to chain spec in `session.keys`

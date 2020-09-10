@@ -58,12 +58,12 @@ async function main() {
 
 	// Then launch each parachain and register it on the relay chain.
 	for (const parachain of config.parachains) {
-		const { id, wsPort, port, flags, balance } = parachain;
+		const { id, wsPort, port, flags, balance, chain } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
 		let account = parachainAccount(id);
 		console.log(`Starting Parachain ${id}: ${account}...`);
 		// This will also create an `<id>.wasm` file in the same directory as `bin`.
-		startCollator(bin, id, wsPort, port, spec, flags)
+		startCollator(bin, id, wsPort, port, chain, spec, flags)
 		// Similarly to before, we wait until we can connect to the node to know
 		// that it has launched successfully.
 		const api = await connect(wsPort);

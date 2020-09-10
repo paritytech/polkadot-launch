@@ -104,26 +104,24 @@ export function startNode(bin, name, wsPort, port, spec, flags) {
 
 // Export the genesis wasm for a parachain.
 // Used for registering the parachain on the relay chain.
-export function generateWasm(bin, id) {
+export function generateWasm(bin, id, chain) {
 	let bin_path = dirname(bin);
 	let wasm_file = resolve(bin_path, `${id}.wasm`);
 	let wasm = fs.createWriteStream(wasm_file);
-	let outputWasm = spawn(bin, [
-		"export-genesis-wasm"
-	]);
+	let args = ["export-genesis-wasm"];
+	if (chain) {
+		args.push("--chain=" + chain);
+	}
+	let outputWasm = spawn(bin, args);
 	outputWasm.stdout.on('data', function (chunk) {
 		wasm.write(chunk);
 	});
 }
 
 // Start a collator node for a parachain.
-export function startCollator(bin, id, wsPort, port, spec, flags) {
-	console.log("startapsdapdh")
+export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
 	// Generate a wasm file for the collator. Used in registration.
-	generateWasm(bin, id);
-
-	console.log("wasm made")
-
+	generateWasm(bin, id, chain);
 
 	// TODO: Make DB directory configurable rather than just `tmp`
 	let args = [
@@ -134,9 +132,15 @@ export function startCollator(bin, id, wsPort, port, spec, flags) {
 		"--validator",
 	];
 
+	if (chain) {
+		args.push("--chain=" + chain);
+		console.log(`Added --chain=${chain}`);
+	}
+
 	if (flags) {
 		// Add any additional flags to the CLI
 		args = args.concat(flags);
+		console.log(`Added ${flags}`);
 	}
 
 	// Arguments for the relay chain node part of the collator binary.
@@ -144,8 +148,6 @@ export function startCollator(bin, id, wsPort, port, spec, flags) {
 		"--",
 		"--chain=" + spec
 	]);
-
-	console.log("Hi Shawn", args)
 
 	p[id] = spawn(bin, args);
 
