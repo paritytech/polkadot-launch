@@ -47,6 +47,8 @@ These variable are fed directly into the Polkadot binary and used to spawn a nod
 * `id`: The id to assign to this parachain. Must be unique.
 * `wsPort`: The websocket port for this node.
 * `port`: The TCP port for this node.
+* `balance`: (Optional) Configure a starting amount of balance on the relay chain for this chain's account ID.
+* `chain`: (Optional) Configure an alternative chain specification to be used for launching the parachain.
 
 These variables are fed directly into the collator binary and used to spawn a node:
 
@@ -57,11 +59,10 @@ These variables are fed directly into the collator binary and used to spawn a no
 	--port=<port> \
 	--parachain-id=<id> \
 	--validator \
+	--chain=<chain>
 	-- \
-	--chain=<chain>-raw.json \
+	--chain=<relaychain.chain>-raw.json \
 ```
-
-The `spec` value will come from the `relaychain` configuration above.
 
 ## How Does It Work?
 
