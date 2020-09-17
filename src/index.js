@@ -8,6 +8,7 @@ import { clearAuthorities, addAuthority } from './spec';
 import { parachainAccount } from './parachain';
 
 const { resolve, dirname } = require('path');
+const fs = require('fs');
 
 // Special care is needed to handle paths to various files (binaries, spec, config, etc...)
 // The user passes the path to `config.json`, and we use that as the starting point for any other
@@ -21,6 +22,10 @@ if (!config_file) {
 }
 let config_path = resolve(process.cwd(), config_file);
 let config_dir = dirname(config_path);
+if (!fs.existsSync(config_path)) {
+	console.error("Config file does not exist: ", config_path);
+	process.exit();
+}
 let config = require(config_path);
 
 function sleep(ms) {
@@ -36,6 +41,10 @@ async function main() {
 	}
 
 	const relay_chain_bin = resolve(config_dir, config.relaychain.bin);
+	if (!fs.existsSync(relay_chain_bin)) {
+		console.error("Relay chain binary does not exist: ", relay_chain_bin);
+		process.exit();
+	}
 	const chain = config.relaychain.chain;
 	await generateChainSpec(relay_chain_bin, chain);
 	clearAuthorities(`${chain}.json`);
@@ -60,6 +69,10 @@ async function main() {
 	for (const parachain of config.parachains) {
 		const { id, wsPort, port, flags, balance, chain } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
+		if (!fs.existsSync(bin)) {
+			console.error("Parachain binary does not exist: ", bin);
+			process.exit();
+		}
 		let account = parachainAccount(id);
 		console.log(`Starting Parachain ${id}: ${account}...`);
 		// This will also create an `<id>.wasm` file in the same directory as `bin`.
