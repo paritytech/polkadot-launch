@@ -140,7 +140,7 @@ export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
 
 	let flags_collator = null;
 	let flags_parachain = null;
-	let split_index = flags.findIndex((value) => value == "--");
+	let split_index = flags ? flags.findIndex((value) => value == "--") : -1;
 	if (split_index < 0) {
 		flags_parachain = flags;
 	} else {
