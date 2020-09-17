@@ -85,6 +85,7 @@ export function startNode(bin, name, wsPort, port, spec, flags) {
 	if (flags) {
 		// Add any additional flags to the CLI
 		args = args.concat(flags);
+		console.log(`Added ${flags}`);
 	}
 
 	p[name] = spawn(bin, args);
