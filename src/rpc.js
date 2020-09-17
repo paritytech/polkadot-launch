@@ -2,6 +2,8 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
+let nonce = 0;
+
 const filterConsole = require('filter-console');
 
 // Hide some warning messages that are coming from Polkadot JS API.
@@ -9,7 +11,8 @@ const filterConsole = require('filter-console');
 filterConsole([
 	`code: '1006' reason: 'connection failed'`,
 	`Unhandled promise rejections`,
-	`UnhandledPromiseRejectionWarning:`
+	`UnhandledPromiseRejectionWarning:`,
+	`Unknown types found`
 ]);
 
 // Connect to a local Substrate node. This function wont resolve until connected.
@@ -52,12 +55,12 @@ export async function registerParachain(api, id, wasm, header) {
 	const alice = keyring.addFromUri('//Alice');
 
 	let always = "0x00";
-	console.log(`--- Submitting extrinsic to register parachain ${id}. ---`)
+	console.log(`--- Submitting extrinsic to register parachain ${id}. (nonce: ${nonce}) ---`)
 	const unsub = await api.tx.sudo
 		.sudo(
 			api.tx.registrar.registerPara(id, always, wasm, header)
 		)
-		.signAndSend(alice, (result) => {
+		.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
 			console.log(`Current status is ${result.status}`);
 			if (result.status.isInBlock) {
 				console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
@@ -66,6 +69,7 @@ export async function registerParachain(api, id, wasm, header) {
 				unsub();
 			}
 		});
+	nonce += 1;
 }
 
 // Set the balance of an account on the relay chain.
@@ -74,12 +78,17 @@ export async function setBalance(api, who, value) {
 
 	const keyring = new Keyring({ type: 'sr25519' });
 	const alice = keyring.addFromUri('//Alice');
-	console.log(`--- Submitting extrinsic to set balance of ${who} to ${value}. ---`)
+
+	if (!nonce) {
+		nonce = (await api.query.system.account(alice.address)).nonce;
+	}
+
+	console.log(`--- Submitting extrinsic to set balance of ${who} to ${value}. (nonce: ${nonce}) ---`)
 	const unsub = await api.tx.sudo
 		.sudo(
 			api.tx.balances.setBalance(who, value, 0)
 		)
-		.signAndSend(alice, (result) => {
+		.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
 			console.log(`Current status is ${result.status}`);
 			if (result.status.isInBlock) {
 				console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
@@ -88,4 +97,5 @@ export async function setBalance(api, who, value) {
 				unsub();
 			}
 		});
+	nonce += 1;
 }

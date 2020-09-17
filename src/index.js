@@ -61,11 +61,9 @@ async function main() {
 		// We spawn a `child_process` starting a node, and then wait until we
 		// able to connect to it using PolkadotJS in order to know its running.
 		startNode(relay_chain_bin, name, wsPort, port, spec, flags);
-		let api = await connect(wsPort);
-		console.log(`Launched ${name} (${wsPort}):`, api.genesisHash.toHex());
 	}
 
-	// Then launch each parachain and register it on the relay chain.
+	// Then launch each parachain
 	for (const parachain of config.parachains) {
 		const { id, wsPort, port, flags, balance, chain } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
@@ -74,13 +72,20 @@ async function main() {
 			process.exit();
 		}
 		let account = parachainAccount(id);
-		console.log(`Starting Parachain ${id}: ${account}...`);
+		console.log(`Starting Parachain ${id}: ${account}`);
 		// This will also create an `<id>.wasm` file in the same directory as `bin`.
 		startCollator(bin, id, wsPort, port, chain, spec, flags)
-		// Similarly to before, we wait until we can connect to the node to know
-		// that it has launched successfully.
+	}
+
+	// Then register each parachain on the relay chain.
+	for (const parachain of config.parachains) {
+		const { id, wsPort, port, flags, balance, chain } = parachain;
+		const bin = resolve(config_dir, parachain.bin);
+		let account = parachainAccount(id);
+
+		console.log(`Connecting to Parachain ${id}`);
 		const api = await connect(wsPort);
-		console.log(`Launched Parachain ${id} (${wsPort}):`, api.genesisHash.toHex());
+		console.log(`Registering Parachain ${id}`);
 
 		// Get the information required to register the parachain on the relay chain.
 		let header = await getHeader(api);
@@ -91,10 +96,8 @@ async function main() {
 		await registerParachain(relayChainApi, id, wasm, header)
 		// Allow time for the TX to complete, avoiding nonce issues.
 		// TODO: Handle nonce directly instead of this.
-		await sleep(6000);
 		if (balance) {
 			await setBalance(relayChainApi, account, balance)
-			await sleep(6000);
 		}
 	}
 }
