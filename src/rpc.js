@@ -2,7 +2,7 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
-let nonce = 0;
+let nonce = {};
 
 const filterConsole = require('filter-console');
 
@@ -74,6 +74,37 @@ export async function registerParachain(api, id, wasm, header) {
 
 // Set the balance of an account on the relay chain.
 export async function setBalance(api, who, value) {
+	await cryptoWaitReady();
+
+	const keyring = new Keyring({ type: 'sr25519' });
+	const alice = keyring.addFromUri('//Alice');
+
+	if (!nonce[api]) {
+		;
+	}
+
+	console.log(`--- Submitting extrinsic to set balance of ${who} to ${value}. (nonce: ${nonce}) ---`)
+	const unsub = await api.tx.sudo
+		.sudo(
+			api.tx.balances.setBalance(who, value, 0)
+		)
+		.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
+			console.log(`Current status is ${result.status}`);
+			if (result.status.isInBlock) {
+				console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
+			} else if (result.status.isFinalized) {
+				console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
+				unsub();
+			}
+		});
+	nonce[api] += 1;
+}
+
+// Set the balance of an account on the relay chain.
+export async function upgradeParachain(path, port) {
+
+	let api = await connect(port);
+
 	await cryptoWaitReady();
 
 	const keyring = new Keyring({ type: 'sr25519' });

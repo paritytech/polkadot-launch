@@ -79,7 +79,7 @@ async function main() {
 
 	// Then register each parachain on the relay chain.
 	for (const parachain of config.parachains) {
-		const { id, wsPort, port, flags, balance, chain } = parachain;
+		const { id, wsPort, port, flags, balance, chain, wasm } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
 		let account = parachainAccount(id);
 
@@ -90,10 +90,17 @@ async function main() {
 		// Get the information required to register the parachain on the relay chain.
 		let header = await getHeader(api);
 		let bin_path = dirname(bin);
-		let wasm = wasmHex(resolve(bin_path, `${id}.wasm`));
+		let wasm_hex = null;
+		if (!wasm) {
+			wasm_hex = wasmHex(resolve(bin_path, `${id}.wasm`));
+		} else {
+			wasm_file = resolve(config_dir, wasm);
+			wasm_hex = wasmHex(wasm_dir);
+			upgradeListener(wam_file);
+		}
 		// Connect to the first relay chain node to submit the extrinsic.
 		let relayChainApi = await connect(config.relaychain.nodes[0].wsPort);
-		await registerParachain(relayChainApi, id, wasm, header)
+		await registerParachain(relayChainApi, id, wasm_file, header)
 		// Allow time for the TX to complete, avoiding nonce issues.
 		// TODO: Handle nonce directly instead of this.
 		if (balance) {

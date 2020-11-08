@@ -12,3 +12,11 @@ export function wasmHex(path) {
 	let hex = bufferToHex(buffer);
 	return "0x" + hex;
 }
+
+export function upgradeListener(path, port) {
+	console.log(`Listening for changes to ${path}`);
+	fs.watch(path, function (event, filename) {
+		console.log('File changed:', filename, event);
+		await upgradeParachain(path, port)
+	});
+}
