@@ -148,12 +148,14 @@ export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
 	let flags_collator = null;
 	let flags_parachain = null;
 	let split_index = flags ? flags.findIndex((value) => value == "--") : -1;
+
 	if (split_index < 0) {
 		flags_parachain = flags;
 	} else {
 		flags_parachain = flags.slice(0, split_index);
 		flags_collator = flags.slice(split_index + 1);
 	}
+
 	if (flags_parachain) {
 		// Add any additional flags to the CLI
 		args = args.concat(flags_parachain);
