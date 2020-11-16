@@ -24,5 +24,12 @@
 			"balance": "1000000000000000000000",
 			"flags": ["--", "--execution=wasm"]
 		}
-	]
+	],
+	"types": {
+		"HrmpChannelId": {
+			"sender": "u32",
+			"receiver": "u32"
+		},
+		"SignedAvailabilityBitfields": "Vec<u8>"
+	}
 }

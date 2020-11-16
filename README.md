@@ -17,7 +17,7 @@ polkadot-launch config.json
 
 The required configuration file defines the properties of the network you want to set up.
 
-The file has two section: `relaychain` and `parachains`. You can see an example [here](config.json).
+The file has three sections: `relaychain`, `parachains`, `types`. You can see an example [here](config.json).
 
 #### `relaychain`
 
@@ -62,6 +62,20 @@ These variables are fed directly into the collator binary and used to spawn a no
 	--chain=<chain>
 	-- \
 	--chain=<relaychain.chain>-raw.json \
+```
+
+#### `types`
+
+These are the Polkadot JS types you might need to include so that Polkadot JS will be able to interface properly
+with your runtime.
+
+```json
+"types": {
+	"HrmpChannelId": {
+		"sender": "u32",
+		"receiver": "u32"
+	}
+}
 ```
 
 ## How Does It Work?
