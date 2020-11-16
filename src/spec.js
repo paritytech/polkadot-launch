@@ -10,7 +10,7 @@ function nameCase(string) {
 export function clearAuthorities(spec) {
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec = JSON.parse(rawdata);
-	chainSpec.genesis.runtime.session.keys = [];
+	chainSpec.genesis.runtime.palletSession.keys = [];
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);
 	console.log(`Starting with a fresh authority set:`);
@@ -41,7 +41,7 @@ export async function addAuthority(spec, name) {
 
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec = JSON.parse(rawdata);
-	chainSpec.genesis.runtime.session.keys.push(key);
+	chainSpec.genesis.runtime.palletSession.keys.push(key);
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);
 	console.log(`Added Authority ${name}`);

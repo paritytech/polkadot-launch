@@ -1,6 +1,7 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
+import types from '../types.json';
 
 let nonce = 0;
 
@@ -19,7 +20,7 @@ filterConsole([
 // TODO: Add a timeout where we know something went wrong so we don't wait forever.
 export async function connect(port) {
 	const provider = new WsProvider('ws://127.0.0.1:' + port);
-	const api = new ApiPromise({ provider });
+	const api = new ApiPromise({ provider, types });
 	await api.isReady;
 	return api;
 }
@@ -54,11 +55,17 @@ export async function registerParachain(api, id, wasm, header) {
 	const keyring = new Keyring({ type: 'sr25519' });
 	const alice = keyring.addFromUri('//Alice');
 
-	let always = "0x00";
+	let paraGenesisArgs = {
+		genesis_head: header,
+		validation_code: wasm,
+		parachain: true,
+	};
+	let genesis = api.createType("ParaGenesisArgs", paraGenesisArgs);
+
 	console.log(`--- Submitting extrinsic to register parachain ${id}. (nonce: ${nonce}) ---`)
 	const unsub = await api.tx.sudo
 		.sudo(
-			api.tx.registrar.registerPara(id, always, wasm, header)
+			api.tx.parasSudoWrapper.sudoScheduleParaInitialize(id, genesis)
 		)
 		.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
 			console.log(`Current status is ${result.status}`);
@@ -87,6 +94,30 @@ export async function setBalance(api, who, value) {
 	const unsub = await api.tx.sudo
 		.sudo(
 			api.tx.balances.setBalance(who, value, 0)
+		)
+		.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
+			console.log(`Current status is ${result.status}`);
+			if (result.status.isInBlock) {
+				console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
+			} else if (result.status.isFinalized) {
+				console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
+				unsub();
+			}
+		});
+	nonce += 1;
+}
+
+// Submit an extrinsic to change the max downward message size.
+export async function changeMaxDownwardMessageSize(api, size) {
+	await cryptoWaitReady();
+
+	const keyring = new Keyring({ type: 'sr25519' });
+	const alice = keyring.addFromUri('//Alice');
+
+	console.log(`--- Submitting extrinsic to set max downward message size ${size}. (nonce: ${nonce}) ---`)
+	const unsub = await api.tx.sudo
+		.sudo(
+			api.tx.parachainsConfiguration.setMaxDownwardMessageSize(size)
 		)
 		.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
 			console.log(`Current status is ${result.status}`);
