@@ -36,9 +36,9 @@
 		},
 		{
 			"bin": "./bin/rococo-collator-mac",
-			"id": "200",
-			"wsPort": 9988,
-			"port": 30888,
+			"id": "300",
+			"wsPort": 9999,
+			"port": 30999,
 			"balance": "1000000000000000000000",
 			"flags": ["--", "--execution=wasm"]
 		}
