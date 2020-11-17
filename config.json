@@ -1,6 +1,6 @@
 {
 	"relaychain": {
-		"bin": "../polkadot/target/release/polkadot",
+		"bin": "./bin/polkadot-mac",
 		"chain": "rococo-local",
 		"nodes": [
 			{
@@ -12,12 +12,30 @@
 				"name": "bob",
 				"wsPort": 9955,
 				"port": 30555
+			},
+			{
+				"name": "charlie",
+				"wsPort": 9966,
+				"port": 30666
+			},
+			{
+				"name": "dave",
+				"wsPort": 9977,
+				"port": 30777
 			}
 		]
 	},
 	"parachains": [
 		{
-			"bin": "../cumulus/target/release/rococo-collator",
+			"bin": "./bin/rococo-collator-mac",
+			"id": "200",
+			"wsPort": 9988,
+			"port": 30888,
+			"balance": "1000000000000000000000",
+			"flags": ["--", "--execution=wasm"]
+		},
+		{
+			"bin": "./bin/rococo-collator-mac",
 			"id": "200",
 			"wsPort": 9988,
 			"port": 30888,
