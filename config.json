@@ -27,18 +27,27 @@
 	},
 	"parachains": [
 		{
-			"bin": "./bin/parachain-mac",
+			"bin": "./bin/rococo-collator-mac",
 			"id": "200",
 			"wsPort": 9988,
 			"port": 30888,
-			"balance": "1000000000000000000000"
+			"balance": "1000000000000000000000",
+			"flags": ["--", "--execution=wasm"]
 		},
 		{
-			"bin": "./bin/parachain-mac",
+			"bin": "./bin/rococo-collator-mac",
 			"id": "300",
 			"wsPort": 9999,
 			"port": 30999,
-			"balance": "1000000000000000000000"
+			"balance": "1000000000000000000000",
+			"flags": ["--", "--execution=wasm"]
 		}
-	]
+	],
+	"types": {
+		"HrmpChannelId": {
+			"sender": "u32",
+			"receiver": "u32"
+		},
+		"SignedAvailabilityBitfields": "Vec<u8>"
+	}
 }
