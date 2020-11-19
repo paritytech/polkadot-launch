@@ -115,7 +115,7 @@ export function generateWasm(bin, id, chain) {
 	let bin_path = dirname(bin);
 	let wasm_file = resolve(bin_path, `${id}.wasm`);
 	let wasm = fs.createWriteStream(wasm_file);
-	let args = ["export-genesis-wasm"];
+	let args = ["export-genesis-wasm", "--raw"];
 	if (chain) {
 		args.push("--chain=" + chain);
 	}
