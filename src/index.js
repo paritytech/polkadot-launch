@@ -92,6 +92,9 @@ async function main() {
 			startCollator(bin, id, wsPort, port, chain, spec_bootnode, flags)
 		}
 
+		// Change the max downward message size for the relay chain
+		await changeMaxDownwardMessageSize(relayChainApi, 100);
+
 		// Then register each parachain on the relay chain.
 		for (const parachain of config.parachains) {
 			const { id, wsPort, port, flags, balance, chain } = parachain;
@@ -107,7 +110,6 @@ async function main() {
 			let bin_path = dirname(bin);
 			let wasm = wasmHex(resolve(bin_path, `${id}.wasm`));
 			await registerParachain(relayChainApi, id, wasm, header);
-			await changeMaxDownwardMessageSize(relayChainApi, 100);
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.
 			if (balance) {
