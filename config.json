@@ -48,6 +48,6 @@
 			"sender": "u32",
 			"receiver": "u32"
 		},
-		"SignedAvailabilityBitfields": "Vec<u8>"
+		"SignedAvailabilityBitfields": "Raw"
 	}
 }
