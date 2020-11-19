@@ -24,10 +24,10 @@ export async function connect(port, types) {
 	return api;
 }
 
-// Get the PeerId for a running node. Can be used when defining bootnodes for future nodes.
-export async function peerId(api) {
-	let peerId = await api.rpc.system.localPeerId();
-	return peerId.toString();
+// Get the Listen Address for a running node. Can be used when defining boot nodes for future nodes.
+export async function listenAddresses(api) {
+	let listenAddresses = await api.rpc.system.localListenAddresses();
+	return listenAddresses.toJSON();
 }
 
 // Track and display basic information about a chain each block it produces.

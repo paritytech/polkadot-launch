@@ -45,6 +45,7 @@ export async function generateChainSpecRaw(bin, chain) {
 			"build-spec",
 			"--chain=" + chain + '.json',
 			"--raw",
+			"--disable-default-bootnode",
 		];
 
 		p['spec'] = spawn(bin, args);

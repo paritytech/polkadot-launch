@@ -46,3 +46,12 @@ export async function addAuthority(spec, name) {
 	fs.writeFileSync(spec, data);
 	console.log(`Added Authority ${name}`);
 }
+
+export async function addBootNodes(spec, addresses) {
+	let rawdata = fs.readFileSync(spec);
+	let chainSpec = JSON.parse(rawdata);
+	chainSpec.bootNodes = addresses;
+	let data = JSON.stringify(chainSpec, null, 2);
+	fs.writeFileSync(spec, data);
+	console.log(`Added Boot Nodes: ${addresses}`);
+}
