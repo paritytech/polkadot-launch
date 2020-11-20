@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { startNode, startCollator, killAll, generateChainSpec, generateChainSpecRaw } from './spawn';
-import { connect, registerParachain, getHeader, setBalance, changeMaxDownwardMessageSize } from './rpc';
+import { connect, registerParachain, getHeader, setBalance } from './rpc';
 import { wasmHex } from './wasm';
 import { checkConfig } from './check';
 import { clearAuthorities, addAuthority } from './spec';
@@ -94,7 +94,7 @@ async function main() {
 		// Connect to the first relay chain node to submit the extrinsic.
 		let relayChainApi = await connect(config.relaychain.nodes[0].wsPort, config.types);
 		await registerParachain(relayChainApi, id, wasm, header);
-		await changeMaxDownwardMessageSize(relayChainApi, 100);
+
 		// Allow time for the TX to complete, avoiding nonce issues.
 		// TODO: Handle nonce directly instead of this.
 		if (balance) {
