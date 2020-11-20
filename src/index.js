@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { startNode, startCollator, killAll, generateChainSpec, generateChainSpecRaw } from './spawn';
-import { connect, registerParachain, getHeader, setBalance, changeMaxDownwardMessageSize } from './rpc';
+import { connect, registerParachain, getHeader, setBalance } from './rpc';
 import { wasmHex } from './wasm';
 import { checkConfig } from './check';
 import { clearAuthorities, addAuthority } from './spec';

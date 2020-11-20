@@ -105,27 +105,3 @@ export async function setBalance(api, who, value) {
 		});
 	nonce += 1;
 }
-
-// Submit an extrinsic to change the max downward message size.
-export async function changeMaxDownwardMessageSize(api, size) {
-	await cryptoWaitReady();
-
-	const keyring = new Keyring({ type: 'sr25519' });
-	const alice = keyring.addFromUri('//Alice');
-
-	console.log(`--- Submitting extrinsic to set max downward message size ${size}. (nonce: ${nonce}) ---`)
-	const unsub = await api.tx.sudo
-		.sudo(
-			api.tx.parachainsConfiguration.setMaxDownwardMessageSize(size)
-		)
-		.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
-			console.log(`Current status is ${result.status}`);
-			if (result.status.isInBlock) {
-				console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
-			} else if (result.status.isFinalized) {
-				console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
-				unsub();
-			}
-		});
-	nonce += 1;
-}
