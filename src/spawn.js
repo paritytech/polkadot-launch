@@ -82,19 +82,13 @@ export function startNode(bin, name, wsPort, port, spec, flags) {
 		"--" + name.toLowerCase(),
 	];
 
-	let options = {};
 	if (flags) {
 		// Add any additional flags to the CLI
 		args = args.concat(flags);
 		console.log(`Added ${flags}`);
-		if(flags.includes("-lruntime=debug")) {
-			console.log("add options...");
-			options = {env: {RUST_LOG: "debug", RUST_BACKTRACE: 1}}
-			console.log(`Added options ${options}`);
-		}
 	}
 
-	p[name] = spawn(bin, args, options);
+	p[name] = spawn(bin, args);
 
 	let log = fs.createWriteStream(`${name}.log`)
 
@@ -144,7 +138,6 @@ export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
 		console.log(`Added --chain=${chain}`);
 	}
 
-	let options = {};
 	let flags_collator = null;
 	let flags_parachain = null;
 	let split_index = flags ? flags.findIndex((value) => value == "--") : -1;
@@ -160,13 +153,6 @@ export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
 		// Add any additional flags to the CLI
 		args = args.concat(flags_parachain);
 		console.log(`Added ${flags_parachain} to parachain`);
-
-		if(flags.includes("-lruntime=debug")) {
-			options = {env: {RUST_LOG: "debug", RUST_BACKTRACE: 1}}
-			console.log(`Added parachain options ${options}`);
-		}
-
-
 	}
 
 	// Arguments for the relay chain node part of the collator binary.
@@ -181,7 +167,7 @@ export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
 		console.log(`Added ${flags_collator} to collator`);
 	}
 
-	p[id] = spawn(bin, args, options);
+	p[id] = spawn(bin, args);
 
 	let log = fs.createWriteStream(`${id}.log`)
 
