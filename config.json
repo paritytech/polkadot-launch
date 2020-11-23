@@ -48,7 +48,12 @@
 			"sender": "u32",
 			"receiver": "u32"
 		},
-		"SignedAvailabilityBitfields": "Raw",
+		"SignedAvailabilityBitfield": {
+			"payload": "BitVec",
+			"validator_index": "u32",
+			"signature": "Signature"
+		},
+		"SignedAvailabilityBitfields": "Vec<SignedAvailabilityBitfield>",
 		"ValidatorSignature": "Signature",
 		"HeadData": "Vec<u8>",
 		"CandidateDescriptor": {
@@ -91,7 +96,7 @@
 		"BackedCandidate": {
 			"candidate": "CommittedCandidateReceipt",
 			"validity_votes": "Vec<ValidityAttestation>",
-			"validator_indices": "Raw"
+			"validator_indices": "BitVec"
 		}
 	}
 }
