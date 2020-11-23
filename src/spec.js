@@ -1,6 +1,7 @@
 import { Keyring } from '@polkadot/api';
-import { cryptoWaitReady } from '@polkadot/util-crypto';
-const fs = require('fs');
+import polkadot_util_crypto from '@polkadot/util-crypto';
+const { cryptoWaitReady } = polkadot_util_crypto;
+import * as fs from 'fs';
 
 function nameCase(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);

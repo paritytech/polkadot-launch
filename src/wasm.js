@@ -1,4 +1,4 @@
-const fs = require('fs');
+import * as fs from 'fs';
 
 const bufferToHex = buffer => {
 	return Array.from(new Uint8Array(buffer))

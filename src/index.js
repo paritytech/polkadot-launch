@@ -1,19 +1,20 @@
 #!/usr/bin/env node
 
-import { startNode, startCollator, killAll, generateChainSpec, generateChainSpecRaw } from './spawn';
-import { connect, registerParachain, getHeader, setBalance } from './rpc';
-import { wasmHex } from './wasm';
-import { checkConfig } from './check';
-import { clearAuthorities, addAuthority } from './spec';
-import { parachainAccount } from './parachain';
+import { startNode, startCollator, killAll, generateChainSpec, generateChainSpecRaw } from './spawn.js';
+import { connect, registerParachain, getHeader, setBalance } from './rpc.js';
+import { wasmHex } from './wasm.js';
+import { checkConfig } from './check.js';
+import { clearAuthorities, addAuthority } from './spec.js';
+import { parachainAccount } from './parachain.js';
 
-const { resolve, dirname } = require('path');
-const fs = require('fs');
+import { resolve, dirname } from 'path';
+import * as fs from 'fs';
 
 // Special care is needed to handle paths to various files (binaries, spec, config, etc...)
 // The user passes the path to `config.json`, and we use that as the starting point for any other
 // relative path. So the `config.json` file is what we will be our starting point.
-const { argv } = require('yargs')
+import yargs from 'yargs';
+const { argv } = yargs;
 
 const config_file = argv._[0] ? argv._[0] : null;
 if (!config_file) {

@@ -2,9 +2,9 @@
 // Used to clean up processes when exiting this program.
 const p = {};
 
-const { spawn } = require("child_process");
-const { resolve, dirname } = require('path');
-const fs = require('fs');
+import { spawn } from 'child_process';
+import { resolve, dirname } from 'path';
+import * as fs from 'fs';
 
 // Output the chainspec of a node.
 export async function generateChainSpec(bin, chain) {
