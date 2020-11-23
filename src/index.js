@@ -27,7 +27,7 @@ if (!fs.existsSync(config_path)) {
 	console.error("Config file does not exist: ", config_path);
 	process.exit();
 }
-let config = require(config_path);
+let config = JSON.parse(fs.readFileSync(config_path));
 
 function sleep(ms) {
 	return new Promise((resolve) => {
