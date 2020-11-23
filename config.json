@@ -89,8 +89,9 @@
 		},
 		"ValidityAttestation": {
 			"_enum": {
-				"Internal": "ValidatorSignature",
-				"External": "ValidatorSignature"
+				"DummyOffsetBy1": "Raw",
+				"Implicit": "ValidatorSignature",
+				"Explicit": "ValidatorSignature"
 			}
 		},
 		"BackedCandidate": {
