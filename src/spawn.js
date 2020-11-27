@@ -18,10 +18,9 @@ export async function generateChainSpec(bin, chain) {
 		p['spec'] = spawn(bin, args);
 		let spec = fs.createWriteStream(`${chain}.json`);
 
-		p['spec'].stdout.on('data', function (chunk) {
-			let message = chunk.toString();
-			spec.write(message);
-		});
+		// `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
+		// before we resolve the promise.
+		p['spec'].stdout.pipe(spec);
 
 		p['spec'].stderr.on('data', function (chunk) {
 			let message = chunk.toString();
