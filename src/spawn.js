@@ -2,8 +2,9 @@
 // Used to clean up processes when exiting this program.
 const p = {};
 
+const util = require('util');
+const execFile = util.promisify(require('child_process').execFile);
 const { spawn } = require("child_process");
-const { resolve, dirname } = require('path');
 const fs = require('fs');
 
 // Output the chainspec of a node.
@@ -102,27 +103,26 @@ export function startNode(bin, name, wsPort, port, spec, flags) {
 	});
 }
 
-// Export the genesis wasm for a parachain.
+// Export the genesis wasm for a parachain and return it as a hex encoded string starting with 0x.
 // Used for registering the parachain on the relay chain.
-export function generateWasm(bin, id, chain) {
-	let bin_path = dirname(bin);
-	let wasm_file = resolve(bin_path, `${id}.wasm`);
-	let wasm = fs.createWriteStream(wasm_file);
-	let args = ["export-genesis-wasm", "--raw"];
+export async function exportGenesisWasm(bin, id, chain) {
+	let args = ["export-genesis-wasm"]
 	if (chain) {
-		args.push("--chain=" + chain);
+		args.push("--chain=" + chain)
 	}
-	let outputWasm = spawn(bin, args);
-	outputWasm.stdout.on('data', function (chunk) {
-		wasm.write(chunk);
-	});
+
+	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
+	// advance. Hopefully, this generous limit will be enough.
+	let opts = { maxBuffer: 5 * 1024 * 1024 }
+	let { stdout, stderr } = await execFile(bin, args, opts)
+	if (stderr) {
+		console.error(stderr)
+	}
+	return stdout.trim()
 }
 
 // Start a collator node for a parachain.
 export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
-	// Generate a wasm file for the collator. Used in registration.
-	generateWasm(bin, id, chain);
-
 	// TODO: Make DB directory configurable rather than just `tmp`
 	let args = [
 		"--tmp",

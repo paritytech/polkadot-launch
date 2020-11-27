@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-import { startNode, startCollator, killAll, generateChainSpec, generateChainSpecRaw } from './spawn';
+import {
+	startNode, startCollator, killAll, generateChainSpec, generateChainSpecRaw, exportGenesisWasm
+} from './spawn';
 import { connect, registerParachain, getHeader, setBalance } from './rpc';
-import { wasmHex } from './wasm';
 import { checkConfig } from './check';
 import { clearAuthorities, addAuthority } from './spec';
 import { parachainAccount } from './parachain';
@@ -89,8 +90,7 @@ async function main() {
 
 		// Get the information required to register the parachain on the relay chain.
 		let header = await getHeader(api);
-		let bin_path = dirname(bin);
-		let wasm = wasmHex(resolve(bin_path, `${id}.wasm`));
+		let wasm = await exportGenesisWasm(bin, id, chain);
 		// Connect to the first relay chain node to submit the extrinsic.
 		let relayChainApi = await connect(config.relaychain.nodes[0].wsPort, config.types);
 		await registerParachain(relayChainApi, id, wasm, header);
