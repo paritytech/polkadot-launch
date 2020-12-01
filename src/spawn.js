@@ -198,6 +198,32 @@ export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
 	});
 }
 
+export function startSimpleCollator(bin, id, spec, port) {
+	let args = [
+		"--tmp",
+		"--parachain-id=" + id,
+		"--port=" + port,
+		"--chain=" + spec,
+		"--execution=wasm"
+	];
+
+	console.log(args)
+
+	p[id] = spawn(bin, args);
+
+	let log = fs.createWriteStream(`${id}.log`)
+
+	p[id].stdout.on('data', function (chunk) {
+		let message = chunk.toString();
+		log.write(message);
+	});
+
+	p[id].stderr.on('data', function (chunk) {
+		let message = chunk.toString();
+		log.write(message);
+	});
+}
+
 // Purge the chain for any node.
 // You shouldn't need to use this function since every node starts with `--tmp`
 // TODO: Make DB directory configurable rather than just `tmp`
