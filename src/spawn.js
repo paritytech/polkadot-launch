@@ -105,8 +105,25 @@ export function startNode(bin, name, wsPort, port, spec, flags) {
 
 // Export the genesis wasm for a parachain and return it as a hex encoded string starting with 0x.
 // Used for registering the parachain on the relay chain.
-export async function exportGenesisWasm(bin, id, chain) {
+export async function exportGenesisWasm(bin, chain) {
 	let args = ["export-genesis-wasm"]
+	if (chain) {
+		args.push("--chain=" + chain)
+	}
+
+	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
+	// advance. Hopefully, this generous limit will be enough.
+	let opts = { maxBuffer: 5 * 1024 * 1024 }
+	let { stdout, stderr } = await execFile(bin, args, opts)
+	if (stderr) {
+		console.error(stderr)
+	}
+	return stdout.trim()
+}
+
+/// Export the genesis state aka genesis head.
+export async function exportGenesisState(bin, chain) {
+	let args = ["export-genesis-state"]
 	if (chain) {
 		args.push("--chain=" + chain)
 	}
