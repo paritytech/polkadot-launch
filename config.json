@@ -30,7 +30,7 @@
 			"bin": "./bin/rococo-collator-mac",
 			"id": "200",
 			"wsPort": 9988,
-			"port": 30888,
+			"port": 31200,
 			"balance": "1000000000000000000000",
 			"flags": ["--", "--execution=wasm"]
 		},
@@ -38,9 +38,17 @@
 			"bin": "./bin/rococo-collator-mac",
 			"id": "300",
 			"wsPort": 9999,
-			"port": 30999,
+			"port": 31300,
 			"balance": "1000000000000000000000",
 			"flags": ["--", "--execution=wasm"]
+		}
+	],
+	"simpleParachains": [
+		{
+			"bin": "./bin/adder-collator-mac",
+			"id": "400",
+			"port": "31400",
+			"balance": "1000000000000000000000"
 		}
 	],
 	"types": {

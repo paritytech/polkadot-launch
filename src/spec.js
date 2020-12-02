@@ -9,7 +9,13 @@ function nameCase(string) {
 // Remove all existing keys from `session.keys`
 export function clearAuthorities(spec) {
 	let rawdata = fs.readFileSync(spec);
-	let chainSpec = JSON.parse(rawdata);
+	let chainSpec;
+	try {
+		chainSpec = JSON.parse(rawdata);
+	} catch {
+		console.error("failed to parse the chain spec");
+		process.exit(1);
+	}
 	chainSpec.genesis.runtime.palletSession.keys = [];
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);

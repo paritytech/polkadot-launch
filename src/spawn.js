@@ -2,8 +2,9 @@
 // Used to clean up processes when exiting this program.
 const p = {};
 
+const util = require('util');
+const execFile = util.promisify(require('child_process').execFile);
 const { spawn } = require("child_process");
-const { resolve, dirname } = require('path');
 const fs = require('fs');
 
 // Output the chainspec of a node.
@@ -18,15 +19,11 @@ export async function generateChainSpec(bin, chain) {
 		p['spec'] = spawn(bin, args);
 		let spec = fs.createWriteStream(`${chain}.json`);
 
-		p['spec'].stdout.on('data', function (chunk) {
-			let message = chunk.toString();
-			spec.write(message);
-		});
+		// `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
+		// before we resolve the promise.
+		p['spec'].stdout.pipe(spec);
 
-		p['spec'].stderr.on('data', function (chunk) {
-			let message = chunk.toString();
-			console.error(message);
-		});
+		p['spec'].stderr.pipe(process.stderr)
 
 		p['spec'].on('close', () => {
 			resolve();
@@ -50,15 +47,10 @@ export async function generateChainSpecRaw(bin, chain) {
 		p['spec'] = spawn(bin, args);
 		let spec = fs.createWriteStream(`${chain}-raw.json`);
 
-		p['spec'].stdout.on('data', function (chunk) {
-			let message = chunk.toString();
-			spec.write(message);
-		});
-
-		p['spec'].stderr.on('data', function (chunk) {
-			let message = chunk.toString();
-			console.error(message);
-		});
+		// `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
+		// before we resolve the promise.
+		p['spec'].stdout.pipe(spec)
+		p['spec'].stderr.pipe(process.stderr)
 
 		p['spec'].on('close', () => {
 			resolve();
@@ -92,38 +84,52 @@ export function startNode(bin, name, wsPort, port, spec, flags) {
 
 	let log = fs.createWriteStream(`${name}.log`)
 
-	p[name].stdout.on('data', function (chunk) {
-		let message = chunk.toString();
-		log.write(message);
-	});
-
-	p[name].stderr.on('data', function (chunk) {
-		let message = chunk.toString();
-		log.write(message);
-	});
+	p[name].stdout.pipe(log)
+	p[name].stderr.pipe(log)
 }
 
-// Export the genesis wasm for a parachain.
+// Export the genesis wasm for a parachain and return it as a hex encoded string starting with 0x.
 // Used for registering the parachain on the relay chain.
-export function generateWasm(bin, id, chain) {
-	let bin_path = dirname(bin);
-	let wasm_file = resolve(bin_path, `${id}.wasm`);
-	let wasm = fs.createWriteStream(wasm_file);
-	let args = ["export-genesis-wasm", "--raw"];
+export async function exportGenesisWasm(bin, chain) {
+	let args = ["export-genesis-wasm"]
 	if (chain) {
-		args.push("--chain=" + chain);
+		args.push("--chain=" + chain)
 	}
-	let outputWasm = spawn(bin, args);
-	outputWasm.stdout.on('data', function (chunk) {
-		wasm.write(chunk);
-	});
+
+	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
+	// advance. Hopefully, this generous limit will be enough.
+	let opts = { maxBuffer: 5 * 1024 * 1024 }
+	let { stdout, stderr } = await execFile(bin, args, opts)
+	if (stderr) {
+		console.error(stderr)
+	}
+	return stdout.trim()
+}
+
+/// Export the genesis state aka genesis head.
+export async function exportGenesisState(bin, id, chain) {
+	let args = [
+		"export-genesis-state",
+	]
+	if (id) {
+		args.push("--parachain-id=" + id)
+	}
+	if (chain) {
+		args.push("--chain=" + chain)
+	}
+
+	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
+	// advance. Hopefully, this generous limit will be enough.
+	let opts = { maxBuffer: 5 * 1024 * 1024 }
+	let { stdout, stderr } = await execFile(bin, args, opts)
+	if (stderr) {
+		console.error(stderr)
+	}
+	return stdout.trim()
 }
 
 // Start a collator node for a parachain.
 export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
-	// Generate a wasm file for the collator. Used in registration.
-	generateWasm(bin, id, chain);
-
 	// TODO: Make DB directory configurable rather than just `tmp`
 	let args = [
 		"--tmp",
@@ -166,6 +172,23 @@ export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
 		args = args.concat(flags_collator);
 		console.log(`Added ${flags_collator} to collator`);
 	}
+
+	p[id] = spawn(bin, args);
+
+	let log = fs.createWriteStream(`${id}.log`)
+
+	p[id].stdout.pipe(log)
+	p[id].stderr.pipe(log)
+}
+
+export function startSimpleCollator(bin, id, spec, port) {
+	let args = [
+		"--tmp",
+		"--parachain-id=" + id,
+		"--port=" + port,
+		"--chain=" + spec,
+		"--execution=wasm"
+	];
 
 	p[id] = spawn(bin, args);
 
