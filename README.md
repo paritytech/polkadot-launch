@@ -64,6 +64,17 @@ These variables are fed directly into the collator binary and used to spawn a no
 	--chain=<relaychain.chain>-raw.json \
 ```
 
+#### `simpleParachains`
+
+This is similar to `parachains` but for "simple" collators like the adder-collator, a very simple
+collator that lives in the polkadot repo and is meant just for simple testing. It supports a subset
+of configuration values:
+
+* `bin`: The path to the collator binary.
+* `id`: The id to assign to this parachain. Must be unique.
+* `port`: The TCP port for this node.
+* `balance`: (Optional) Configure a starting amount of balance on the relay chain for this chain's account ID.
+
 #### `types`
 
 These are the Polkadot JS types you might need to include so that Polkadot JS will be able to interface properly
