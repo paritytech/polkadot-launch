@@ -107,8 +107,13 @@ export async function exportGenesisWasm(bin, chain) {
 }
 
 /// Export the genesis state aka genesis head.
-export async function exportGenesisState(bin, chain) {
-	let args = ["export-genesis-state"]
+export async function exportGenesisState(bin, id, chain) {
+	let args = [
+		"export-genesis-state",
+	]
+	if (id) {
+		args.push("--parachain-id=" + id)
+	}
 	if (chain) {
 		args.push("--chain=" + chain)
 	}

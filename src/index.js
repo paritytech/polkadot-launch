@@ -86,7 +86,7 @@ async function main() {
 		let genesisState
 		let genesisWasm
 		try {
-			genesisState = await exportGenesisState(bin, chain)
+			genesisState = await exportGenesisState(bin, id, chain)
 			genesisWasm = await exportGenesisWasm(bin, chain)
 		} catch (err) {
 			console.error(err)
@@ -119,7 +119,9 @@ async function main() {
 		let genesisState
 		let genesisWasm
 		try {
-			genesisState = await exportGenesisState(bin, null)
+			// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
+			// not necessary for it anyway), so we don't pass it here.
+			genesisState = await exportGenesisState(bin, null, null)
 			genesisWasm = await exportGenesisWasm(bin, null)
 		} catch (err) {
 			console.error(err)
