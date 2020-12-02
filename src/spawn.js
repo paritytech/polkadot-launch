@@ -190,8 +190,6 @@ export function startSimpleCollator(bin, id, spec, port) {
 		"--execution=wasm"
 	];
 
-	console.log(args)
-
 	p[id] = spawn(bin, args);
 
 	let log = fs.createWriteStream(`${id}.log`)
