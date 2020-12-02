@@ -23,10 +23,7 @@ export async function generateChainSpec(bin, chain) {
 		// before we resolve the promise.
 		p['spec'].stdout.pipe(spec);
 
-		p['spec'].stderr.on('data', function (chunk) {
-			let message = chunk.toString();
-			console.error(message);
-		});
+		p['spec'].stderr.pipe(process.stderr)
 
 		p['spec'].on('close', () => {
 			resolve();
@@ -50,15 +47,10 @@ export async function generateChainSpecRaw(bin, chain) {
 		p['spec'] = spawn(bin, args);
 		let spec = fs.createWriteStream(`${chain}-raw.json`);
 
-		p['spec'].stdout.on('data', function (chunk) {
-			let message = chunk.toString();
-			spec.write(message);
-		});
-
-		p['spec'].stderr.on('data', function (chunk) {
-			let message = chunk.toString();
-			console.error(message);
-		});
+		// `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
+		// before we resolve the promise.
+		p['spec'].stdout.pipe(spec)
+		p['spec'].stderr.pipe(process.stderr)
 
 		p['spec'].on('close', () => {
 			resolve();
@@ -92,15 +84,8 @@ export function startNode(bin, name, wsPort, port, spec, flags) {
 
 	let log = fs.createWriteStream(`${name}.log`)
 
-	p[name].stdout.on('data', function (chunk) {
-		let message = chunk.toString();
-		log.write(message);
-	});
-
-	p[name].stderr.on('data', function (chunk) {
-		let message = chunk.toString();
-		log.write(message);
-	});
+	p[name].stdout.pipe(log)
+	p[name].stderr.pipe(log)
 }
 
 // Export the genesis wasm for a parachain and return it as a hex encoded string starting with 0x.
@@ -187,15 +172,8 @@ export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
 
 	let log = fs.createWriteStream(`${id}.log`)
 
-	p[id].stdout.on('data', function (chunk) {
-		let message = chunk.toString();
-		log.write(message);
-	});
-
-	p[id].stderr.on('data', function (chunk) {
-		let message = chunk.toString();
-		log.write(message);
-	});
+	p[id].stdout.pipe(log)
+	p[id].stderr.pipe(log)
 }
 
 export function startSimpleCollator(bin, id, spec, port) {
