@@ -1,8 +1,10 @@
-with (import <nixpkgs> {});
+with (import <nixpkgs> { });
 rec {
   polkadot-launch = mkYarnPackage {
     name = "polkadot-launch";
-    src = ./.;
+    src = builtins.filterSource
+      (path: type: type != "directory" || baseNameOf path != "bin")
+      ./.;
     buildPhase = ''
       yarn build
     '';
