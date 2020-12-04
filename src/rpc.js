@@ -105,3 +105,63 @@ export async function setBalance(api, who, value) {
 		});
 	nonce += 1;
 }
+
+export async function establishHrmpChannel(api, sender, receiver, maxCapacity, maxMessageSize) {
+	await cryptoWaitReady();
+
+	const keyring = new Keyring({ type: 'sr25519' });
+	const alice = keyring.addFromUri('//Alice');
+
+	if (!nonce) {
+		nonce = (await api.query.system.account(alice.address)).nonce;
+	}
+
+	console.log(`--- Submitting extrinsic to establish an HRMP channel ${sender}->${receiver}. (nonce: ${nonce}) ---`)
+	const unsub = await api.tx.sudo
+		.sudo(
+			api.tx.parasSudoWrapper.sudoEstablishHrmpChannel(sender, receiver, maxCapacity, maxMessageSize)
+		)
+		.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
+			console.log(`Current status is ${result.status}`);
+			if (result.status.isInBlock) {
+				console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
+			} else if (result.status.isFinalized) {
+				console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
+				unsub();
+			}
+		});
+	nonce += 1;
+}
+
+export async function sendHrmpMessage(api, recipient, data) {
+	await cryptoWaitReady();
+
+	const keyring = new Keyring({ type: 'sr25519' });
+	const alice = keyring.addFromUri('//Alice');
+
+	if (!nonce) {
+		nonce = (await api.query.system.account(alice.address)).nonce;
+	}
+
+	let hrmpMessage = {
+		recipient: recipient,
+		data: data,
+	};
+	let message = api.createType("OutboundHrmpMessage", hrmpMessage);
+
+	console.log(`--- Sending a message ${sender}->${receiver}. (nonce: ${nonce}) ---`)
+	const unsub = await api.tx.sudo
+		.sudo(
+			api.tx.messageBroker.sudoSendHrmpMessage(message)
+		)
+		.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
+			console.log(`Current status is ${result.status}`);
+			if (result.status.isInBlock) {
+				console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
+			} else if (result.status.isFinalized) {
+				console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
+				unsub();
+			}
+		});
+	nonce += 1;
+}

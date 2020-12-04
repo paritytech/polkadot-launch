@@ -51,6 +51,14 @@
 			"balance": "1000000000000000000000"
 		}
 	],
+	"hrmpChannels": [
+		{
+			"sender": "200",
+			"recipient": "300",
+			"maxCapacity": 8,
+			"maxMessageSize": 512
+		}
+	],
 	"types": {
 		"OriginKind": {
 			"_enum": {
@@ -263,6 +271,46 @@
 				"Ok": "()",
 				"Err": "XcmError"
 			}
+		},
+		"InboundDownwardMessage": {
+			"sent_at": "BlockNumber",
+			"msg": "Vec<u8>"
+		},
+		"InboundHrmpMessage": {
+			"sent_at": "BlockNumber",
+			"data": "Vec<u8>"
+		},
+		"MessageIngestionType": {
+			"dmp": "Vec<InboundDownwardMessage>",
+			"hrmp": "BTreeMap<u32,Vec<InboundHrmpMessage>>"
+		},
+		"ValidationData": {
+			"persisted": "PersistedValidationData",
+			"transient": "TransientValidationData"
+		},
+		"PersistedValidationData": {
+			"parent_head": "HeadData",
+			"block_number": "BlockNumber",
+			"hrmp_mqc_heads": "Vec<(u32,Hash)>",
+			"dmq_mqc_head": "Hash",
+			"max_pov_size": "u32"
+		},
+		"TransientValidationData": {
+			"max_code_size": "u32",
+			"max_head_data_size": "u32",
+			"balance": "Balance",
+			"code_upgrade_allowed": "Option<BlockNumber>",
+			"dmq_length": "u32"
+		},
+		"HrmpChannel": {
+			"sender_deposit": "Balance",
+			"recipient_deposit": "Balance",
+			"max_capacity": "u32",
+			"max_total_size": "u32",
+			"max_message_size": "u32",
+			"msg_count": "u32",
+			"total_size": "u32",
+			"mqc_head": "Option<Hash>"
 		}
 	}
 }

@@ -4,7 +4,7 @@ import {
 	startNode, startCollator, killAll, generateChainSpec, generateChainSpecRaw, exportGenesisWasm,
 	exportGenesisState, startSimpleCollator,
 } from './spawn';
-import { connect, registerParachain, setBalance } from './rpc';
+import { connect, registerParachain, setBalance, establishHrmpChannel } from './rpc';
 import { checkConfig } from './check';
 import { clearAuthorities, addAuthority } from './spec';
 import { parachainAccount } from './parachain';
@@ -136,6 +136,17 @@ async function main() {
 		if (balance) {
 			await setBalance(relayChainApi, account, balance)
 		}
+	}
+
+	// wait here until the next session. Currently it's configured to be 5 blocks
+	// with 6 seconds per block. We wait for 2 sessions just in case.
+	let secsToSleep = 2 * 5 * 6
+	console.log(`sleeping for ${secsToSleep} seconds`)
+	await sleep(secsToSleep * 1000)
+
+	for (const hrmpChannel of config.hrmpChannels) {
+		const { sender, recipient, maxCapacity, maxMessageSize } = hrmpChannel
+		await establishHrmpChannel(relayChainApi, sender, recipient, maxCapacity, maxMessageSize)
 	}
 }
 
