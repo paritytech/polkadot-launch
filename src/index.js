@@ -104,7 +104,7 @@ async function main() {
 
 	// Then launch each simple parachain (e.g. an adder-collator)
 	for (const simpleParachain of config.simpleParachains) {
-		const { id, port } = simpleParachain
+		const { id, port, balance } = simpleParachain
 		const bin = resolve(config_dir, simpleParachain.bin)
 		if (!fs.existsSync(bin)) {
 			console.error("Simple parachain binary does not exist: ", bin);
