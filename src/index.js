@@ -80,11 +80,11 @@ async function main() {
 			process.exit();
 		}
 		let account = parachainAccount(id);
-		console.log(`Starting Parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`);
+		console.log(`Starting a collator for para ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`);
 		startCollator(bin, id, wsPort, port, chain, spec, flags)
 
 		// If it isn't registered yet, register the parachain on the relaychain
-		if (!registerParachain[id]){
+		if (!registerParachain[id]) {
 			console.log(`Registering Parachain ${id}`);
 
 			// Get the information required to register the parachain on the relay chain.
@@ -100,7 +100,7 @@ async function main() {
 
 			await registerParachain(relayChainApi, id, genesisWasm, genesisState);
 
-			registerParachain[id]=true
+			registerParachain[id] = true
 
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.
