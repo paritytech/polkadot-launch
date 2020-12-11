@@ -1,6 +1,6 @@
 {
 	"relaychain": {
-		"bin": "./bin/polkadot-mac",
+		"bin": "./bin/mac/polkadot-mac",
 		"chain": "rococo-local",
 		"nodes": [
 			{
@@ -27,7 +27,7 @@
 	},
 	"parachains": [
 		{
-			"bin": "./bin/rococo-collator-mac",
+			"bin": "./bin/mac/rococo-collator-mac",
 			"id": "200",
 			"wsPort": 9988,
 			"port": 31200,
@@ -35,7 +35,7 @@
 			"flags": ["--", "--execution=wasm"]
 		},
 		{
-			"bin": "./bin/rococo-collator-mac",
+			"bin": "./bin/mac/rococo-collator-mac",
 			"id": "300",
 			"wsPort": 9999,
 			"port": 31300,
@@ -45,7 +45,7 @@
 	],
 	"simpleParachains": [
 		{
-			"bin": "./bin/adder-collator-mac",
+			"bin": "./bin/mac/adder-collator-mac",
 			"id": "400",
 			"port": "31400",
 			"balance": "1000000000000000000000"
