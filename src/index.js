@@ -73,15 +73,15 @@ async function main() {
 
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
-		const { id, wsPort, balance, port, flags, chain } = parachain;
+		const { id, wsPort, balance, port, rpcPort, flags, chain } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
 			process.exit();
 		}
 		let account = parachainAccount(id);
-		console.log(`Starting Parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`);
-		startCollator(bin, id, wsPort, port, chain, spec, flags)
+		console.log(`Starting Parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort} rpcPort : ${rpcPort}`);
+		startCollator(bin, id, wsPort, port, rpcPort, chain, spec, flags)
 
 		// If it isn't registered yet, register the parachain on the relaychain
 		if (!registerParachain[id]){
