@@ -37,6 +37,9 @@ function sleep(ms) {
 }
 
 async function main() {
+	// keep track of registered parachains
+	let registeredParachains = {}
+
 	// Verify that the `config.json` has all the expected properties.
 	if (!checkConfig(config)) {
 		return;
@@ -77,28 +80,33 @@ async function main() {
 			process.exit();
 		}
 		let account = parachainAccount(id);
-		console.log(`Starting Parachain ${id}: ${account}`);
+		console.log(`Starting Parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`);
 		startCollator(bin, id, wsPort, port, chain, spec, flags)
 
-		console.log(`Registering Parachain ${id}`);
+		// If it isn't registered yet, register the parachain on the relaychain
+		if (!registerParachain[id]){
+			console.log(`Registering Parachain ${id}`);
 
-		// Get the information required to register the parachain on the relay chain.
-		let genesisState
-		let genesisWasm
-		try {
-			genesisState = await exportGenesisState(bin, id, chain)
-			genesisWasm = await exportGenesisWasm(bin, chain)
-		} catch (err) {
-			console.error(err)
-			process.exit(1)
-		}
+			// Get the information required to register the parachain on the relay chain.
+			let genesisState
+			let genesisWasm
+			try {
+				genesisState = await exportGenesisState(bin, id, chain)
+				genesisWasm = await exportGenesisWasm(bin, chain)
+			} catch (err) {
+				console.error(err)
+				process.exit(1)
+			}
 
-		await registerParachain(relayChainApi, id, genesisWasm, genesisState);
+			await registerParachain(relayChainApi, id, genesisWasm, genesisState);
 
-		// Allow time for the TX to complete, avoiding nonce issues.
-		// TODO: Handle nonce directly instead of this.
-		if (balance) {
-			await setBalance(relayChainApi, account, balance)
+			registerParachain[id]=true
+
+			// Allow time for the TX to complete, avoiding nonce issues.
+			// TODO: Handle nonce directly instead of this.
+			if (balance) {
+				await setBalance(relayChainApi, account, balance)
+			}
 		}
 	}
 
