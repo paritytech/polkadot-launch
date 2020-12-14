@@ -84,7 +84,7 @@ async function main() {
 		startCollator(bin, id, wsPort, port, rpcPort, chain, spec, flags)
 
 		// If it isn't registered yet, register the parachain on the relaychain
-		if (!registerParachain[id]){
+		if (!registeredParachains[id]){
 			console.log(`Registering Parachain ${id}`);
 
 			// Get the information required to register the parachain on the relay chain.
@@ -100,7 +100,7 @@ async function main() {
 
 			await registerParachain(relayChainApi, id, genesisWasm, genesisState);
 
-			registerParachain[id]=true
+			registeredParachains[id]=true
 
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.
