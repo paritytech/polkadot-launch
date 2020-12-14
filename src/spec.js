@@ -42,6 +42,8 @@ export async function addAuthority(spec, name) {
 			"im_online": sr_account.address,
 			"parachain_validator": sr_account.address,
 			"authority_discovery": sr_account.address,
+			"para_validator": sr_account.address,
+			"para_assignment": sr_account.address,
 		}
 	];
 
