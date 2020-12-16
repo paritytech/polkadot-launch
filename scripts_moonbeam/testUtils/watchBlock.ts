@@ -1,6 +1,6 @@
 import Web3 from "web3";
-import {Subscription} from 'web3-core-subscriptions';
-import {BlockHeader} from 'web3-eth'
+import { Subscription } from "web3-core-subscriptions";
+import { BlockHeader } from "web3-eth";
 
 // function subscribe(web3:Web3,eventName:string):Subscription<string> {
 //   //return new Promise<Subscription>((resolve, reject) => {
@@ -17,16 +17,22 @@ import {BlockHeader} from 'web3-eth'
 
 export async function listenForBlocks(web3: Web3) {
   // setup listeners for web3_1
-  const subscription1:Subscription<string> = web3.eth
+  const subscription1: Subscription<string> = web3.eth
     .subscribe("pendingTransactions")
     .on("data", function (transaction) {
       console.log("pending transaction", transaction);
     });
-  const subscription2:Subscription<BlockHeader> = web3.eth
+  const subscription2: Subscription<BlockHeader> = web3.eth
     .subscribe("newBlockHeaders")
     .on("data", function (blockHeader) {
-      console.log("++ New Block", blockHeader.number);
+      console.log(
+        "+++++++++++++++++++++++++++++++++++++++++++++ New Block ++++++++++++++++++++++++=",
+        blockHeader.number,
+        // " ++ Number of tx : ",
+        // blockHeader
+      );
     });
+  console.log("listening for events");
 
   // Kill all processes when exiting.
   process.on("exit", function () {

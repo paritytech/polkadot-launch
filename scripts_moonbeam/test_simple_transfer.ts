@@ -1,7 +1,8 @@
 import { assert, hexToNumber } from "@polkadot/util";
 import Web3 from "web3";
 import { listenForBlocks } from "./testUtils/watchBlock";
-import { sendTxWrapped } from "./testUtils/webCalls";
+import { sendTxWrapped } from "./testUtils/web3Calls";
+import { TransactionReceipt } from "web3-core";
 //const Web3 = require("web3");
 const PORT_1 = 9846;
 const RPC_PORT = 9846;
@@ -76,9 +77,10 @@ async function main() {
     _value: string,
     nbIterations: number
   ): Promise<number> {
+    let res:TransactionReceipt;
     for (let i = 0; i < nbIterations; i++) {
       console.log("---------- Starting Tx send #", i);
-      const resp = await sendTxWrapped(web3_1, {
+      res = await sendTxWrapped(web3_1, {
         from: GENESIS_ACCOUNT,
         to: TEST_ACCOUNT,
         value: _value, // Must me higher than ExistentialDeposit (500)
@@ -87,10 +89,10 @@ async function main() {
       });
       console.log(
         "---------- Tx " + i + " included in Block : ",
-        resp.blockNumber
+        res.blockNumber
       );
     }
-    return (resp.gasUsed + hexToNumber(value)) * nbIterations;
+    return (res.gasUsed + hexToNumber(value)) * nbIterations;
   }
   const cost: number = await serialSend(value, 10);
 
