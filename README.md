@@ -24,6 +24,12 @@ To launch the process, run `yarn start` followed by the congig file of your choi
 
 For moonbeam, run `yarn start config_moonbeam`
 
+### Test
+To start a test sequence, launch this command on another terminal:
+`ts-node ./scripts_moonbeam/test_simple_transfer.ts`
+
+NB: Make sure you have ts-node installed globally.
+
 ## Development
 
 To work on this project, you will need [`yarn`](https://yarnpkg.com/).
