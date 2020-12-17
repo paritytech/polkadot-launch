@@ -24,13 +24,14 @@ export async function listenForBlocks(web3: Web3) {
     });
   const subscription2: Subscription<BlockHeader> = web3.eth
     .subscribe("newBlockHeaders")
-    .on("data", function (blockHeader) {
+    .on("data", async function (blockHeader) {
       console.log(
         "+++++++++++++++++++++++++++++++++++++++++++++ New Block ++++++++++++++++++++++++=",
         blockHeader.number,
         // " ++ Number of tx : ",
         // blockHeader
       );
+        console.log('getBlock says',(await web3.eth.getBlock('latest')).number)
     });
   console.log("listening for events");
 

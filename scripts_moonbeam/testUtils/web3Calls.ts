@@ -19,7 +19,7 @@ export async function sendTxWrapped(
         }
       })
       .on("error", function (error) {
-        console.log("error");
+        console.log("error on sendTxWrapped",error);
         reject(`Failed to send tx: ${error.message || error.toString()}`);
       })
       .then(function (receipt) {
@@ -44,7 +44,7 @@ export function sendTxSync(web3: Web3, txConfig: TransactionConfig) {
       }
     })
     .on("error", function (error) {
-      console.log("error");
+      console.log("error on sendTxSync",error);
       // reject(
       //           `Failed to send tx: ${
       //             error.message || error.toString()
