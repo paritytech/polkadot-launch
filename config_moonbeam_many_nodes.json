@@ -12,6 +12,26 @@
 				"name": "bob",
 				"wsPort": 9955,
 				"port": 30555
+			},
+			{
+				"name": "charlie",
+				"wsPort": 9956,
+				"port": 30556
+			},
+			{
+				"name": "dave",
+				"wsPort": 9957,
+				"port": 30557
+			},
+			{
+				"name": "edward",
+				"wsPort": 9958,
+				"port": 30558
+			},
+			{
+				"name": "ferdinand",
+				"wsPort": 9959,
+				"port": 30559
 			}
 		]
 	},
@@ -22,6 +42,42 @@
             "rpcPort":9846,
 			"wsPort": 9946,
 			"port": 40335,
+			"balance": "1000000000000000000000",
+			"flags": ["--", "--execution=wasm"]
+		},
+		{
+			"bin": "../moonbeam/target/release/moonbase-alphanet",
+            "id": "200",
+            "rpcPort":9847,
+			"wsPort": 9947,
+			"port": 40336,
+			"balance": "1000000000000000000000",
+			"flags": ["--", "--execution=wasm"]
+		},
+		{
+			"bin": "../moonbeam/target/release/moonbase-alphanet",
+            "id": "200",
+            "rpcPort":9848,
+			"wsPort": 9948,
+			"port": 40337,
+			"balance": "1000000000000000000000",
+			"flags": ["--", "--execution=wasm"]
+		},
+		{
+			"bin": "../moonbeam/target/release/moonbase-alphanet",
+            "id": "200",
+            "rpcPort":9849,
+			"wsPort": 9949,
+			"port": 40338,
+			"balance": "1000000000000000000000",
+			"flags": ["--", "--execution=wasm"]
+		},
+		{
+			"bin": "../moonbeam/target/release/moonbase-alphanet",
+            "id": "200",
+            "rpcPort":9850,
+			"wsPort": 9950,
+			"port": 40339,
 			"balance": "1000000000000000000000",
 			"flags": ["--", "--execution=wasm"]
 		}

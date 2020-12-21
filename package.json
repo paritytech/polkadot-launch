@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@polkadot/api": "^2.10.1",
+    "@polkadot/apps-config": "^0.71.2",
     "@polkadot/util": "^4.2.1",
     "@polkadot/util-crypto": "^4.1.1",
     "filter-console": "^0.1.1",
