@@ -3,14 +3,6 @@ import Web3 from "web3";
 import { readEveryBlock } from "./testUtils/testChecks";
 import { listenForBlocks } from "./testUtils/watchBlock";
 import { sendTxSync, sendTxWrapped } from "./testUtils/web3Calls";
-//const Web3 = require("web3");
-// const PORT_1 = 9846;
-// const RPC_PORT = 9846;
-// const WS_PORT = 9946;
-
-// const PORT_2 = 9847;
-// const RPC_PORT_2 = 9847;
-// const WS_PORT_2 = 9947;
 
 export const GENESIS_ACCOUNT = "0x6be02d1d3665660d22ff9624b7be0551ee1ac91b";
 const GENESIS_ACCOUNT_BALANCE = "1152921504606846976";
@@ -18,9 +10,13 @@ const GENESIS_ACCOUNT_PRIVATE_KEY =
   "0x99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E342";
 const TEST_ACCOUNT = "0x1111111111111111111111111111111111111111";
 
-const NUMBER_TX: number = 2;
+const { argv } = require('yargs')
+const NUMBER_TX:number = argv._[0] ? Number(argv._[0]) : 2;
+if (!argv._[0]) {
+	console.error("Missing tx number argument... tx number set to 2");
+}
 
-const config = require("../config_moonbeam.json");
+const config = require("../config_moonbeam_many_nodes.json");
 
 //simple test sequence that checks balances and sends one and then 10 transactions
 async function main() {
@@ -28,8 +24,6 @@ async function main() {
   const clientList: Web3[] = config.parachains.map((parachain) => {
     return new Web3(`ws://localhost:${parachain.wsPort}`);
   });
-  //   const web3_1: Web3 = new Web3(`ws://localhost:${WS_PORT}`);
-  //   const web3_2: Web3 = new Web3(`ws://localhost:${WS_PORT_2}`);
 
   // listen for block updates
   listenForBlocks(clientList[0]);
@@ -38,16 +32,11 @@ async function main() {
   await clientList[0].eth.accounts.wallet.add(GENESIS_ACCOUNT_PRIVATE_KEY);
   console.log("wallet genesis added");
 
-  // create accounts for the other addresses
-  //   await clientList[0].eth.accounts.wallet.create(config.parachains.length-1)
-  //   console.log(web3.eth.accounts.wallet)
-
   // add these accounts to the other nodes
   let accounts: string[] = await Promise.all(
     config.parachains.map(async (_, i) => {
       if (i > 0) {
         const wallet = await clientList[i].eth.accounts.wallet.create(1);
-        //console.log('wallet',wallet)
         return wallet[0].address;
       } else {
         return GENESIS_ACCOUNT;
@@ -80,8 +69,6 @@ async function main() {
     })
   );
   const initialBalance = await clientList[0].eth.getBalance(TEST_ACCOUNT);
-  //   await web3_1.eth.getTransactionCount(GENESIS_ACCOUNT);
-  //   const initialBalance = await web3_1.eth.getBalance(TEST_ACCOUNT);
 
   // Send a series of 10 transactions
   function parallelSend(

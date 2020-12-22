@@ -12,11 +12,6 @@
 				"name": "bob",
 				"wsPort": 9955,
 				"port": 30555
-			},
-			{
-				"name": "charlie",
-				"wsPort": 9956,
-				"port": 30556
 			}
 		]
 	},
@@ -27,15 +22,6 @@
             "rpcPort":9846,
 			"wsPort": 9946,
 			"port": 40335,
-			"balance": "1000000000000000000000",
-			"flags": ["--", "--execution=wasm"]
-		},
-		{
-			"bin": "../moonbeam/target/release/moonbase-alphanet",
-            "id": "200",
-            "rpcPort":9847,
-			"wsPort": 9947,
-			"port": 40336,
 			"balance": "1000000000000000000000",
 			"flags": ["--", "--execution=wasm"]
 		}

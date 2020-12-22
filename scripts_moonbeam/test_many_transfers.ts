@@ -18,8 +18,12 @@ const GENESIS_ACCOUNT_PRIVATE_KEY =
   "0x99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E342";
 const TEST_ACCOUNT = "0x1111111111111111111111111111111111111111";
 
-const NUMBER_TX: number = 1000;
+const { argv } = require('yargs')
 
+const NUMBER_TX:number = argv._[0] ? Number(argv._[0]) : 100;
+if (!argv._[0]) {
+	console.error("Missing tx number argument... tx number set to 100");
+}
 //simple test sequence that checks balances and sends one and then 10 transactions
 async function main() {
   // instantiate apis

@@ -41,21 +41,17 @@ Ive been able to "break the blockchain", i.e. no new blocks on the explorer avec
 
 => leave 2 nodes
 
-=> Should I use the Ferrari?
+=> Should I use the Ferrari? yes, both
 
 => add an issue in the polkadot-launch repo about n+1
 
-=> ajouter une config dans les nodes et publier
-
-=> to break the blockchain, if evm execution time>block
-=> we dont have a gas  limit
+=> possible to break the blockchain, if evm execution time>block
+=> we dont have an appropriate gas limit
 
 
-=> worth it to ask Alan to setup a machine with the good requirements
-
-
+=> worth it to ask Alan to setup a machine with the good requirements? ferrari should be enough
 => use the ferrari for the tests
 
 ### meeting with Oskar
 => we should eventually use kubernetes for those type of tests
-=> we need a report structure
+=> we need a report structure for errors
