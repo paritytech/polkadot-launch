@@ -107,7 +107,7 @@ async function main() {
   );
   console.log('Should contain ',NUMBER_TX,' tx')
   await readEveryBlock(web3_2)
-  //process.exit(2);
+  process.exit(0);
 }
 
 main();
