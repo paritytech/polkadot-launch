@@ -149,7 +149,7 @@ async function main() {
   );
   console.log('Should contain ',config.parachains.length-1+NUMBER_TX*(config.parachains.length),' tx')
   await readEveryBlock(clientList[0])
-  //process.exit(2);
+  process.exit(0);
 }
 
 main();
