@@ -16,13 +16,14 @@ if (!argv._[0]) {
 	console.error("Missing tx number argument... tx number set to 2");
 }
 
-const config = require("../config_moonbeam_many_nodes.json");
+const config = require("../config_moonbeam_antoine.json");
 
 //simple test sequence that checks balances and sends one and then 10 transactions
 async function main() {
   // instantiate apis
   const clientList: Web3[] = config.parachains.map((parachain) => {
-    return new Web3(`ws://localhost:${parachain.wsPort}`);
+    console.log('connecting new web3 instance to wsport:'+parachain.wsPort)
+    return new Web3(`ws://127.0.0.1:${parachain.wsPort}`);
   });
 
   // listen for block updates

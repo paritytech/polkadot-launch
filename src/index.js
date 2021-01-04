@@ -113,38 +113,40 @@ async function main() {
 	}
 
 	// Then launch each simple parachain (e.g. an adder-collator)
-	for (const simpleParachain of config.simpleParachains) {
-		const { id, port, balance } = simpleParachain
-		const bin = resolve(config_dir, simpleParachain.bin)
-		if (!fs.existsSync(bin)) {
-			console.error("Simple parachain binary does not exist: ", bin);
-			process.exit();
-		}
+	if (config.simpleParachains){
+		for (const simpleParachain of config.simpleParachains) {
+			const { id, port, balance } = simpleParachain
+			const bin = resolve(config_dir, simpleParachain.bin)
+			if (!fs.existsSync(bin)) {
+				console.error("Simple parachain binary does not exist: ", bin);
+				process.exit();
+			}
 
-		let account = parachainAccount(id);
-		console.log(`Starting Parachain ${id}: ${account}`);
-		startSimpleCollator(bin, id, spec, port)
+			let account = parachainAccount(id);
+			console.log(`Starting Parachain ${id}: ${account}`);
+			startSimpleCollator(bin, id, spec, port)
 
-		// Get the information required to register the parachain on the relay chain.
-		let genesisState
-		let genesisWasm
-		try {
-			// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
-			// not necessary for it anyway), so we don't pass it here.
-			genesisState = await exportGenesisState(bin, null, null)
-			genesisWasm = await exportGenesisWasm(bin, null)
-		} catch (err) {
-			console.error(err)
-			process.exit(1)
-		}
+			// Get the information required to register the parachain on the relay chain.
+			let genesisState
+			let genesisWasm
+			try {
+				// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
+				// not necessary for it anyway), so we don't pass it here.
+				genesisState = await exportGenesisState(bin, null, null)
+				genesisWasm = await exportGenesisWasm(bin, null)
+			} catch (err) {
+				console.error(err)
+				process.exit(1)
+			}
 
-		console.log(`Registering Parachain ${id}`);
-		await registerParachain(relayChainApi, id, genesisWasm, genesisState);
+			console.log(`Registering Parachain ${id}`);
+			await registerParachain(relayChainApi, id, genesisWasm, genesisState);
 
-		// Allow time for the TX to complete, avoiding nonce issues.
-		// TODO: Handle nonce directly instead of this.
-		if (balance) {
-			await setBalance(relayChainApi, account, balance)
+			// Allow time for the TX to complete, avoiding nonce issues.
+			// TODO: Handle nonce directly instead of this.
+			if (balance) {
+				await setBalance(relayChainApi, account, balance)
+			}
 		}
 	}
 }
