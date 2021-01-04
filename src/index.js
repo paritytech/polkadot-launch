@@ -67,12 +67,14 @@ async function main() {
 		// able to connect to it using PolkadotJS in order to know its running.
 		startNode(relay_chain_bin, name, wsPort, port, spec, flags);
 	}
-
+	console.log('about to connect....')
 	// Connect to the first relay chain node to submit the extrinsic.
 	let relayChainApi = await connect(config.relaychain.nodes[0].wsPort, config.types);
+	console.log('connect resolved')
 
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
+		console.log('launching parachain ...')
 		const { id, wsPort, balance, port, rpcPort, flags, chain } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
@@ -146,6 +148,12 @@ async function main() {
 		}
 	}
 }
+
+// log unhandledRejection
+process.on('unhandledRejection', error => {
+	console.log('unhandledRejection', error.message, error);
+	console.trace(error);
+});
 
 // Kill all processes when exiting.
 process.on('exit', function () {
