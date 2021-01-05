@@ -67,13 +67,14 @@ async function main() {
 		// able to connect to it using PolkadotJS in order to know its running.
 		startNode(relay_chain_bin, name, wsPort, port, spec, flags);
 	}
-
+	console.log('about to connect....')
 	// Connect to the first relay chain node to submit the extrinsic.
 	let relayChainApi = await connect(config.relaychain.nodes[0].wsPort, config.types);
+	console.log('connect resolved')
 
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
-		console.log('parachain')
+		console.log('launching parachain ...')
 		const { id, wsPort, balance, port, rpcPort, flags, chain } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
@@ -81,11 +82,11 @@ async function main() {
 			process.exit();
 		}
 		let account = parachainAccount(id);
-		console.log(`Starting Parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort} rpcPort : ${rpcPort}`);
-		startCollator(bin, id, wsPort, port, rpcPort, chain, spec, flags)
+		console.log(`Starting a Collator for parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`);
+		startCollator(bin, id, wsPort, port, chain, spec, flags)
 
 		// If it isn't registered yet, register the parachain on the relaychain
-		if (!registeredParachains[id]){
+		if (!registeredParachains[id]) {
 			console.log(`Registering Parachain ${id}`);
 
 			// Get the information required to register the parachain on the relay chain.
@@ -104,7 +105,7 @@ async function main() {
 				console.log('error during registtr',e)
 			}
 
-			registeredParachains[id]=true
+			registeredParachains[id] = true
 
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.
@@ -115,41 +116,49 @@ async function main() {
 	}
 
 	// Then launch each simple parachain (e.g. an adder-collator)
-	for (const simpleParachain of config.simpleParachains) {
-		const { id, port, balance } = simpleParachain
-		const bin = resolve(config_dir, simpleParachain.bin)
-		if (!fs.existsSync(bin)) {
-			console.error("Simple parachain binary does not exist: ", bin);
-			process.exit();
-		}
+	if (config.simpleParachains){
+		for (const simpleParachain of config.simpleParachains) {
+			const { id, port, balance } = simpleParachain
+			const bin = resolve(config_dir, simpleParachain.bin)
+			if (!fs.existsSync(bin)) {
+				console.error("Simple parachain binary does not exist: ", bin);
+				process.exit();
+			}
 
-		let account = parachainAccount(id);
-		console.log(`Starting Parachain ${id}: ${account}`);
-		startSimpleCollator(bin, id, spec, port)
+			let account = parachainAccount(id);
+			console.log(`Starting Parachain ${id}: ${account}`);
+			startSimpleCollator(bin, id, spec, port)
 
-		// Get the information required to register the parachain on the relay chain.
-		let genesisState
-		let genesisWasm
-		try {
-			// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
-			// not necessary for it anyway), so we don't pass it here.
-			genesisState = await exportGenesisState(bin, null, null)
-			genesisWasm = await exportGenesisWasm(bin, null)
-		} catch (err) {
-			console.error(err)
-			process.exit(1)
-		}
+			// Get the information required to register the parachain on the relay chain.
+			let genesisState
+			let genesisWasm
+			try {
+				// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
+				// not necessary for it anyway), so we don't pass it here.
+				genesisState = await exportGenesisState(bin, null, null)
+				genesisWasm = await exportGenesisWasm(bin, null)
+			} catch (err) {
+				console.error(err)
+				process.exit(1)
+			}
 
-		console.log(`Registering Parachain ${id}`);
-		await registerParachain(relayChainApi, id, genesisWasm, genesisState);
+			console.log(`Registering Parachain ${id}`);
+			await registerParachain(relayChainApi, id, genesisWasm, genesisState);
 
-		// Allow time for the TX to complete, avoiding nonce issues.
-		// TODO: Handle nonce directly instead of this.
-		if (balance) {
-			await setBalance(relayChainApi, account, balance)
+			// Allow time for the TX to complete, avoiding nonce issues.
+			// TODO: Handle nonce directly instead of this.
+			if (balance) {
+				await setBalance(relayChainApi, account, balance)
+			}
 		}
 	}
 }
+
+// log unhandledRejection
+process.on('unhandledRejection', error => {
+	console.log('unhandledRejection', error.message, error);
+	console.trace(error);
+});
 
 // Kill all processes when exiting.
 process.on('exit', function () {
