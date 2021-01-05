@@ -3,6 +3,11 @@
 
 ## Install
 
+```
+yarn global add polkadot-launch
+```
+
+Or, if you use `npm`:
 ```bash
 npm i polkadot-launch -g
 ```

@@ -88,4 +88,12 @@ These steps can be done for you automatically by running:
 yarn start
 ```
 
+<<<<<<< HEAD
 When you have finished your changes, make a [pull request](https://github.com/shawntabrizi/polkadot-launch/pulls) to this 
+=======
+When you have finished your changes, make a [pull request](https://github.com/paritytech/polkadot-launch/pulls) to this repo.
+
+## Get Help
+
+Open an [issue](https://github.com/paritytech/polkadot-launch/issues) if you have problems or feature requests!
+>>>>>>> paritytech/master
