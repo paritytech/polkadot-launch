@@ -3,6 +3,11 @@
 
 ## Install
 
+```
+yarn global add polkadot-launch
+```
+
+Or, if you use `npm`:
 ```bash
 npm i polkadot-launch -g
 ```
@@ -134,8 +139,8 @@ These steps can be done for you automatically by running:
 yarn start
 ```
 
-When you have finished your changes, make a [pull request](https://github.com/shawntabrizi/polkadot-launch/pulls) to this repo.
+When you have finished your changes, make a [pull request](https://github.com/paritytech/polkadot-launch/pulls) to this repo.
 
 ## Get Help
 
-Open an [issue](https://github.com/shawntabrizi/polkadot-launch/issues) if you have problems or feature requests!
+Open an [issue](https://github.com/paritytech/polkadot-launch/issues) if you have problems or feature requests!

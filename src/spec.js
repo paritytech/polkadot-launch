@@ -6,6 +6,13 @@ function nameCase(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function getAuthorityKeys(chainSpec) {
+	if (chainSpec.genesis.runtime.runtime_genesis_config) {
+		return chainSpec.genesis.runtime.runtime_genesis_config.palletSession.keys;
+	}
+	return chainSpec.genesis.runtime.palletSession.keys;
+}
+
 // Remove all existing keys from `session.keys`
 export function clearAuthorities(spec) {
 	let rawdata = fs.readFileSync(spec);
@@ -16,7 +23,10 @@ export function clearAuthorities(spec) {
 		console.error("failed to parse the chain spec");
 		process.exit(1);
 	}
-	chainSpec.genesis.runtime.runtime_genesis_config.palletSession.keys = [];
+
+	let keys = getAuthorityKeys(chainSpec)
+	keys.length = 0
+
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);
 	console.log(`Starting with a fresh authority set:`);
@@ -49,7 +59,10 @@ export async function addAuthority(spec, name) {
 
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec = JSON.parse(rawdata);
-	chainSpec.genesis.runtime.runtime_genesis_config.palletSession.keys.push(key);
+
+	let keys = getAuthorityKeys(chainSpec)
+	keys.push(key)
+
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);
 	console.log(`Added Authority ${name}`);
