@@ -6,6 +6,7 @@ function nameCase(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+// Get authority keys from within chainSpec data
 function getAuthorityKeys(chainSpec) {
 	if (chainSpec.genesis.runtime.runtime_genesis_config) {
 		return chainSpec.genesis.runtime.runtime_genesis_config.palletSession.keys;
@@ -24,8 +25,8 @@ export function clearAuthorities(spec) {
 		process.exit(1);
 	}
 
-	let keys = getAuthorityKeys(chainSpec)
-	keys.length = 0
+	let keys = getAuthorityKeys(chainSpec);
+	keys.length = 0;
 
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);
@@ -60,8 +61,8 @@ export async function addAuthority(spec, name) {
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec = JSON.parse(rawdata);
 
-	let keys = getAuthorityKeys(chainSpec)
-	keys.push(key)
+	let keys = getAuthorityKeys(chainSpec);
+	keys.push(key);
 
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);
