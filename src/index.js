@@ -73,6 +73,7 @@ async function main() {
 
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
+		console.log('parachain')
 		const { id, wsPort, balance, port, rpcPort, flags, chain } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
@@ -97,8 +98,11 @@ async function main() {
 				console.error(err)
 				process.exit(1)
 			}
-
-			await registerParachain(relayChainApi, id, genesisWasm, genesisState);
+			try{
+				await registerParachain(relayChainApi, id, genesisWasm, genesisState);
+			} catch(e){
+				console.log('error during registtr',e)
+			}
 
 			registeredParachains[id]=true
 
