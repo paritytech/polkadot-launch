@@ -75,7 +75,7 @@ async function main() {
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
 		console.log('launching parachain ...')
-		const { id, wsPort, balance, port, rpcPort, flags, chain } = parachain;
+		const { id, wsPort, balance, port, flags, chain } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);

@@ -27,6 +27,7 @@ const config = require("../config_moonbeam_antoine.json");
 
 //simple test sequence that checks balances and sends one and then 10 transactions
 describe("Multi Node transfer Test", async () => {
+  
   let clientList: Web3[];
   let accounts: string[];
   // set a value for the transfers
@@ -44,6 +45,7 @@ describe("Multi Node transfer Test", async () => {
           "connecting new web3 instance to wsport:" + parachain.wsPort
         );
         return new Web3(`ws://127.0.0.1:${parachain.wsPort}`);
+        //return new Web3(`http://127.0.0.1:${parachain.rpcPort}`);
       });
 
       // listen for block updates
@@ -83,7 +85,9 @@ describe("Multi Node transfer Test", async () => {
       console.log("money ditributed to other nodes");
     }
   );
-  it("Sends paralle transfers to node 0 from all the other nodes", async () => {
+  it("Sends parallel transfers to node 0 from all the other nodes", async () => {
+    //@ts-ignore
+    //this.timeout(0)
     // get the nonces of each node
     const nonces: number[] = await Promise.all(
       config.parachains.map(async (_, i) => {
@@ -179,5 +183,5 @@ describe("Multi Node transfer Test", async () => {
     // log the tx for each block
     await readEveryBlock(clientList[0]);
     process.exit(0);
-  });
+  }).timeout(0);
 });

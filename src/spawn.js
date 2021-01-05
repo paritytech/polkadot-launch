@@ -66,6 +66,7 @@ export async function generateChainSpecRaw(bin, chain) {
 // `name` must be `alice`, `bob`, `charlie`, etc... (hardcoded in Substrate).
 export function startNode(bin, name, wsPort, port, spec, flags) {
 	// TODO: Make DB directory configurable rather than just `tmp`
+	console.log('chain',spec)
 	let args = [
 		"--chain=" + spec,
 		"--tmp",
@@ -129,11 +130,10 @@ export async function exportGenesisState(bin, id, chain) {
 }
 
 // Start a collator node for a parachain.
-export function startCollator(bin, id, wsPort, port, rpcPort, chain, spec, flags) {
+export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
 	// TODO: Make DB directory configurable rather than just `tmp`
 	let args = [
 		"--tmp",
-		"--rpc-port=" + rpcPort,
 		"--ws-port=" + wsPort,
 		"--port=" + port,
 		"--parachain-id=" + id,
