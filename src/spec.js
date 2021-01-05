@@ -16,7 +16,9 @@ export function clearAuthorities(spec) {
 		console.error("failed to parse the chain spec");
 		process.exit(1);
 	}
-	chainSpec.genesis.runtime.palletSession.keys = [];
+	console.log("ha",Object.keys(chainSpec.genesis.runtime),Object.keys(chainSpec.genesis.runtime.runtime_genesis_config))
+	//console.log('ho',chainSpec.genesis.runtime.runtime_genesis_config)
+	chainSpec.genesis.runtime.runtime_genesis_config.palletSession.keys = [];
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);
 	console.log(`Starting with a fresh authority set:`);
@@ -49,7 +51,7 @@ export async function addAuthority(spec, name) {
 
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec = JSON.parse(rawdata);
-	chainSpec.genesis.runtime.palletSession.keys.push(key);
+	chainSpec.genesis.runtime.runtime_genesis_config.palletSession.keys.push(key);
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);
 	console.log(`Added Authority ${name}`);

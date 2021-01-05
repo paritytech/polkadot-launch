@@ -6,13 +6,21 @@
   "license": "MIT",
   "scripts": {
     "build": "babel src -d dist",
-    "start": "yarn build && node dist/index.js"
+    "start": "yarn build && node dist/index.js",
+    "test-only": "mocha -r ts-node/register 'tests/**/*.ts'",
+    "test": "yarn start config_moonbeam_antoine.json & sleep 5 &&yarn run test-only"
   },
   "dependencies": {
     "@polkadot/api": "^3.0.1",
     "@polkadot/util": "^5.0.1",
     "@polkadot/util-crypto": "^5.0.1",
+    "@types/chai": "^4.2.14",
+    "@types/mocha": "^8.2.0",
+    "chai": "^4.2.0",
     "filter-console": "^0.1.1",
+    "mocha": "^8.2.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.3",
     "web3": "^1.3.0",
     "yargs": "^15.4.1"
   },

@@ -27,7 +27,7 @@ export async function connect(port, types) {
 	} catch(e){
 		console.log('error during api is ready',e)
 	}
-	console.log('isready')
+	console.log('api is ready')
 	return api;
 }
 
