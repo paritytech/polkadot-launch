@@ -8,7 +8,7 @@
     "build": "babel src -d dist",
     "start": "yarn build && node dist/index.js",
     "test-only": "mocha -r ts-node/register 'tests/**/*.ts'",
-    "test": "yarn start config_moonbeam_antoine.json & sleep 5 &&yarn run test-only"
+    "test": "yarn start config_moonbeam_antoine.json & sleep 20 &&yarn run test-only"
   },
   "dependencies": {
     "@polkadot/api": "^3.0.1",

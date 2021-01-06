@@ -156,8 +156,11 @@ async function main() {
 
 // log unhandledRejection
 process.on('unhandledRejection', error => {
-	console.log('unhandledRejection', error.message, error);
-	console.trace(error);
+	if (error.message){
+		console.trace(error);
+	}else {
+		console.log('unhandledRejection: error thrown without a message')
+	}
 });
 
 // Kill all processes when exiting.

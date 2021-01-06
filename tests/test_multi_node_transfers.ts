@@ -5,23 +5,24 @@ import { parallelSend } from "../scripts_moonbeam/testUtils";
 import { readEveryBlock } from "../scripts_moonbeam/testUtils/testChecks";
 import { listenForBlocks } from "../scripts_moonbeam/testUtils/watchBlock";
 import {
-  sendTxSync,
+  //sendTxSync,
   sendTxWrapped,
 } from "../scripts_moonbeam/testUtils/web3Calls";
 
 export const GENESIS_ACCOUNT = "0x6be02d1d3665660d22ff9624b7be0551ee1ac91b";
-const GENESIS_ACCOUNT_BALANCE = "1152921504606846976";
+//const GENESIS_ACCOUNT_BALANCE = "1152921504606846976";
 const GENESIS_ACCOUNT_PRIVATE_KEY =
   "0x99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E342";
 const TEST_ACCOUNT = "0x1111111111111111111111111111111111111111";
 const TRANSFER_VALUE = "0x2000";
 const INITIAL_NODE_BALANCE = "0x200000000";
 
-const { argv } = require("yargs");
-const NUMBER_TX: number = argv._[0] ? Number(argv._[0]) : 2;
-if (!argv._[0]) {
-  console.error("Missing tx number argument... tx number set to 2");
-}
+//const { argv } = require("yargs");
+const NUMBER_TX: number = 10
+// argv._ &&argv._[0] ? Number(argv._[0]) : 2;
+// if (!argv._ ||!argv._[0]) {
+//   console.error("Missing tx number argument... tx number set to 2");
+// }
 
 const config = require("../config_moonbeam_antoine.json");
 
@@ -38,14 +39,14 @@ describe("Multi Node transfer Test", async () => {
 
   before(
     "Connect a web3 instance to each collator node, fund each with one account",
-    async () => {
+    async function () {
+      this.timeout(0)
       // instantiate apis
       clientList = config.parachains.map((parachain) => {
         console.log(
           "connecting new web3 instance to wsport:" + parachain.wsPort
         );
         return new Web3(`ws://127.0.0.1:${parachain.wsPort}`);
-        //return new Web3(`http://127.0.0.1:${parachain.rpcPort}`);
       });
 
       // listen for block updates
@@ -85,17 +86,18 @@ describe("Multi Node transfer Test", async () => {
       console.log("money ditributed to other nodes");
     }
   );
-  it("Sends parallel transfers to node 0 from all the other nodes", async () => {
-    //@ts-ignore
-    //this.timeout(0)
+  it("Sends "+NUMBER_TX+" parallel transfers to node 0 from all the other nodes", async function()  {
+    this.timeout(0) //TODO add time limits
     // get the nonces of each node
     const nonces: number[] = await Promise.all(
       config.parachains.map(async (_, i) => {
         return clientList[i].eth.getTransactionCount(accounts[i]);
       })
     );
-    //check initial balance for comparaison
+    //check initial balance and block for comparaison
     const initialBalance = await clientList[0].eth.getBalance(TEST_ACCOUNT);
+    let initialBlockNumber = (await clientList[0].eth.getBlock("latest"))
+    .number;
 
     //have all nodes send their transfers in parallel
     config.parachains.forEach((_, i) => {
@@ -136,8 +138,7 @@ describe("Multi Node transfer Test", async () => {
     }
 
     // Check balances until test account has reached target balance
-    let initialBlockNumber = (await clientList[0].eth.getBlock("latest"))
-      .number;
+    
     let balance = 0;
     while (
       balance <
@@ -152,19 +153,19 @@ describe("Multi Node transfer Test", async () => {
       });
     }
     //check one last time?
-    console.log(
-      "balance",
-      balance,
-      "target",
-      Number(initialBalance) +
-        NUMBER_TX * hexToNumber(value) * config.parachains.length
-    );
-    await new Promise<number>((resolve, reject) => {
-      setTimeout(async () => {
-        balance = await checkBalanceSync(clientList[0]);
-        resolve(balance);
-      }, 6000);
-    });
+    // console.log(
+    //   "balance",
+    //   balance,
+    //   "target",
+    //   Number(initialBalance) +
+    //     NUMBER_TX * hexToNumber(value) * config.parachains.length
+    // );
+    // await new Promise<number>((resolve, reject) => {
+    //   setTimeout(async () => {
+    //     balance = await checkBalanceSync(clientList[0]);
+    //     resolve(balance);
+    //   }, 6000);
+    // });
 
     // log end of test information
     console.log(
@@ -181,7 +182,11 @@ describe("Multi Node transfer Test", async () => {
       " tx"
     );
     // log the tx for each block
-    await readEveryBlock(clientList[0]);
+    let nbTx:number=await readEveryBlock(clientList[0],initialBlockNumber);
+    expect (nbTx).to.eq(config.parachains.length - 1 + NUMBER_TX * config.parachains.length)
+    //process.exit(0);
+  });
+  after('close all subscriptions',()=>{
     process.exit(0);
-  }).timeout(0);
+  })
 });

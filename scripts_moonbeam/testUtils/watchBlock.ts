@@ -47,6 +47,7 @@ export async function listenForBlocks(web3: Web3) {
     console.log("exit");
   });
 
+
   // Handle ctrl+c to trigger `exit`.
   process.on("SIGINT", async function () {
     console.log("SIGINT");
