@@ -98,7 +98,7 @@ export async function exportGenesisWasm(bin, chain) {
 
 	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
 	// advance. Hopefully, this generous limit will be enough.
-	let opts = { maxBuffer: 5 * 1024 * 1024 }
+	let opts = { maxBuffer: 10 * 1024 * 1024 }
 	let { stdout, stderr } = await execFile(bin, args, opts)
 	if (stderr) {
 		console.error(stderr)
