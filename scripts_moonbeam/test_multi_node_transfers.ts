@@ -1,5 +1,6 @@
 import { assert, hexToNumber } from "@polkadot/util";
 import Web3 from "web3";
+import { start } from "../src";
 import { readEveryBlock } from "./testUtils/testChecks";
 import { listenForBlocks } from "./testUtils/watchBlock";
 import { sendTxSync, sendTxWrapped } from "./testUtils/web3Calls";
@@ -20,6 +21,7 @@ const config = require("../config_moonbeam_antoine.json");
 
 //simple test sequence that checks balances and sends one and then 10 transactions
 async function main() {
+  await start()
   // instantiate apis
   const clientList: Web3[] = config.parachains.map((parachain) => {
     console.log('connecting new web3 instance to wsport:'+parachain.wsPort)
@@ -149,7 +151,7 @@ async function main() {
     initialBlockNumber
   );
   console.log('Should contain ',config.parachains.length-1+NUMBER_TX*(config.parachains.length),' tx')
-  await readEveryBlock(clientList[0])
+  await readEveryBlock(clientList[0],initialBlockNumber)
   process.exit(0);
 }
 

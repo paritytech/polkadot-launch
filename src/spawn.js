@@ -4,7 +4,7 @@ const p = {};
 
 const util = require('util');
 const execFile = util.promisify(require('child_process').execFile);
-const { spawn } = require("child_process");
+const { spawn, exec } = require("child_process");
 const fs = require('fs');
 
 // Output the chainspec of a node.
@@ -131,6 +131,7 @@ export async function exportGenesisState(bin, id, chain) {
 
 // Start a collator node for a parachain.
 export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
+	console.log('COLLATOR BIN',bin)
 	// TODO: Make DB directory configurable rather than just `tmp`
 	let args = [
 		"--tmp",
@@ -230,6 +231,46 @@ export function purgeChain(bin, spec) {
 	p['purge'].stderr.on('data', function (chunk) {
 		let message = chunk.toString();
 		console.log(message);
+	});
+}
+
+export function startTests(){
+	console.log('START TEST SEQUENCE')
+	// let args = [
+	// 	"--tmp",
+	// 	"--parachain-id=" + id,
+	// 	"--port=" + port,
+	// 	"--chain=" + spec,
+	// 	"--execution=wasm"
+	// ];
+
+	// p['tests'] = exec("./test-only.sh", (error, stdout, stderr) => {
+	// 	if (error) {
+	// 		console.log(`error: ${error.message}`);
+	// 		return;
+	// 	}
+	// 	if (stderr) {
+	// 		console.log(`stderr: ${stderr}`);
+	// 		return;
+	// 	}
+	// 	console.log(`stdout: ${stdout}`);
+	// });
+	
+	p['tests'] = spawn('./test-only.sh',[]);
+
+	let log = fs.createWriteStream(`tests.log`)
+
+	p['tests'].stdout.on('data', function (chunk) {
+		let message = chunk.toString();
+		console.log("1"+message.substring(0,message.length-1)+"2")
+		log.write(message);
+	});
+
+	p['tests'].stderr.on('data', function (chunk) {
+		let message = chunk.toString();
+		console.log('ERROR',message)
+		log.write(message);
+		throw new Error(message)
 	});
 }
 

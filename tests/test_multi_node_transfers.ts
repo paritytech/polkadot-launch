@@ -1,13 +1,14 @@
 import { assert, hexToNumber } from "@polkadot/util";
 import { expect } from "chai";
 import Web3 from "web3";
-import { parallelSend } from "../scripts_moonbeam/testUtils";
+import { parallelSend, startNodes } from "../scripts_moonbeam/testUtils";
 import { readEveryBlock } from "../scripts_moonbeam/testUtils/testChecks";
 import { listenForBlocks } from "../scripts_moonbeam/testUtils/watchBlock";
 import {
   //sendTxSync,
   sendTxWrapped,
 } from "../scripts_moonbeam/testUtils/web3Calls";
+import {start} from '../src/index.js'
 
 export const GENESIS_ACCOUNT = "0x6be02d1d3665660d22ff9624b7be0551ee1ac91b";
 //const GENESIS_ACCOUNT_BALANCE = "1152921504606846976";
@@ -40,7 +41,15 @@ describe("Multi Node transfer Test", async () => {
   before(
     "Connect a web3 instance to each collator node, fund each with one account",
     async function () {
+      console.log('start')
       this.timeout(0)
+      //
+      // try {
+      //   await startNodes()
+      // } catch(e){
+      //   console.log('error starting nodes',e)
+      // }
+      // console.log('GREAT SUCCESS')
       // instantiate apis
       clientList = config.parachains.map((parachain) => {
         console.log(
@@ -88,6 +97,7 @@ describe("Multi Node transfer Test", async () => {
   );
   it("Sends "+NUMBER_TX+" parallel transfers to node 0 from all the other nodes", async function()  {
     this.timeout(0) //TODO add time limits
+    //expect(false).to.be.true
     // get the nonces of each node
     const nonces: number[] = await Promise.all(
       config.parachains.map(async (_, i) => {
@@ -187,6 +197,7 @@ describe("Multi Node transfer Test", async () => {
     //process.exit(0);
   });
   after('close all subscriptions',()=>{
+    //process.kill(process.pid, 'SIGINT');
     process.exit(0);
   })
 });

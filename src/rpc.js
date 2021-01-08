@@ -55,7 +55,7 @@ export async function getHeader(api) {
 
 // Submit an extrinsic to the relay chain to register a parachain.
 // Uses the Alice account which is known to be Sudo for the relay chain.
-export async function registerParachain(api, id, wasm, header) {
+export async function registerParachain(api, id, wasm, header,cb) {
 	await cryptoWaitReady();
 
 	const keyring = new Keyring({ type: 'sr25519' });
@@ -74,19 +74,22 @@ export async function registerParachain(api, id, wasm, header) {
 			api.tx.parasSudoWrapper.sudoScheduleParaInitialize(id, genesis)
 		)
 		.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
-			console.log(`Current status is ${result.status}`);
+			console.log(`Current registration status is ${result.status}`);
 			if (result.status.isInBlock) {
 				console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
 			} else if (result.status.isFinalized) {
 				console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
 				unsub();
+				cb()
 			}
 		});
+		console.log('REGISTRATION DONE')
 	nonce += 1;
 }
 
 // Set the balance of an account on the relay chain.
-export async function setBalance(api, who, value) {
+export async function setBalance(api, who, value,cb) {
+	console.log('SETBALANCE')
 	await cryptoWaitReady();
 
 	const keyring = new Keyring({ type: 'sr25519' });
@@ -97,18 +100,23 @@ export async function setBalance(api, who, value) {
 	}
 
 	console.log(`--- Submitting extrinsic to set balance of ${who} to ${value}. (nonce: ${nonce}) ---`)
-	const unsub = await api.tx.sudo
+	//await new Promise(async(resolve,reject)=>{
+		const unsub = await api.tx.sudo
 		.sudo(
 			api.tx.balances.setBalance(who, value, 0)
 		)
 		.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
-			console.log(`Current status is ${result.status}`);
+			console.log(`Current setBalance status is ${result.status}`);
 			if (result.status.isInBlock) {
 				console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
 			} else if (result.status.isFinalized) {
 				console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
 				unsub();
+				cb()
+				//resolve()
 			}
 		});
+	//})
 	nonce += 1;
+	console.log('setbalance finished')
 }
