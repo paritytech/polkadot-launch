@@ -1,4 +1,4 @@
-import { assert, hexToNumber } from "@polkadot/util";
+import { hexToNumber } from "@polkadot/util";
 import { expect } from "chai";
 import Web3 from "web3";
 import { parallelSend, startNodes } from "../scripts_moonbeam/testUtils";
@@ -27,8 +27,8 @@ const NUMBER_TX: number = 10
 
 const config = require("../config_moonbeam_antoine.json");
 
-//simple test sequence that checks balances and sends one and then 10 transactions
-describe("Multi Node transfer Test", async () => {
+
+describe("Multi Node transfer Test", async function () {
   
   let clientList: Web3[];
   let accounts: string[];
@@ -42,14 +42,27 @@ describe("Multi Node transfer Test", async () => {
     "Connect a web3 instance to each collator node, fund each with one account",
     async function () {
       console.log('start')
-      this.timeout(0)
-      //
-      // try {
-      //   await startNodes()
-      // } catch(e){
-      //   console.log('error starting nodes',e)
-      // }
-      // console.log('GREAT SUCCESS')
+      this.timeout(120000)
+      //this.enableTimeouts(false)
+      
+      try {
+        await startNodes()
+      } catch(e){
+        console.log('error starting nodes',e)
+      }
+      console.log(2)
+      // await new Promise<number>((resolved,reject)=>{  
+      //   console.log(3)  
+      //   try{
+      //     setTimeout(function(){
+      //       console.log(4)
+      //       resolved(1)
+      //     },30000)
+      //   } catch(e){
+      //     console.log('he',e)
+      //   }
+      // })
+      console.log('GREAT SUCCESS')
       // instantiate apis
       clientList = config.parachains.map((parachain) => {
         console.log(
@@ -86,11 +99,11 @@ describe("Multi Node transfer Test", async () => {
           gasPrice: "0x01",
           gas: "0x100000",
         });
-        assert(
+        expect(
           Number(await clientList[0].eth.getBalance(accounts[i])) ===
             hexToNumber(initialNodeBalance),
           "balance for node not correctly set"
-        );
+        ).to.be.true;
       }
       console.log("money ditributed to other nodes");
     }
