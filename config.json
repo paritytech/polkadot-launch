@@ -67,9 +67,10 @@
 		"CandidateDescriptor": {
 			"para_id": "u32",
 			"relay_parent": "Hash",
-			"collator_id": "Hash",
+			"collator": "Hash",
 			"persisted_validation_data_hash": "Hash",
 			"pov_hash": "Hash",
+			"erasure_root": "Hash",
 			"signature": "Signature"
 		},
 		"CandidateReceipt": {
