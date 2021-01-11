@@ -146,16 +146,26 @@ async function main() {
 		}
 	}
 
-	// wait here until the next session. Currently it's configured to be 5 blocks
-	// with 6 seconds per block. We wait for 2 sessions just in case.
-	let secsToSleep = 2 * 5 * 6
-	console.log(`sleeping for ${secsToSleep} seconds`)
-	await sleep(secsToSleep * 1000)
-
 	for (const hrmpChannel of config.hrmpChannels) {
+		await ensureOnboarded(relayChainApi, hrmpChannel.sender)
+		await ensureOnboarded(relayChainApi, hrmpChannel.recipient)
+
 		const { sender, recipient, maxCapacity, maxMessageSize } = hrmpChannel
 		await establishHrmpChannel(relayChainApi, sender, recipient, maxCapacity, maxMessageSize)
 	}
+}
+
+async function ensureOnboarded(relayChainApi, paraId) {
+	return new Promise(async function (resolve) {
+		// We subscribe to the heads as a simple way to tell that the chain onboarded.
+		let unsub = await relayChainApi.query.paras.heads(paraId, (response) => {
+			if (response.isSome) {
+				// Surprisingly, this ouroboros like subscription pattern seem to work.
+				unsub()
+				resolve()
+			}
+		});
+	})
 }
 
 // Kill all processes when exiting.
