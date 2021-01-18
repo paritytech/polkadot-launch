@@ -3,13 +3,16 @@
 
 ## Install
 
-```
-yarn global add polkadot-launch
-```
+This tool currently isn't being published on NPM, so you can install it using the steps below.
 
-Or, if you use `npm`:
 ```bash
-npm i polkadot-launch -g
+git clone https://github.com/paritytech/polkadot-launch
+cd polkadot-launch
+
+yarn install
+yarn build
+
+yarn global add file:$(pwd)
 ```
 
 ## Use
@@ -87,10 +90,7 @@ with your runtime.
 
 ```json
 "types": {
-	"HrmpChannelId": {
-		"sender": "u32",
-		"receiver": "u32"
-	}
+  "Foo": "H256",
 }
 ```
 
