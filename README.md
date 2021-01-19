@@ -80,6 +80,23 @@ of configuration values:
 * `port`: The TCP port for this node.
 * `balance`: (Optional) Configure a starting amount of balance on the relay chain for this chain's account ID.
 
+#### `hrmpChannels`
+
+Open HRMP channels between the specified parachains so that it's possible to send messages between
+those. Keep in mind that an HRMP channel is unidirectional and in case you need to communicate both
+ways you need to open channels in both directions.
+
+```json
+"htmpChannels": [
+	{
+		"sender": "200",
+		"recipient": "300",
+		"maxCapacity": 8,
+		"maxMessageSize": 512
+	}
+]
+```
+
 #### `types`
 
 These are the Polkadot JS types you might need to include so that Polkadot JS will be able to interface properly

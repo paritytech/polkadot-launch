@@ -4,7 +4,7 @@ import {
 	startNode, startCollator, killAll, generateChainSpec, generateChainSpecRaw, exportGenesisWasm,
 	exportGenesisState, startSimpleCollator,
 } from './spawn';
-import { connect, registerParachain, setBalance } from './rpc';
+import { connect, registerParachain, setBalance, establishHrmpChannel } from './rpc';
 import { checkConfig } from './check';
 import { clearAuthorities, addAuthority } from './spec';
 import { parachainAccount } from './parachain';
@@ -145,6 +145,27 @@ async function main() {
 			await setBalance(relayChainApi, account, balance)
 		}
 	}
+
+	for (const hrmpChannel of config.hrmpChannels) {
+		await ensureOnboarded(relayChainApi, hrmpChannel.sender)
+		await ensureOnboarded(relayChainApi, hrmpChannel.recipient)
+
+		const { sender, recipient, maxCapacity, maxMessageSize } = hrmpChannel
+		await establishHrmpChannel(relayChainApi, sender, recipient, maxCapacity, maxMessageSize)
+	}
+}
+
+async function ensureOnboarded(relayChainApi, paraId) {
+	return new Promise(async function (resolve) {
+		// We subscribe to the heads as a simple way to tell that the chain onboarded.
+		let unsub = await relayChainApi.query.paras.heads(paraId, (response) => {
+			if (response.isSome) {
+				// Surprisingly, this ouroboros like subscription pattern seem to work.
+				unsub()
+				resolve()
+			}
+		});
+	})
 }
 
 // Kill all processes when exiting.
