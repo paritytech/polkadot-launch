@@ -9,7 +9,7 @@
     "start": "yarn build && node dist/index.js"
   },
   "dependencies": {
-    "@polkadot/api": "^3.0.1",
+    "@polkadot/api": "3.5.2-7",
     "@polkadot/util": "^5.0.1",
     "@polkadot/util-crypto": "^5.0.1",
     "filter-console": "^0.1.1",
