@@ -311,6 +311,16 @@
 			"msg_count": "u32",
 			"total_size": "u32",
 			"mqc_head": "Option<Hash>"
+		},
+		"Address": "MultiAddress",
+		"LookupSource": "MultiAddress",
+		"PerDispatchClass": {
+			"normal": "u32",
+			"operational": "u32",
+			"mandatory": "u32"
+		},
+		"BlockLength": {
+			"max": "PerDispatchClass"
 		}
 	}
 }
