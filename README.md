@@ -28,7 +28,7 @@ cargo build --release
 ```
 
 #### Build Relaychain
-First, in the moonbeam repo, look in the cargo.lock file to get the sha of the commit of the used polkadot version (ctrl+f `https://github.com/paritytech/polkadot?branch=master#`), or run any of the relay related scripts to see that sha logged.
+First, in the moonbeam repo, look in the cargo.lock file to get the sha of the commit of the used polkadot version (ctrl+f `https://github.com/paritytech/polkadot`), or run any of the relay related scripts to see that sha logged.
 
 Then, in the polkadot repo, run:
 ```

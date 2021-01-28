@@ -114,9 +114,8 @@ export async function start() {
 					process.exit(1)
 				}
 				try{
-					await registerParachain(relayChainApi, id, genesisWasm, genesisState,()=>{
-						checkFinality('isRegistered')
-					});
+					await registerParachain(relayChainApi, id, genesisWasm, genesisState);
+					checkFinality('isRegistered')
 				} catch(e){
 					console.log('error during registtr',e)
 				}

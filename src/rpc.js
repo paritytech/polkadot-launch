@@ -55,36 +55,42 @@ export async function getHeader(api) {
 
 // Submit an extrinsic to the relay chain to register a parachain.
 // Uses the Alice account which is known to be Sudo for the relay chain.
-export async function registerParachain(api, id, wasm, header,cb) {
-	await cryptoWaitReady();
+export async function registerParachain(api, id, wasm, header) {
+	await new Promise(async(resolvePromise,reject)=>{
+		await cryptoWaitReady();
 
-	const keyring = new Keyring({ type: 'sr25519' });
-	const alice = keyring.addFromUri('//Alice');
+		const keyring = new Keyring({ type: 'sr25519' });
+		const alice = keyring.addFromUri('//Alice');
 
-	let paraGenesisArgs = {
-		genesis_head: header,
-		validation_code: wasm,
-		parachain: true,
-	};
-	let genesis = api.createType("ParaGenesisArgs", paraGenesisArgs);
-
-	console.log(`--- Submitting extrinsic to register parachain ${id}. (nonce: ${nonce}) ---`)
-	const unsub = await api.tx.sudo
-		.sudo(
-			api.tx.parasSudoWrapper.sudoScheduleParaInitialize(id, genesis)
-		)
-		.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
-			console.log(`Current registration status is ${result.status}`);
-			if (result.status.isInBlock) {
-				console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
-			} else if (result.status.isFinalized) {
-				console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
-				unsub();
-				cb()
-			}
-		});
-		console.log('REGISTRATION DONE')
-	nonce += 1;
+		let paraGenesisArgs = {
+			genesis_head: header,
+			validation_code: wasm,
+			parachain: true,
+		};
+		let genesis = api.createType("ParaGenesisArgs", paraGenesisArgs);
+		nonce =Number((await api.query.system.account(alice.address)).nonce)+1;
+		console.log('NONCE',Number((await api.query.system.account(alice.address)).nonce))
+		console.log(`--- Submitting extrinsic to register parachain ${id}. (nonce: ${nonce}) ---`)
+		const unsub = await api.tx.sudo
+			.sudo(
+				api.tx.parasSudoWrapper.sudoScheduleParaInitialize(id, genesis)
+			)
+			.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
+				console.log(`Current registration status is ${result.status}`);
+				if (result.status.isInBlock) {
+					console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
+				} else if (result.status.isFinalized) {
+					console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
+					unsub();
+					console.log('REGISTRATION DONE')
+					resolvePromise()
+					//cb()
+				}
+			});
+		// nonce += 1;
+		// console.log('nonce after inc',nonce)
+		//resolvePromise()
+	})
 }
 
 // Set the balance of an account on the relay chain.
@@ -95,10 +101,13 @@ export async function setBalance(api, who, value,cb) {
 	const keyring = new Keyring({ type: 'sr25519' });
 	const alice = keyring.addFromUri('//Alice');
 
-	if (!nonce) {
-		nonce = (await api.query.system.account(alice.address)).nonce;
-	}
+	// if (!nonce) {
+	// 	console.log('ha')
+	// 	nonce = (await api.query.system.account(alice.address)).nonce;
+	// }
+	nonce =Number((await api.query.system.account(alice.address)).nonce)+1;
 
+	console.log('NONCE',Number((await api.query.system.account(alice.address)).nonce))
 	console.log(`--- Submitting extrinsic to set balance of ${who} to ${value}. (nonce: ${nonce}) ---`)
 	//await new Promise(async(resolve,reject)=>{
 		const unsub = await api.tx.sudo
@@ -117,6 +126,7 @@ export async function setBalance(api, who, value,cb) {
 			}
 		});
 	//})
-	nonce += 1;
+	// nonce += 1;
+	// console.log('nonce after inc',nonce)
 	console.log('setbalance finished')
 }
