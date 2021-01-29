@@ -2,18 +2,6 @@ import Web3 from "web3";
 import { Subscription } from "web3-core-subscriptions";
 import { BlockHeader } from "web3-eth";
 
-// function subscribe(web3:Web3,eventName:string):Subscription<string> {
-//   //return new Promise<Subscription>((resolve, reject) => {
-//     return web3.eth
-//     .subscribe(eventName)
-//     .on("data", function (transaction) {
-//       console.log(eventName, transaction);
-//     })
-//     .on("error", function (error) {
-//       console.log("sub error", error);
-//     });
-//   //});
-// }
 
 export async function listenForBlocks(web3: Web3) {
   //@ts-ignore
@@ -34,9 +22,7 @@ export async function listenForBlocks(web3: Web3) {
     .on("data", async function (blockHeader) {
       console.log(
         "+++++++++++++++++++++++++++++++++++++++++++++ New Block ++++++++++++++++++++++++=",
-        blockHeader.number,
-        // " ++ Number of tx : ",
-        // blockHeader
+        blockHeader.number
       );
         console.log('getBlock says',(await web3.eth.getBlock('latest')).number)
     });

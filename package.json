@@ -11,9 +11,9 @@
     "test": "./test.sh"
   },
   "dependencies": {
-    "@polkadot/api": "^3.0.1",
-    "@polkadot/util": "^5.0.1",
-    "@polkadot/util-crypto": "^5.0.1",
+    "@polkadot/api": "^3.6.4",
+    "@polkadot/util": "^5.4.4",
+    "@polkadot/util-crypto": "^5.4.4",
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.2.0",
     "chai": "^4.2.0",

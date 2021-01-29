@@ -42,25 +42,14 @@ describe("Multi Node transfer Test", async function () {
     "Connect a web3 instance to each collator node, fund each with one account",
     async function () {
       console.log('start')
-      this.timeout(120000)
-      //this.enableTimeouts(false)
+      this.timeout(0)//120000)
       
       try {
         await startNodes()
       } catch(e){
         console.log('error starting nodes',e)
       }
-      // await new Promise<number>((resolved,reject)=>{  
-      //   console.log(3)  
-      //   try{
-      //     setTimeout(function(){
-      //       console.log(4)
-      //       resolved(1)
-      //     },30000)
-      //   } catch(e){
-      //     console.log('he',e)
-      //   }
-      // })
+      
       console.log('GREAT SUCCESS, nodes ready')
       // instantiate apis
       clientList = config.parachains.map((parachain) => {
@@ -69,6 +58,8 @@ describe("Multi Node transfer Test", async function () {
         );
         return new Web3(`ws://127.0.0.1:${parachain.wsPort}`);
       });
+
+      //TODO add check on each client, or not...
 
       // listen for block updates
       listenForBlocks(clientList[0]);
@@ -108,15 +99,20 @@ describe("Multi Node transfer Test", async function () {
     }
   );
   it("Sends "+NUMBER_TX+" parallel transfers to node 0 from all the other nodes", async function()  {
+    this.timeout(0) //TODO add time limits
     console.log(3)
-    //this.timeout(0) //TODO add time limits
     //expect(false).to.be.true
     // get the nonces of each node
-    const nonces: number[] = await Promise.all(
-      config.parachains.map(async (_, i) => {
-        return clientList[i].eth.getTransactionCount(accounts[i]);
-      })
-    );
+    let nonces: number[]
+    try {
+       nonces= await Promise.all(
+        config.parachains.map(async (_, i) => {
+          return clientList[i].eth.getTransactionCount(accounts[i]);
+        })
+      );
+    } catch(e){
+      console.log('nonce error',e)
+    }
     console.log(3)
     //check initial balance and block for comparaison
     const initialBalance = await clientList[0].eth.getBalance(TEST_ACCOUNT);
@@ -136,6 +132,7 @@ describe("Multi Node transfer Test", async function () {
         TEST_ACCOUNT
       );
     });
+    console.log(4)
 
     // Function to check that all nodes hold the same balance of the test account
     async function checkBalanceSync(web3: Web3) {

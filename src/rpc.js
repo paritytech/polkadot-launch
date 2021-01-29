@@ -19,15 +19,12 @@ filterConsole([
 // TODO: Add a timeout where we know something went wrong so we don't wait forever.
 export async function connect(port, types) {
   const provider = new WsProvider("ws://127.0.0.1:" + port);
-  console.log("provider instantiated");
   const api = new ApiPromise({ provider, types });
-  console.log("new api promise");
   try {
     await api.isReady;
   } catch (e) {
     console.log("error during api is ready", e);
   }
-  console.log("api is ready");
   return api;
 }
 
@@ -70,11 +67,7 @@ export async function registerParachain(api, id, wasm, header) {
       parachain: true,
     };
     let genesis = api.createType("ParaGenesisArgs", paraGenesisArgs);
-    //nonce =Number((await api.query.system.account(alice.address)).nonce)+1;
-    console.log(
-      "NONCE",
-      Number((await api.query.system.account(alice.address)).nonce)
-    );
+    
     console.log(
       `--- Submitting extrinsic to register parachain ${id}. (nonce: ${nonce}) ---`
     );
@@ -93,12 +86,9 @@ export async function registerParachain(api, id, wasm, header) {
           unsub();
           console.log("one REGISTRATION DONE");
           resolvePromise();
-          //cb()
         }
       });
     nonce += 1;
-    // console.log('nonce after inc',nonce)
-    //resolvePromise()
   });
 }
 
@@ -112,7 +102,7 @@ export async function setBalance(api, who, value) {
     const alice = keyring.addFromUri("//Alice");
 
     if (!nonce) {
-      console.log("ha");
+      console.log("ha, no nonce");
       nonce = (await api.query.system.account(alice.address)).nonce;
     }
     //nonce =Number((await api.query.system.account(alice.address)).nonce)+1;
