@@ -34,10 +34,10 @@ export async function startNodes() {
 
   return new Promise<void>((resolve, reject) => {
     try {
-      p["tests"] = spawn("./start_nodes.sh", []);
+      p["start_nodes"] = spawn("./start_nodes.sh", []);
 
-      let log = fs.createWriteStream(`tests.log`)
-      p["tests"].stdout.on("data", function (chunk) {
+      let log = fs.createWriteStream(`start_nodes.log`)
+      p["start_nodes"].stdout.on("data", function (chunk) {
         let message = chunk.toString();
         console.log( "START NODES LOGS : ",message.substring(0, message.length - 1));
         if (message.substring(0, message.length - 1) == "ALL PARACHAINS REGISTERED") {
@@ -46,7 +46,7 @@ export async function startNodes() {
         log.write(message);
       });
 
-      p["tests"].stderr.on("data", function (chunk) {
+      p["start_nodes"].stderr.on("data", function (chunk) {
         let message = chunk.toString();
         console.log("ERROR IN START NODES", message.substring(0, message.length - 1));
         log.write(message);
@@ -61,8 +61,7 @@ export async function startNodes() {
 export function killAll() {
   console.log("\nKilling all processes... (tests)");
   for (const key of Object.keys(p)) {
-    p[key]
-    p[key].kill();
+    p[key].kill('SIGINT');
   }
 }
 
