@@ -7,8 +7,7 @@
   "scripts": {
     "build": "babel src -d dist",
     "start": "yarn build && node dist/index.js",
-    "test-only": "yarn build && mocha -r ts-node/register 'tests/**/*.ts'",
-    "test": "./test.sh"
+    "test": "yarn build && mocha -r ts-node/register 'tests/**/*.ts'"
   },
   "dependencies": {
     "@polkadot/api": "^3.6.4",
