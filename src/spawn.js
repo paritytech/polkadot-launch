@@ -138,7 +138,7 @@ export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
 		"--ws-port=" + wsPort,
 		"--port=" + port,
 		"--parachain-id=" + id,
-		"--validator",
+		"--collator",
 	];
 
 	if (chain) {
@@ -175,6 +175,7 @@ export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
 		console.log(`Added ${flags_collator} to collator`);
 	}
 
+	console.log("ARGS",args)
 	p[id] = spawn(bin, args);
 
 	let log = fs.createWriteStream(`${id}.log`)
@@ -276,7 +277,7 @@ export function startTests(){
 
 // Kill all processes spawned and tracked by this file.
 export function killAll() {
-	console.log("\nKilling all processes...")
+	console.log("\nKilling all processes... (spawn)")
 	for (const key of Object.keys(p)) {
 		p[key].kill();
 	}

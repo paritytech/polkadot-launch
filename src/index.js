@@ -88,6 +88,7 @@ export async function start() {
 			}
 		}
 		for (const parachain of config.parachains) {
+		//config.parachains.forEach(async(parachain)=>{	
 			console.log('launching parachain ...')
 			const { id, wsPort, balance, port, flags, chain } = parachain;
 			const bin = resolve(config_dir, parachain.bin);
@@ -125,9 +126,8 @@ export async function start() {
 				// Allow time for the TX to complete, avoiding nonce issues.
 				// TODO: Handle nonce directly instead of this.
 				if (balance) {
-					await setBalance(relayChainApi, account, balance,()=>{
-						checkFinality('isBalanceSet')
-					})
+					await setBalance(relayChainApi, account, balance)
+					checkFinality('isBalanceSet')
 				}
 			}
 		}
@@ -184,13 +184,13 @@ process.on('unhandledRejection', error => {
 
 // Kill all processes when exiting.
 process.on('exit', function () {
-	console.log('exit index')
+	console.log('exit index spawn')
 	killAll();
 });
 
 // Handle ctrl+c to trigger `exit`.
 process.on('SIGINT', function () {
-	console.log('SIGINT')
+	console.log('SIGINT spawn')
 	process.exit(2);
 });
 

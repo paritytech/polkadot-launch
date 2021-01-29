@@ -50,7 +50,6 @@ describe("Multi Node transfer Test", async function () {
       } catch(e){
         console.log('error starting nodes',e)
       }
-      console.log(2)
       // await new Promise<number>((resolved,reject)=>{  
       //   console.log(3)  
       //   try{
@@ -62,7 +61,7 @@ describe("Multi Node transfer Test", async function () {
       //     console.log('he',e)
       //   }
       // })
-      console.log('GREAT SUCCESS')
+      console.log('GREAT SUCCESS, nodes ready')
       // instantiate apis
       clientList = config.parachains.map((parachain) => {
         console.log(
@@ -109,7 +108,8 @@ describe("Multi Node transfer Test", async function () {
     }
   );
   it("Sends "+NUMBER_TX+" parallel transfers to node 0 from all the other nodes", async function()  {
-    this.timeout(0) //TODO add time limits
+    console.log(3)
+    //this.timeout(0) //TODO add time limits
     //expect(false).to.be.true
     // get the nonces of each node
     const nonces: number[] = await Promise.all(
@@ -117,10 +117,13 @@ describe("Multi Node transfer Test", async function () {
         return clientList[i].eth.getTransactionCount(accounts[i]);
       })
     );
+    console.log(3)
     //check initial balance and block for comparaison
     const initialBalance = await clientList[0].eth.getBalance(TEST_ACCOUNT);
+    console.log(3)
     let initialBlockNumber = (await clientList[0].eth.getBlock("latest"))
     .number;
+    console.log(3)
 
     //have all nodes send their transfers in parallel
     config.parachains.forEach((_, i) => {

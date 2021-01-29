@@ -43,8 +43,30 @@ export async function listenForBlocks(web3: Web3) {
   console.log("listening for events");
 
   // Kill all processes when exiting.
-  process.on("exit", function () {
-    console.log("exit");
+  process.on("exit", async function () {
+    console.log("exit subs");
+    await new Promise<boolean>((resolve, reject) => {
+      subscription1.unsubscribe((e, res) => {
+        if (e) {
+          console.log("error whiile clearing subscriptions", e);
+          reject(e);
+        } else {
+          console.log("subscription1 cleared");
+          resolve(res);
+        }
+      });
+    });
+    await new Promise<boolean>((resolve, reject) => {
+      subscription2.unsubscribe((e, res) => {
+        if (e) {
+          console.log("error whiile clearing subscriptions", e);
+          reject(e);
+        } else {
+          console.log("subscription2 cleared");
+          resolve(res);
+        }
+      });
+    });
   });
 
 

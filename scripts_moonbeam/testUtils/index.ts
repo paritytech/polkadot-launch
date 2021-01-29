@@ -91,7 +91,7 @@ export async function startNodes() {
 }
 // Kill all processes spawned and tracked by this file.
 export function killAll() {
-  console.log("\nKilling all processes...");
+  console.log("\nKilling all processes... (tests)");
   for (const key of Object.keys(p)) {
     p[key].kill();
   }
@@ -99,13 +99,13 @@ export function killAll() {
 
 // Kill all processes when exiting.
 process.on("exit", function () {
-  console.log("exit index");
+  console.log("exit index test");
   killAll();
 });
 
 // Handle ctrl+c to trigger `exit`.
 process.on("SIGINT", function () {
-  console.log("SIGINT");
+  console.log("SIGINT test");
   process.exit(2);
 });
 console.log("PROCESS CAUGHT");
