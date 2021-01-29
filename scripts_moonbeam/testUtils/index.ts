@@ -33,10 +33,10 @@ export async function startNodes() {
   console.log("START NODES");
 
   return new Promise<void>((resolve, reject) => {
-    p["tests"] = spawn("./start_nodes.sh", []);
-
-    let log = fs.createWriteStream(`tests.log`)
     try {
+      p["tests"] = spawn("./start_nodes.sh", []);
+
+      let log = fs.createWriteStream(`tests.log`)
       p["tests"].stdout.on("data", function (chunk) {
         let message = chunk.toString();
         console.log( "START NODES LOGS : ",message.substring(0, message.length - 1));
