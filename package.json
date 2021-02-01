@@ -1,7 +1,7 @@
 {
   "name": "polkadot-launch",
   "version": "1.0.12",
-  "main": "dist/index.js",
+  "main": "scripts_moonbeam/test_multi_node_transfers.ts",
   "author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
   "license": "MIT",
   "scripts": {
