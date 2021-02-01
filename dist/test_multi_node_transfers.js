@@ -55,6 +55,7 @@ var parachain_1 = require("../src/parachain");
 //@ts-ignore
 var rpc_1 = require("../src/rpc");
 var fs_1 = __importDefault(require("fs"));
+var path_1 = require("path");
 //const fs=require('fs')
 exports.GENESIS_ACCOUNT = "0x6be02d1d3665660d22ff9624b7be0551ee1ac91b";
 //const GENESIS_ACCOUNT_BALANCE = "1152921504606846976";
@@ -64,12 +65,6 @@ var TRANSFER_VALUE = "0x2000";
 var INITIAL_NODE_BALANCE = "0x200000000";
 //const { argv } = require("yargs");
 var NUMBER_TX = 10;
-// argv._ &&argv._[0] ? Number(argv._[0]) : 2;
-// if (!argv._ ||!argv._[0]) {
-//   console.error("Missing tx number argument... tx number set to 2");
-// }
-//const config = require("../config_moonbeam_antoine.json");
-var _a = require("path"), resolve = _a.resolve, dirname = _a.dirname;
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         // Function to check that all nodes hold the same balance of the test account
@@ -120,14 +115,14 @@ function main() {
                         console.error("Missing config file argument...");
                         process.exit();
                     }
-                    config_path = resolve(process.cwd(), config_file);
-                    config_dir = dirname(config_path);
+                    config_path = path_1.resolve(process.cwd(), config_file);
+                    config_dir = path_1.dirname(config_path);
                     if (!fs_1.default.existsSync(config_path)) {
                         console.error("Config file does not exist: ", config_path);
                         process.exit();
                     }
                     config = require(config_path);
-                    relay_chain_bin = resolve(config_dir, config.relaychain.bin);
+                    relay_chain_bin = path_1.resolve(config_dir, config.relaychain.bin);
                     if (!fs_1.default.existsSync(relay_chain_bin)) {
                         console.error("Relay chain binary does not exist: ", relay_chain_bin);
                         process.exit();
@@ -152,7 +147,7 @@ function main() {
                 case 5: return [4 /*yield*/, spawn_1.generateChainSpecRaw(relay_chain_bin, chain)];
                 case 6:
                     _j.sent();
-                    spec = resolve(chain + "-raw.json");
+                    spec = path_1.resolve(chain + "-raw.json");
                     // First we launch each of the validators for the relay chain.
                     for (_b = 0, _c = config.relaychain.nodes; _b < _c.length; _b++) {
                         node = _c[_b];
@@ -184,7 +179,7 @@ function main() {
                                         if (!(_i < _a.length)) return [3 /*break*/, 14];
                                         parachain = _a[_i];
                                         id = parachain.id, wsPort = parachain.wsPort, balance_1 = parachain.balance, port = parachain.port, flags = parachain.flags, chain_1 = parachain.chain;
-                                        bin = resolve(config_dir, parachain.bin);
+                                        bin = path_1.resolve(config_dir, parachain.bin);
                                         if (!fs_1.default.existsSync(bin)) {
                                             console.error("Parachain binary does not exist: ", bin);
                                             process.exit();

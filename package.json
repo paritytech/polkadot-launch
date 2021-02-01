@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "build": "babel src -d dist",
-    "build-ts":"tsc scripts_moonbeam/test_multi_node_transfers.ts",
+    "build-ts":"tsc",
     "start": "yarn build && node dist/index.js",
     "test": "yarn build && mocha -r ts-node/register 'tests/**/*.ts'"
   },
