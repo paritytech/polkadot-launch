@@ -1,13 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "target": "es6",
     "module": "commonjs",
-    "lib": ["es2017", "es7", "es6", "dom"],
-    "declaration": true,
-    "outDir": "dist",
-    "strict": true,
-    "esModuleInterop": true
-  },
-  "exclude": ["node_modules", "dist"],
-  "include": ["scripts_moonbeam/test_multi_node_transfers.ts"],
+    "lib": ["esnext"],
+    "allowJs": true,
+  }
 }
