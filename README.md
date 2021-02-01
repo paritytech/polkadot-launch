@@ -52,13 +52,18 @@ For moonbeam, run `yarn start config_moonbeam.json`
 
 
 ### Test
+
+#### Mocha
+Run `yarn run test`
+
+#### Scripts
 To start a test sequence, launch one of these commands on another terminal:
 
 `ts-node ./scripts_moonbeam/test_simple_transfer.ts` - for one simple transfer followed by 10 transfers
 
 `ts-node ./scripts_moonbeam/test_many_transfers.ts X` - to send X transfers at the same time from the first collator node
 
-`ts-node ./scripts_moonbeam/test_multi_node_transfers.ts X` - to send X transfers from each node at the same time
+`ts-node ./scripts_moonbeam/test_multi_node_transfers.ts X` - to send X transfers from each node at the same time (most up to date)
 
 NB: Make sure you have ts-node installed globally.
 

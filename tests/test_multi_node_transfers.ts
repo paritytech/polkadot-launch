@@ -8,7 +8,6 @@ import {
   //sendTxSync,
   sendTxWrapped,
 } from "../scripts_moonbeam/testUtils/web3Calls";
-import {start} from '../src/index.js'
 
 export const GENESIS_ACCOUNT = "0x6be02d1d3665660d22ff9624b7be0551ee1ac91b";
 //const GENESIS_ACCOUNT_BALANCE = "1152921504606846976";
