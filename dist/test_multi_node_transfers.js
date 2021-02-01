@@ -54,7 +54,8 @@ var spec_1 = require("../src/spec");
 var parachain_1 = require("../src/parachain");
 //@ts-ignore
 var rpc_1 = require("../src/rpc");
-var fs = require('fs');
+var fs_1 = __importDefault(require("fs"));
+//const fs=require('fs')
 exports.GENESIS_ACCOUNT = "0x6be02d1d3665660d22ff9624b7be0551ee1ac91b";
 //const GENESIS_ACCOUNT_BALANCE = "1152921504606846976";
 var GENESIS_ACCOUNT_PRIVATE_KEY = "0x99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E342";
@@ -121,13 +122,13 @@ function main() {
                     }
                     config_path = resolve(process.cwd(), config_file);
                     config_dir = dirname(config_path);
-                    if (!fs.existsSync(config_path)) {
+                    if (!fs_1.default.existsSync(config_path)) {
                         console.error("Config file does not exist: ", config_path);
                         process.exit();
                     }
                     config = require(config_path);
                     relay_chain_bin = resolve(config_dir, config.relaychain.bin);
-                    if (!fs.existsSync(relay_chain_bin)) {
+                    if (!fs_1.default.existsSync(relay_chain_bin)) {
                         console.error("Relay chain binary does not exist: ", relay_chain_bin);
                         process.exit();
                     }
@@ -184,7 +185,7 @@ function main() {
                                         parachain = _a[_i];
                                         id = parachain.id, wsPort = parachain.wsPort, balance_1 = parachain.balance, port = parachain.port, flags = parachain.flags, chain_1 = parachain.chain;
                                         bin = resolve(config_dir, parachain.bin);
-                                        if (!fs.existsSync(bin)) {
+                                        if (!fs_1.default.existsSync(bin)) {
                                             console.error("Parachain binary does not exist: ", bin);
                                             process.exit();
                                         }

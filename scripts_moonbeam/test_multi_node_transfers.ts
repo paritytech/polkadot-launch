@@ -24,8 +24,8 @@ import { clearAuthorities, addAuthority } from "../src/spec";
 import { parachainAccount } from "../src/parachain";
 //@ts-ignore
 import { connect, registerParachain, setBalance } from "../src/rpc";
-
-const fs=require('fs')
+import fs from 'fs'
+//const fs=require('fs')
 
 export const GENESIS_ACCOUNT = "0x6be02d1d3665660d22ff9624b7be0551ee1ac91b";
 //const GENESIS_ACCOUNT_BALANCE = "1152921504606846976";
