@@ -37,7 +37,6 @@ function sleep(ms) {
 }
 
 export async function start() {
-	//await startTests()
 	// keep track of registered parachains
 	let registeredParachains = {}
 
