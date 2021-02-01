@@ -6,5 +6,8 @@
     "module": "commonjs",
     "lib": ["esnext"],
     "allowJs": true,
-  }
+    "outDir": "dist",
+    "resolveJsonModule":true
+  },
+  "exclude": ["node_modules", "dist","src","test"]
 }

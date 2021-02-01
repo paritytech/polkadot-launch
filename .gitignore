@@ -1,4 +1,3 @@
-dist/testUtils
 node_modules
 *.wasm
 *.log

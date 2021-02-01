@@ -1,8 +1,8 @@
 {
   "name": "polkadot-launch",
   "version": "1.0.12",
-  "main": "dist/test_multi_node_transfers.js",
-  "types": "dist/test_multi_node_transfers.d.ts",
+  "main": "dist/scripts_moonbeam/test_multi_node_transfers.js",
+  "types": "dist/scripts_moonbeam/test_multi_node_transfers.d.ts",
   "author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
   "license": "MIT",
   "scripts": {
@@ -29,8 +29,8 @@
     "dist"
   ],
   "bin": {
-    "polkadot-launch": "dist/test_multi_node_transfers.js",
-    "moonbeam-launch":"dist/test_multi_node_transfers.js"
+    "polkadot-launch": "dist/scripts_moonbeam/test_multi_node_transfers.js",
+    "moonbeam-launch":"dist/scripts_moonbeam/test_multi_node_transfers.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.5",

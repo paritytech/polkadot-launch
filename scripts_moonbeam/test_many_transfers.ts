@@ -106,7 +106,7 @@ async function main() {
     initialBlockNumber
   );
   console.log('Should contain ',NUMBER_TX,' tx')
-  await readEveryBlock(web3_2)
+  await readEveryBlock(web3_2,0)
   process.exit(0);
 }
 
