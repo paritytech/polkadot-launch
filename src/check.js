@@ -35,8 +35,8 @@ export function checkConfig(config) {
 		return false
 	}
 
-	if (config.parachains.length >= config.relaychain.nodes.length) {
-		console.error("Must have more relaychain nodes than parachains.")
+	if (config.parachains.length > config.relaychain.nodes.length) {
+		console.error("Must have the same or greater number of relaychain nodes than parachains.")
 		return false
 	}
 
