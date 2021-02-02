@@ -73,7 +73,7 @@ export default async function main() {
   // 	return;
   // }
 
-  const config_file = "config_moonbeam_antoine.json"; //argv._[0] ? argv._[0] : null;
+  const config_file = "config_moonbeam.json"; //argv._[0] ? argv._[0] : null;
   if (!config_file) {
     console.error("Missing config file argument...");
     process.exit();

@@ -32,7 +32,7 @@ const NUMBER_TX = 10;
 // if (!argv._ ||!argv._[0]) {
 //   console.error("Missing tx number argument... tx number set to 2");
 // }
-const config = require("../config_moonbeam_antoine.json");
+const config = require("../config_moonbeam.json");
 describe("Multi Node transfer Test", function () {
     return __awaiter(this, void 0, void 0, function* () {
         let clientList;
