@@ -22,7 +22,6 @@ Also, you need to run `yarn` in this repo in order to install the dependancies.
 In the moonbeam repo, checkout to the desired commit of moonbeam and then run:
 
 ```
-cd ./node/parachain
 cargo build --release
 ./target/release/moonbase-alphanet --version
 ```
@@ -93,12 +92,16 @@ These steps can be done for you automatically by running:
 yarn start
 ```
 
-<<<<<<< HEAD
-When you have finished your changes, make a [pull request](https://github.com/shawntabrizi/polkadot-launch/pulls) to this 
-=======
-When you have finished your changes, make a [pull request](https://github.com/paritytech/polkadot-launch/pulls) to this repo.
+## FAQ
 
-## Get Help
 
-Open an [issue](https://github.com/paritytech/polkadot-launch/issues) if you have problems or feature requests!
->>>>>>> paritytech/master
+### Why did we have to fork polkadot launch?
+
+There are many features that are not present in the original repo:
+- typescript
+- mocha testing
+- preconfigured config for moonbeam
+- parachain (moonbeam) transaction tests (the original only tests registration tx on the relay chain)
+- specific logs and promises to use the launch part as an async function
+
+And in general I'm keeping this up to date with the latest developments on moonbeam whereas the original repo is not maintained very regularly and they don't want to implement anything moonbeam specific
