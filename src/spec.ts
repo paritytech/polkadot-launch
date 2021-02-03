@@ -7,15 +7,15 @@ function nameCase(string:string) {
 }
 
 // Get authority keys from within chainSpec data
-function getAuthorityKeys(chainSpec:any) {
-	if (chainSpec.genesis.runtime.runtime_genesis_config) {
-		return chainSpec.genesis.runtime.runtime_genesis_config.palletSession.keys;
+function getAuthorityKeys(chainSpec:ChainSpec) {
+	if (chainSpec.genesis.runtime.frameSystem) {
+		return chainSpec.genesis.runtime.frameSystem.palletSession.keys;
 	}
 	return chainSpec.genesis.runtime.palletSession.keys;
 }
 
 // Remove all existing keys from `session.keys`
-export function clearAuthorities(spec:any) {
+export function clearAuthorities(spec:string) {
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec;
 	try {
@@ -34,7 +34,7 @@ export function clearAuthorities(spec:any) {
 }
 
 // Add additional authorities to chain spec in `session.keys`
-export async function addAuthority(spec:any, name:string) {
+export async function addAuthority(spec:string, name:string) {
 	await cryptoWaitReady();
 
 	const sr_keyring = new Keyring({ type: 'sr25519' });

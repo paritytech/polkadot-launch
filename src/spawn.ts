@@ -1,5 +1,6 @@
 import {spawn, ChildProcessWithoutNullStreams,execFile as ex} from "child_process"
 import util from 'util'
+import fs from 'fs';
 
 // This tracks all the processes that we spawn from this file.
 // Used to clean up processes when exiting this program.
@@ -9,7 +10,6 @@ const p :{[key:string]:ChildProcessWithoutNullStreams}={};
 //const execFile = util.promisify(require('child_process').execFile);
 const execFile = util.promisify(ex);
 //const { spawn } = require("child_process");
-const fs = require('fs');
 
 // Output the chainspec of a node.
 export async function generateChainSpec(bin:string, chain:string) {
