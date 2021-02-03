@@ -244,7 +244,6 @@ export default async function main() {
       TEST_ACCOUNT
     );
   });
-  console.log(4);
 
   // Function to check that all nodes hold the same balance of the test account
   async function checkBalanceSync(web3: Web3) {
@@ -313,7 +312,7 @@ export default async function main() {
   //process.kill(process.pid, 'SIGINT');
   process.exit(0);
 }
-main();
+//main();
 
 // log unhandledRejection
 process.on("unhandledRejection", (error: any) => {

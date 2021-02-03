@@ -194,7 +194,6 @@ function main() {
         config.parachains.forEach((_, i) => {
             testUtils_1.parallelSend(clientList[i], nonces[i], value, NUMBER_TX, accounts[i], TEST_ACCOUNT);
         });
-        console.log(4);
         // Function to check that all nodes hold the same balance of the test account
         function checkBalanceSync(web3) {
             return __awaiter(this, void 0, void 0, function* () {
@@ -239,7 +238,7 @@ function main() {
     });
 }
 exports.default = main;
-main();
+//main();
 // log unhandledRejection
 process.on("unhandledRejection", (error) => {
     if (error.message) {
