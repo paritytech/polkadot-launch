@@ -107,7 +107,6 @@ async function main() {
 
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.
-
 			if (balance) {
 				await setBalance(relayChainApi, account, balance)
 
