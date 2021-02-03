@@ -2,12 +2,12 @@ import { Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 const fs = require('fs');
 
-function nameCase(string) {
+function nameCase(string:string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 // Get authority keys from within chainSpec data
-function getAuthorityKeys(chainSpec) {
+function getAuthorityKeys(chainSpec:any) {
 	if (chainSpec.genesis.runtime.runtime_genesis_config) {
 		return chainSpec.genesis.runtime.runtime_genesis_config.palletSession.keys;
 	}
@@ -15,7 +15,7 @@ function getAuthorityKeys(chainSpec) {
 }
 
 // Remove all existing keys from `session.keys`
-export function clearAuthorities(spec) {
+export function clearAuthorities(spec:any) {
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec;
 	try {
@@ -34,7 +34,7 @@ export function clearAuthorities(spec) {
 }
 
 // Add additional authorities to chain spec in `session.keys`
-export async function addAuthority(spec, name) {
+export async function addAuthority(spec:any, name:string) {
 	await cryptoWaitReady();
 
 	const sr_keyring = new Keyring({ type: 'sr25519' });
