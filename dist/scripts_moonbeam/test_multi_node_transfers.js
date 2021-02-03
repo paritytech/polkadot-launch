@@ -49,8 +49,11 @@ function main() {
         console.log("initial node balance is ", util_1.hexToNumber(initialNodeBalance));
         // keep track of registered parachains
         let registeredParachains = {};
-        
-        const config_file = "config_moonbeam.json"; 
+        // Verify that the `config.json` has all the expected properties.
+        // if (!checkConfig(config)) {
+        // 	return;
+        // }
+        const config_file = "config_moonbeam.json"; //argv._[0] ? argv._[0] : null;
         if (!config_file) {
             console.error("Missing config file argument...");
             process.exit();
@@ -235,7 +238,7 @@ function main() {
     });
 }
 exports.default = main;
-main();
+//main();
 // log unhandledRejection
 process.on("unhandledRejection", (error) => {
     if (error.message) {

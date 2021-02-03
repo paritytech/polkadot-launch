@@ -312,7 +312,7 @@ export default async function main() {
   //process.kill(process.pid, 'SIGINT');
   process.exit(0);
 }
-main();
+//main();
 
 // log unhandledRejection
 process.on("unhandledRejection", (error: any) => {
