@@ -110,7 +110,6 @@ async function main() {
 			if (balance) {
 				await setBalance(relayChainApi, account, balance)
 			}
-
 		}
 	}
 
