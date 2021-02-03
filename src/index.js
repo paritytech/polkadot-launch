@@ -109,7 +109,6 @@ async function main() {
 			// TODO: Handle nonce directly instead of this.
 			if (balance) {
 				await setBalance(relayChainApi, account, balance)
-
 			}
 
 		}
