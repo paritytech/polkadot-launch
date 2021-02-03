@@ -68,6 +68,9 @@ async function main() {
 		startNode(relay_chain_bin, name, wsPort, port, spec, flags);
 	}
 
+	// Wait a second for relay chan validator API endpoints to become available
+	await sleep(5000);
+
 	// Connect to the first relay chain node to submit the extrinsic.
 	let relayChainApi = await connect(config.relaychain.nodes[0].wsPort, config.types);
 
@@ -104,9 +107,12 @@ async function main() {
 
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.
+
 			if (balance) {
 				await setBalance(relayChainApi, account, balance)
+
 			}
+
 		}
 	}
 
@@ -146,7 +152,7 @@ async function main() {
 		}
 	}
 
-	for (const hrmpChannel of config.hrmpChannels) {
+	for (const hrmpChannel of (config.hrmpChannels || [])) {
 		await ensureOnboarded(relayChainApi, hrmpChannel.sender)
 		await ensureOnboarded(relayChainApi, hrmpChannel.recipient)
 
