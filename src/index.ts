@@ -156,7 +156,7 @@ async function main() {
 }
 
 async function ensureOnboarded(relayChainApi, paraId) {
-	return new Promise(async function (resolve) {
+	return new Promise<void>(async function (resolve) {
 		// We subscribe to the heads as a simple way to tell that the chain onboarded.
 		let unsub = await relayChainApi.query.paras.heads(paraId, (response) => {
 			if (response.isSome) {

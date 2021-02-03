@@ -149,7 +149,7 @@ export async function sendHrmpMessage(api, recipient, data) {
 	};
 	let message = api.createType("OutboundHrmpMessage", hrmpMessage);
 
-	console.log(`--- Sending a message ${sender}->${receiver}. (nonce: ${nonce}) ---`)
+	console.log(`--- Sending a message to ${recipient}. (nonce: ${nonce}) ---`)
 	const unsub = await api.tx.sudo
 		.sudo(
 			api.tx.messageBroker.sudoSendHrmpMessage(message)

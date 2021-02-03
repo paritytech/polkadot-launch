@@ -9,7 +9,7 @@ const fs = require('fs');
 
 // Output the chainspec of a node.
 export async function generateChainSpec(bin, chain) {
-	return new Promise(function (resolve, reject) {
+	return new Promise<void>(function (resolve, reject) {
 		let args = [
 			"build-spec",
 			"--chain=" + chain,
@@ -37,7 +37,7 @@ export async function generateChainSpec(bin, chain) {
 
 // Output the chainspec of a node using `--raw` from a JSON file.
 export async function generateChainSpecRaw(bin, chain) {
-	return new Promise(function (resolve, reject) {
+	return new Promise<void>(function (resolve, reject) {
 		let args = [
 			"build-spec",
 			"--chain=" + chain + '.json',
