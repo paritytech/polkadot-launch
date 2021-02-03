@@ -54,12 +54,12 @@ function start() {
         }
         const chain = config.relaychain.chain;
         yield spawn_1.generateChainSpec(relay_chain_bin, chain);
-        spec_1.clearAuthorities(`${chain}.json`);
+        spec_1.clearAuthorities(`specFiles/${chain}.json`);
         for (const node of config.relaychain.nodes) {
-            yield spec_1.addAuthority(`${chain}.json`, node.name);
+            yield spec_1.addAuthority(`specFiles/${chain}.json`, node.name);
         }
         yield spawn_1.generateChainSpecRaw(relay_chain_bin, chain);
-        const spec = resolve(`${chain}-raw.json`);
+        const spec = resolve(`specFiles/${chain}-raw.json`);
         // First we launch each of the validators for the relay chain.
         for (const node of config.relaychain.nodes) {
             const { name, wsPort, port, flags } = node;

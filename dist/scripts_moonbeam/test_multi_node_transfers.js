@@ -72,12 +72,12 @@ function main() {
         }
         const chain = config.relaychain.chain;
         yield spawn_1.generateChainSpec(relay_chain_bin, chain);
-        spec_1.clearAuthorities(`${chain}.json`);
+        spec_1.clearAuthorities(`specFiles/${chain}.json`);
         for (const node of config.relaychain.nodes) {
-            yield spec_1.addAuthority(`${chain}.json`, node.name);
+            yield spec_1.addAuthority(`specFiles/${chain}.json`, node.name);
         }
         yield spawn_1.generateChainSpecRaw(relay_chain_bin, chain);
-        const spec = path_1.resolve(`${chain}-raw.json`);
+        const spec = path_1.resolve(`specFiles/${chain}-raw.json`);
         // First we launch each of the validators for the relay chain.
         for (const node of config.relaychain.nodes) {
             const { name, wsPort, port, flags } = node;
@@ -106,6 +106,7 @@ function main() {
                 }
                 let account = parachain_1.parachainAccount(id);
                 console.log(`Starting a Collator for parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`);
+                console.log('chain', chain);
                 yield spawn_1.startCollator(bin, id, wsPort, port, chain, spec, flags);
                 // If it isn't registered yet, register the parachain on the relaychain
                 if (!registeredParachains[id]) {
@@ -238,7 +239,7 @@ function main() {
     });
 }
 exports.default = main;
-//main();
+main();
 // log unhandledRejection
 process.on("unhandledRejection", (error) => {
     if (error.message) {

@@ -52,12 +52,12 @@ export async function start() {
 	}
 	const chain = config.relaychain.chain;
 	await generateChainSpec(relay_chain_bin, chain);
-	clearAuthorities(`${chain}.json`);
+	clearAuthorities(`specFiles/${chain}.json`);
 	for (const node of config.relaychain.nodes) {
-		await addAuthority(`${chain}.json`, node.name);
+		await addAuthority(`specFiles/${chain}.json`, node.name);
 	}
 	await generateChainSpecRaw(relay_chain_bin, chain);
-	const spec = resolve(`${chain}-raw.json`);
+	const spec = resolve(`specFiles/${chain}-raw.json`);
 
 	// First we launch each of the validators for the relay chain.
 	for (const node of config.relaychain.nodes) {

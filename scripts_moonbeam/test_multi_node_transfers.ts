@@ -92,12 +92,12 @@ export default async function main() {
   }
   const chain = config.relaychain.chain;
   await generateChainSpec(relay_chain_bin, chain);
-  clearAuthorities(`${chain}.json`);
+  clearAuthorities(`specFiles/${chain}.json`);
   for (const node of config.relaychain.nodes) {
-    await addAuthority(`${chain}.json`, node.name);
+    await addAuthority(`specFiles/${chain}.json`, node.name);
   }
   await generateChainSpecRaw(relay_chain_bin, chain);
-  const spec = resolve(`${chain}-raw.json`);
+  const spec = resolve(`specFiles/${chain}-raw.json`);
 
   // First we launch each of the validators for the relay chain.
   for (const node of config.relaychain.nodes) {
@@ -134,6 +134,7 @@ export default async function main() {
       console.log(
         `Starting a Collator for parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`
       );
+      console.log('chain',chain)
       await startCollator(bin, id, wsPort, port, chain, spec, flags);
 
       // If it isn't registered yet, register the parachain on the relaychain
@@ -312,7 +313,7 @@ export default async function main() {
   //process.kill(process.pid, 'SIGINT');
   process.exit(0);
 }
-//main();
+main();
 
 // log unhandledRejection
 process.on("unhandledRejection", (error: any) => {

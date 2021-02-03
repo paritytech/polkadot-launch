@@ -23,7 +23,7 @@ function generateChainSpec(bin, chain) {
         return new Promise(function (resolve, reject) {
             let args = ["build-spec", "--chain=" + chain, "--disable-default-bootnode"];
             p["spec"] = spawn(bin, args);
-            let spec = fs.createWriteStream(`${chain}.json`);
+            let spec = fs.createWriteStream(`specFiles/${chain}.json`);
             // `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
             // before we resolve the promise.
             p["spec"].stdout.pipe(spec);
@@ -42,9 +42,9 @@ exports.generateChainSpec = generateChainSpec;
 function generateChainSpecRaw(bin, chain) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise(function (resolve, reject) {
-            let args = ["build-spec", "--chain=" + chain + ".json", "--raw"];
+            let args = ["build-spec", "--chain=specFiles/" + chain + ".json", "--raw"];
             p["spec"] = spawn(bin, args);
-            let spec = fs.createWriteStream(`${chain}-raw.json`);
+            let spec = fs.createWriteStream(`specFiles/${chain}-raw.json`);
             // `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
             // before we resolve the promise.
             p["spec"].stdout.pipe(spec);
@@ -126,6 +126,8 @@ exports.exportGenesisState = exportGenesisState;
 function startCollator(bin, id, wsPort, port, chain, spec, flags) {
     return new Promise(function (resolve, reject) {
         console.log("COLLATOR BIN", bin);
+        console.log("COLLATOR CHAIN", chain);
+        console.log("COLLATOR SPEC", spec);
         // TODO: Make DB directory configurable rather than just `tmp`
         let args = [
             "--tmp",
