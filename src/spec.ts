@@ -8,9 +8,10 @@ function nameCase(string:string) {
 
 // Get authority keys from within chainSpec data
 function getAuthorityKeys(chainSpec:ChainSpec) {
-	if (chainSpec.genesis.runtime.frameSystem) {
-		return chainSpec.genesis.runtime.frameSystem.palletSession.keys;
-	}
+	// if (chainSpec.genesis.runtime.frameSystem) {
+	// 	return chainSpec.genesis.runtime.frameSystem.palletSession.keys;
+	// }
+	// Why is this code trying to call palletSession on different fields?
 	return chainSpec.genesis.runtime.palletSession.keys;
 }
 
@@ -26,6 +27,7 @@ export function clearAuthorities(spec:string) {
 	}
 
 	let keys = getAuthorityKeys(chainSpec);
+	console.log('getAuthorityKeys')
 	keys.length = 0;
 
 	let data = JSON.stringify(chainSpec, null, 2);

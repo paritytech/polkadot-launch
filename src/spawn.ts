@@ -21,6 +21,7 @@ export async function generateChainSpec(bin:string, chain:string) {
 		];
 
 		p['spec'] = spawn(bin, args);
+		console.log('spawned')
 		let spec = fs.createWriteStream(`${chain}.json`);
 
 		// `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
@@ -30,6 +31,7 @@ export async function generateChainSpec(bin:string, chain:string) {
 		p['spec'].stderr.pipe(process.stderr)
 
 		p['spec'].on('close', () => {
+			console.log('resolving')
 			resolve();
 		});
 
