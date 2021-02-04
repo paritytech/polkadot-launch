@@ -65,15 +65,11 @@ async function main() {
   }
   const chain = config.relaychain.chain;
   await generateChainSpec(relay_chain_bin, chain);
-  console.log('generateChainSpec')
   clearAuthorities(`${chain}.json`);
-  console.log('clearAuthorities')
   for (const node of config.relaychain.nodes) {
     await addAuthority(`${chain}.json`, node.name);
   }
-  console.log('addAuthority')
   await generateChainSpecRaw(relay_chain_bin, chain);
-  console.log('generateChainSpecRaw')
   const spec = resolve(`${chain}-raw.json`);
 
   // First we launch each of the validators for the relay chain.

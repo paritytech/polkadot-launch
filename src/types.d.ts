@@ -51,40 +51,7 @@ interface ChainSpec {
   consensusEngine: null;
   lightSyncState: null;
   genesis: {
-    runtime: any;
-    // {
-    //   frameSystem: {
-    //     changesTrieConfig: null;
-    //     code: string;
-    //   };
-    //   palletBabe: {
-    //     authorities: string[];
-    //   };
-    //   palletIndices: {
-    //     indices: string[];
-    //   };
-    //   palletBalances: {
-    //     balances: [[string, number]];
-    //   };
-    //   palletSession: {
-    //     keys: [
-    //       [
-    //         string,
-    //         string,
-    //         any
-    //         // {
-    //         //   "grandpa": "5FA9nQDVg267DEd8m1ZypXLBnvN7SFxYwV7ndqSYGiN9TTpu",
-    //         //   "babe": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-    //         //   "im_online": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-    //         //   "parachain_validator": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-    //         //   "authority_discovery": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-    //         //   "para_validator": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-    //         //   "para_assignment": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
-    //         // }
-    //       ]
-    //     ];
-    //   };
-    // };
+    runtime: any;// this can change depending on the versions
     raw: {
       top: {
         [key: string]: string;
