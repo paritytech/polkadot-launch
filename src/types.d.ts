@@ -22,10 +22,10 @@ interface SimpleParachainConfig {
   balance: string;
 }
 interface HrmpChannelsConfig {
-  sender: "200";
-  recipient: "300";
-  maxCapacity: 8;
-  maxMessageSize: 512;
+  sender:number;
+  recipient: number;
+  maxCapacity: number;
+  maxMessageSize: number;
 }
 interface RelayChainConfig {
   bin: string;

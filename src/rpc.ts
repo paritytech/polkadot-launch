@@ -106,7 +106,7 @@ export async function setBalance(api:ApiPromise, who:string, value:string) {
 	nonce += 1;
 }
 
-export async function establishHrmpChannel(api:ApiPromise, sender:string, receiver:string, maxCapacity:number, maxMessageSize:number) {
+export async function establishHrmpChannel(api:ApiPromise, sender:number, receiver:number, maxCapacity:number, maxMessageSize:number) {
 	await cryptoWaitReady();
 
 	const keyring = new Keyring({ type: 'sr25519' });
