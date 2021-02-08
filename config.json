@@ -1,6 +1,6 @@
 {
 	"relaychain": {
-		"bin": "./path/to/bin/polkadot",
+		"bin": "./bin/polkadot",
 		"chain": "rococo-local",
 		"nodes": [
 			{
@@ -27,7 +27,7 @@
 	},
 	"parachains": [
 		{
-			"bin": "./path/to/bin/rococo-collator",
+			"bin": "./bin/rococo-collator",
 			"id": "200",
 			"wsPort": 9988,
 			"port": 31200,
@@ -35,7 +35,7 @@
 			"flags": ["--", "--execution=wasm"]
 		},
 		{
-			"bin": "./path/to/bin/rococo-collator",
+			"bin": "./bin/rococo-collator",
 			"id": "300",
 			"wsPort": 9999,
 			"port": 31300,
@@ -45,7 +45,7 @@
 	],
 	"simpleParachains": [
 		{
-			"bin": "./path/to/bin/adder-collator",
+			"bin": "./bin/adder-collator",
 			"id": "400",
 			"port": "31400",
 			"balance": "1000000000000000000000"

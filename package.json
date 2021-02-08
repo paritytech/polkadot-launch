@@ -9,9 +9,9 @@
     "start": "yarn build && node dist/index.js"
   },
   "dependencies": {
-    "@polkadot/api": "^3.0.1",
-    "@polkadot/util": "^5.0.1",
-    "@polkadot/util-crypto": "^5.0.1",
+    "@polkadot/api": "^3.8.1",
+    "@polkadot/util": "^5.6.1",
+    "@polkadot/util-crypto": "^5.6.1",
     "filter-console": "^0.1.1",
     "yargs": "^15.4.1"
   },
@@ -20,11 +20,5 @@
   ],
   "bin": {
     "polkadot-launch": "dist/index.js"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.11.5",
-    "@babel/core": "^7.11.5",
-    "@babel/plugin-transform-runtime": "^7.11.5",
-    "@babel/preset-env": "^7.11.5"
   }
 }
