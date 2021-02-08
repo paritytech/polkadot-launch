@@ -1,15 +1,19 @@
+import {spawn, ChildProcessWithoutNullStreams,execFile as ex} from "child_process"
+import util from 'util'
+import fs from 'fs';
+
 // This tracks all the processes that we spawn from this file.
 // Used to clean up processes when exiting this program.
-const p = {};
+const p :{[key:string]:ChildProcessWithoutNullStreams}={};
 
-const util = require('util');
-const execFile = util.promisify(require('child_process').execFile);
-const { spawn } = require("child_process");
-const fs = require('fs');
+//const util = require('util');
+//const execFile = util.promisify(require('child_process').execFile);
+const execFile = util.promisify(ex);
+//const { spawn } = require("child_process");
 
 // Output the chainspec of a node.
-export async function generateChainSpec(bin, chain) {
-	return new Promise(function (resolve, reject) {
+export async function generateChainSpec(bin:string, chain:string) {
+	return new Promise<void>(function (resolve, reject) {
 		let args = [
 			"build-spec",
 			"--chain=" + chain,
@@ -17,6 +21,7 @@ export async function generateChainSpec(bin, chain) {
 		];
 
 		p['spec'] = spawn(bin, args);
+		console.log('spawned')
 		let spec = fs.createWriteStream(`${chain}.json`);
 
 		// `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
@@ -26,6 +31,7 @@ export async function generateChainSpec(bin, chain) {
 		p['spec'].stderr.pipe(process.stderr)
 
 		p['spec'].on('close', () => {
+			console.log('resolving')
 			resolve();
 		});
 
@@ -36,8 +42,8 @@ export async function generateChainSpec(bin, chain) {
 }
 
 // Output the chainspec of a node using `--raw` from a JSON file.
-export async function generateChainSpecRaw(bin, chain) {
-	return new Promise(function (resolve, reject) {
+export async function generateChainSpecRaw(bin:string, chain:string) {
+	return new Promise<void>(function (resolve, reject) {
 		let args = [
 			"build-spec",
 			"--chain=" + chain + '.json',
@@ -64,7 +70,7 @@ export async function generateChainSpecRaw(bin, chain) {
 
 // Spawn a new relay chain node.
 // `name` must be `alice`, `bob`, `charlie`, etc... (hardcoded in Substrate).
-export function startNode(bin, name, wsPort, port, spec, flags) {
+export function startNode(bin:string, name:string, wsPort:number, port:number, spec:string, flags?:string[]) {
 	// TODO: Make DB directory configurable rather than just `tmp`
 	let args = [
 		"--chain=" + spec,
@@ -90,7 +96,7 @@ export function startNode(bin, name, wsPort, port, spec, flags) {
 
 // Export the genesis wasm for a parachain and return it as a hex encoded string starting with 0x.
 // Used for registering the parachain on the relay chain.
-export async function exportGenesisWasm(bin, chain) {
+export async function exportGenesisWasm(bin:string, chain?:string):Promise<string> {
 	let args = ["export-genesis-wasm"]
 	if (chain) {
 		args.push("--chain=" + chain)
@@ -107,7 +113,7 @@ export async function exportGenesisWasm(bin, chain) {
 }
 
 /// Export the genesis state aka genesis head.
-export async function exportGenesisState(bin, id, chain) {
+export async function exportGenesisState(bin:string, id?:string, chain?:string):Promise<string> {
 	let args = [
 		"export-genesis-state",
 	]
@@ -129,7 +135,7 @@ export async function exportGenesisState(bin, id, chain) {
 }
 
 // Start a collator node for a parachain.
-export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
+export function startCollator(bin:string, id:string, wsPort:number, port:number, chain?:string, spec?:string, flags?:string[]) {
 	// TODO: Make DB directory configurable rather than just `tmp`
 	let args = [
 		"--tmp",
@@ -151,8 +157,8 @@ export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
 	if (split_index < 0) {
 		flags_parachain = flags;
 	} else {
-		flags_parachain = flags.slice(0, split_index);
-		flags_collator = flags.slice(split_index + 1);
+		flags_parachain = flags?flags.slice(0, split_index):null;
+		flags_collator = flags?flags.slice(split_index + 1):null;
 	}
 
 	if (flags_parachain) {
@@ -181,7 +187,7 @@ export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
 	p[id].stderr.pipe(log)
 }
 
-export function startSimpleCollator(bin, id, spec, port) {
+export function startSimpleCollator(bin:string, id:string, spec:string, port:string) {
 	let args = [
 		"--tmp",
 		"--parachain-id=" + id,
@@ -208,7 +214,7 @@ export function startSimpleCollator(bin, id, spec, port) {
 // Purge the chain for any node.
 // You shouldn't need to use this function since every node starts with `--tmp`
 // TODO: Make DB directory configurable rather than just `tmp`
-export function purgeChain(bin, spec) {
+export function purgeChain(bin:string, spec:string) {
 	console.log("Purging Chain...");
 	let args = ["purge-chain"];
 

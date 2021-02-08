@@ -53,8 +53,8 @@
 	],
 	"hrmpChannels": [
 		{
-			"sender": "200",
-			"recipient": "300",
+			"sender": 200,
+			"recipient": 300,
 			"maxCapacity": 8,
 			"maxMessageSize": 512
 		}

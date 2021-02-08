@@ -5,7 +5,7 @@
   "author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "babel src -d dist",
+    "build": "tsc",
     "start": "yarn build && node dist/index.js"
   },
   "dependencies": {
