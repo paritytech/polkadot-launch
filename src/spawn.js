@@ -122,9 +122,6 @@ export async function exportGenesisState(bin, id, chain) {
 // Start a collator node for a parachain.
 export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
   return new Promise(function (resolve, reject) {
-    console.log("COLLATOR BIN", bin);
-    console.log("COLLATOR CHAIN", chain);
-    console.log("COLLATOR SPEC", spec);
     // TODO: Make DB directory configurable rather than just `tmp`
     let args = [
       "--tmp",
@@ -165,12 +162,12 @@ export function startCollator(bin, id, wsPort, port, chain, spec, flags) {
       console.log(`Added ${flags_collator} to collator`);
     }
 
-    p[id] = spawn(bin, args);
+    p[wsPort] = spawn(bin, args);
 
     let log = fs.createWriteStream(`${id}.log`);
 
-    p[id].stdout.pipe(log);
-    p[id].stderr.on("data", function (chunk) {
+    p[wsPort].stdout.pipe(log);
+    p[wsPort].stderr.on("data", function (chunk) {
       let message = chunk.toString();
       if (message.substring(21, 50) == "Listening for new connections") {
         resolve();
@@ -229,28 +226,6 @@ export function purgeChain(bin, spec) {
   p["purge"].stderr.on("data", function (chunk) {
     let message = chunk.toString();
     console.log(message);
-  });
-}
-
-//deprecated, TODO:delete
-export function startTests() {
-  console.log("START TEST SEQUENCE");
-
-  p["tests"] = spawn("./test-only.sh", []);
-
-  let log = fs.createWriteStream(`tests.log`);
-
-  p["tests"].stdout.on("data", function (chunk) {
-    let message = chunk.toString();
-    console.log("1" + message.substring(0, message.length - 1) + "2");
-    log.write(message);
-  });
-
-  p["tests"].stderr.on("data", function (chunk) {
-    let message = chunk.toString();
-    console.log("ERROR", message);
-    log.write(message);
-    throw new Error(message);
   });
 }
 

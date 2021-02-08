@@ -320,6 +320,7 @@ process.on("unhandledRejection", (error: any) => {
     console.trace(error);
   } else {
     console.log("unhandledRejection: error thrown without a message");
+    console.trace(error);
   }
 });
 

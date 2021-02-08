@@ -246,6 +246,7 @@ process.on("unhandledRejection", (error) => {
     }
     else {
         console.log("unhandledRejection: error thrown without a message");
+        console.trace(error);
     }
 });
 // Kill all processes when exiting.
