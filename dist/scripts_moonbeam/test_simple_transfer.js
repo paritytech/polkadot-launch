@@ -85,6 +85,7 @@ function main() {
                     });
                     console.log("---------- Tx " + i + " included in Block : ", res.blockNumber);
                 }
+                //@ts-ignore
                 return (res.gasUsed + util_1.hexToNumber(value)) * nbIterations;
             });
         }

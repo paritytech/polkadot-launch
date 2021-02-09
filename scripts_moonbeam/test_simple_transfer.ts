@@ -92,6 +92,7 @@ async function main() {
         res.blockNumber
       );
     }
+    //@ts-ignore
     return (res.gasUsed + hexToNumber(value)) * nbIterations;
   }
   const cost: number = await serialSend(value, 10);

@@ -6,15 +6,14 @@
   "author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "babel src -d dist",
-    "build-ts":"tsc",
-    "start": "yarn build && node dist/index.js",
+    "build": "tsc",
+    "start": "yarn build && node dist/src/index.js",
     "test": "yarn build && mocha -r ts-node/register 'tests/**/*.ts'"
   },
   "dependencies": {
-    "@polkadot/api": "^3.6.4",
-    "@polkadot/util": "^5.4.4",
-    "@polkadot/util-crypto": "^5.4.4",
+    "@polkadot/api": "^3.8.1",
+    "@polkadot/util": "^5.6.1",
+    "@polkadot/util-crypto": "^5.6.1",
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.2.0",
     "chai": "^4.2.0",
@@ -29,13 +28,6 @@
     "dist"
   ],
   "bin": {
-    "polkadot-launch": "dist/scripts_moonbeam/test_multi_node_transfers.js",
-    "moonbeam-launch":"dist/scripts_moonbeam/test_multi_node_transfers.js"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.11.5",
-    "@babel/core": "^7.11.5",
-    "@babel/plugin-transform-runtime": "^7.11.5",
-    "@babel/preset-env": "^7.11.5"
+    "polkadot-launch": "dist/src/index.js"
   }
 }

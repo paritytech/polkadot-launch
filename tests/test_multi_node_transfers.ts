@@ -10,6 +10,7 @@ import {
 } from "../scripts_moonbeam/testUtils/web3Calls";
 
 export const GENESIS_ACCOUNT = "0x6be02d1d3665660d22ff9624b7be0551ee1ac91b";
+import {LaunchConfig,ParachainConfig} from '../src/types'
 //const GENESIS_ACCOUNT_BALANCE = "1152921504606846976";
 const GENESIS_ACCOUNT_PRIVATE_KEY =
   "0x99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E342";
@@ -24,7 +25,7 @@ const NUMBER_TX: number = 10
 //   console.error("Missing tx number argument... tx number set to 2");
 // }
 
-const config = require("../config_moonbeam.json");
+const config:LaunchConfig = require("../config_moonbeam.json");
 
 
 describe("Multi Node transfer Test", async function () {
@@ -51,7 +52,7 @@ describe("Multi Node transfer Test", async function () {
       
       console.log('GREAT SUCCESS, nodes ready')
       // instantiate apis
-      clientList = config.parachains.map((parachain) => {
+      clientList = config.parachains.map((parachain:ParachainConfig) => {
         console.log(
           "connecting new web3 instance to wsport:" + parachain.wsPort
         );
@@ -69,7 +70,7 @@ describe("Multi Node transfer Test", async function () {
 
       // add these accounts to the other nodes
       accounts = await Promise.all(
-        config.parachains.map(async (_, i) => {
+        config.parachains.map(async (_:ParachainConfig, i:number) => {
           if (i > 0) {
             const wallet = await clientList[i].eth.accounts.wallet.create(1);
             return wallet[0].address;
@@ -105,7 +106,7 @@ describe("Multi Node transfer Test", async function () {
     let nonces: number[]
     try {
        nonces= await Promise.all(
-        config.parachains.map(async (_, i) => {
+        config.parachains.map(async (_:ParachainConfig, i:number) => {
           return clientList[i].eth.getTransactionCount(accounts[i]);
         })
       );
@@ -121,7 +122,7 @@ describe("Multi Node transfer Test", async function () {
     console.log(3)
 
     //have all nodes send their transfers in parallel
-    config.parachains.forEach((_, i) => {
+    config.parachains.forEach((_:ParachainConfig, i:number) => {
       parallelSend(
         clientList[i],
         nonces[i],
