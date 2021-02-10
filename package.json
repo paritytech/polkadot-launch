@@ -8,8 +8,8 @@
   "scripts": {
     "build": "babel src -d dist",
     "build-ts":"tsc",
-    "start": "yarn build && node dist/index.js",
-    "test": "yarn build && mocha -r ts-node/register 'tests/**/*.ts'"
+    "start": "yarn build && mkdir -p specFiles && node dist/index.js",
+    "test": "yarn build && mkdir -p specFiles && mocha -r ts-node/register 'tests/**/*.ts'"
   },
   "dependencies": {
     "@polkadot/api": "^3.6.4",
