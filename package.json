@@ -7,12 +7,12 @@
   "license": "MIT",
   "scripts": {
     "build": "babel src -d dist",
-    "build-ts":"tsc",
+    "build-ts": "tsc",
     "start": "yarn build && mkdir -p specFiles && node dist/index.js",
     "test": "yarn build && mkdir -p specFiles && mocha -r ts-node/register 'tests/**/*.ts'"
   },
   "dependencies": {
-    "@polkadot/api": "^3.6.4",
+    "@polkadot/api": "^3.8.1",
     "@polkadot/util": "^5.4.4",
     "@polkadot/util-crypto": "^5.4.4",
     "@types/chai": "^4.2.14",
@@ -30,7 +30,7 @@
   ],
   "bin": {
     "polkadot-launch": "dist/scripts_moonbeam/test_multi_node_transfers.js",
-    "moonbeam-launch":"dist/scripts_moonbeam/test_multi_node_transfers.js"
+    "moonbeam-launch": "dist/scripts_moonbeam/test_multi_node_transfers.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.5",
