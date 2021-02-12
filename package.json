@@ -7,13 +7,13 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start": "yarn build && node dist/src/index.js",
-    "test": "yarn build && mocha -r ts-node/register 'tests/**/*.ts'"
+    "start": "yarn build && mkdir -p specFiles && node dist/src/index.js",
+    "test": "yarn build && mkdir -p specFiles && mocha -r ts-node/register 'tests/**/*.ts'"
   },
   "dependencies": {
     "@polkadot/api": "^3.8.1",
-    "@polkadot/util": "^5.6.1",
-    "@polkadot/util-crypto": "^5.6.1",
+    "@polkadot/util": "^5.6.2",
+    "@polkadot/util-crypto": "^5.6.2",
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.2.0",
     "chai": "^4.2.0",

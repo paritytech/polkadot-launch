@@ -22,7 +22,7 @@
   },
   "parachains": [
     {
-      "bin": "../moonbeam/target/release/moonbase-alphanet",
+      "bin": "../moonbeam/target/release/moonbeam",
       "id": "200",
       "rpcPort": 36846,
       "wsPort": 36946,
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "bin": "../moonbeam/target/release/moonbase-alphanet",
+      "bin": "../moonbeam/target/release/moonbeam",
       "id": "200",
       "rpcPort": 36847,
       "wsPort": 36947,
@@ -57,5 +57,6 @@
   "simpleParachains": [],
 	"hrmpChannels": [],
   "types": {
+    "Address": "MultiAddress", "LookupSource": "MultiAddress" 
   }
 }
