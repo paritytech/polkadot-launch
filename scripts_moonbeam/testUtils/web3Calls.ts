@@ -19,7 +19,12 @@ export async function sendTxWrapped(
         }
       })
       .on("error", function (error) {
-        console.log("error on sendTxWrapped",error);
+        console.log("error on sendTxWrapped","+"+error+"+");
+        const ERROR_NOT_MINED_50_BLOCKS:string="Error: Transaction was not mined within 50 blocks, please make sure your transaction was properly sent. Be aware that it might still be mined!"
+        if (error.toString()===ERROR_NOT_MINED_50_BLOCKS){
+          console.log(ERROR_NOT_MINED_50_BLOCKS)
+          console.log('(error ignored)')
+        }
         reject(`Failed to send tx: ${error.message || error.toString()}`);
       })
       .then(function (receipt) {
