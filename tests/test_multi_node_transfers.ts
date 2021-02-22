@@ -80,7 +80,10 @@ describe("Multi Node transfer Test", async function () {
         })
       );
 
-      //send money from genesis to other accounts
+      // stake address 0 WIP
+      //api join_candidates(fee: Perbill, bond: Balance)
+
+      // send money from genesis to other accounts
       for (let i = 1; i < config.parachains.length; i++) {
         await sendTxWrapped(clientList[0], {
           from: GENESIS_ACCOUNT,
