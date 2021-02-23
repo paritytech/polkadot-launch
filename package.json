@@ -3,6 +3,7 @@
   "version": "1.0.12",
   "main": "dist/scripts_moonbeam/test_multi_node_transfers.js",
   "types": "dist/scripts_moonbeam/test_multi_node_transfers.d.ts",
+  "prepublish": "tsc",
   "author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
   "license": "MIT",
   "scripts": {
@@ -24,9 +25,6 @@
     "web3": "^1.3.0",
     "yargs": "^15.4.1"
   },
-  "files": [
-    "dist"
-  ],
   "bin": {
     "polkadot-launch": "dist/src/index.js"
   }
