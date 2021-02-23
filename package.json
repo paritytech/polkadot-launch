@@ -26,7 +26,8 @@
     "yargs": "^15.4.1"
   },
   "files": [ 
-    "dist/scripts_moonbeam/test_multi_node_transfers.js" 
+    "dist/scripts_moonbeam/test_multi_node_transfers.js",
+    "dist/scripts_moonbeam/test_multi_node_transfers.d.ts"
   ],
   "bin": {
     "polkadot-launch": "dist/src/index.js"

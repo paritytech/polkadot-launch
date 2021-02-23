@@ -8,6 +8,8 @@
     "outDir": "dist",
     "resolveJsonModule":true,
     "strict": true,
+    "declaration":true
   },
+  "include":["src","scripts_moonbeam"],
   "exclude": ["node_modules", "dist","tests"]
 }
