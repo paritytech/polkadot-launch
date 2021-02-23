@@ -3,7 +3,8 @@
   "version": "1.0.12",
   "main": "dist/scripts_moonbeam/test_multi_node_transfers.js",
   "types": "dist/scripts_moonbeam/test_multi_node_transfers.d.ts",
-  "prepublish": "tsc",
+  "prepublish": "yarn run build",
+  "prepare" : "yarn run build",
   "author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
   "license": "MIT",
   "scripts": {
