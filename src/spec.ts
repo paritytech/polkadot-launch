@@ -2,12 +2,12 @@ import { Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 const fs = require('fs');
 
-function nameCase(string:string) {
+function nameCase(string: string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 // Get authority keys from within chainSpec data
-function getAuthorityKeys(chainSpec:ChainSpec) {
+function getAuthorityKeys(chainSpec: ChainSpec) {
 	// this is the most recent spec struct
 	if (chainSpec.genesis.runtime.runtime_genesis_config && chainSpec.genesis.runtime.runtime_genesis_config.palletSession) {
 		return chainSpec.genesis.runtime.runtime_genesis_config.palletSession.keys;
@@ -17,7 +17,7 @@ function getAuthorityKeys(chainSpec:ChainSpec) {
 }
 
 // Remove all existing keys from `session.keys`
-export function clearAuthorities(spec:string) {
+export function clearAuthorities(spec: string) {
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec;
 	try {
@@ -26,7 +26,6 @@ export function clearAuthorities(spec:string) {
 		console.error("failed to parse the chain spec");
 		process.exit(1);
 	}
-
 	let keys = getAuthorityKeys(chainSpec)
 	keys.length = 0;
 
@@ -35,8 +34,21 @@ export function clearAuthorities(spec:string) {
 	console.log(`Starting with a fresh authority set:`);
 }
 
+export function extractAuthorityBeefyKeys(spec: string) {
+	let rawdata = fs.readFileSync(spec);
+	let chainSpec;
+	try {
+		chainSpec = JSON.parse(rawdata);
+	} catch {
+		console.error("failed to parse the chain spec");
+		process.exit(1);
+	}
+	let keys = getAuthorityKeys(chainSpec)
+	return keys.map((k: { beefy: any; }[]) => k[2].beefy);
+}
+
 // Add additional authorities to chain spec in `session.keys`
-export async function addAuthority(spec:string, name:string) {
+export async function addAuthority(spec: string, name: string, beefyKey: any) {
 	await cryptoWaitReady();
 
 	const sr_keyring = new Keyring({ type: 'sr25519' });
@@ -57,6 +69,7 @@ export async function addAuthority(spec:string, name:string) {
 			"authority_discovery": sr_account.address,
 			"para_validator": sr_account.address,
 			"para_assignment": sr_account.address,
+			"beefy": beefyKey
 		}
 	];
 

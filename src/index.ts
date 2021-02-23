@@ -17,7 +17,7 @@ import {
   establishHrmpChannel,
 } from "./rpc";
 import { checkConfig } from "./check";
-import { clearAuthorities, addAuthority } from "./spec";
+import { extractAuthorityBeefyKeys, clearAuthorities, addAuthority } from "./spec";
 import { parachainAccount } from "./parachain";
 import { ApiPromise } from "@polkadot/api";
 
@@ -65,9 +65,10 @@ async function main() {
   }
   const chain = config.relaychain.chain;
   await generateChainSpec(relay_chain_bin, chain);
+  const beefyKeys = extractAuthorityBeefyKeys(`${chain}.json`);
   clearAuthorities(`${chain}.json`);
-  for (const node of config.relaychain.nodes) {
-    await addAuthority(`${chain}.json`, node.name);
+  for (const [i, node] of config.relaychain.nodes.entries()) {
+    await addAuthority(`${chain}.json`, node.name, beefyKeys[i]);
   }
   await generateChainSpecRaw(relay_chain_bin, chain);
   const spec = resolve(`${chain}-raw.json`);
@@ -80,6 +81,8 @@ async function main() {
     // able to connect to it using PolkadotJS in order to know its running.
     startNode(relay_chain_bin, name, wsPort, port, spec, flags);
   }
+
+  await sleep(5000)
 
   // Connect to the first relay chain node to submit the extrinsic.
   let relayChainApi: ApiPromise = await connect(
@@ -179,10 +182,10 @@ async function main() {
   }
 }
 
-async function ensureOnboarded(relayChainApi: ApiPromise, paraId:number) {
+async function ensureOnboarded(relayChainApi: ApiPromise, paraId: number) {
   return new Promise<void>(async function (resolve) {
     // We subscribe to the heads as a simple way to tell that the chain onboarded.
-    let unsub = await relayChainApi.query.paras.heads(paraId, (response:any) => {
+    let unsub = await relayChainApi.query.paras.heads(paraId, (response: any) => {
       if (response.isSome) {
         // Surprisingly, this ouroboros like subscription pattern seem to work.
         unsub();
