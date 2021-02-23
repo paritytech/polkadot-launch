@@ -81,7 +81,7 @@ describe("Multi Node transfer Test", async function () {
       );
 
       // stake address 0 WIP
-      //api join_candidates(fee: Perbill, bond: Balance)
+      //api join_candidates(fee: Perbill, bond: Balance) //NB: do it in the script
 
       // send money from genesis to other accounts
       for (let i = 1; i < config.parachains.length; i++) {
