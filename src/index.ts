@@ -65,12 +65,12 @@ async function main() {
   }
   const chain = config.relaychain.chain;
   await generateChainSpec(relay_chain_bin, chain);
-  clearAuthorities(`${chain}.json`);
+  clearAuthorities(`specFiles/${chain}.json`);
   for (const node of config.relaychain.nodes) {
-    await addAuthority(`${chain}.json`, node.name);
+    await addAuthority(`specFiles/${chain}.json`, node.name);
   }
   await generateChainSpecRaw(relay_chain_bin, chain);
-  const spec = resolve(`${chain}-raw.json`);
+  const spec = resolve(`specFiles/${chain}-raw.json`);
 
   // First we launch each of the validators for the relay chain.
   for (const node of config.relaychain.nodes) {
@@ -125,14 +125,12 @@ async function main() {
         }
 
         await registerParachain(relayChainApi, id, genesisWasm, genesisState);
-        console.log('registered')
         registeredParachains[id] = true;
 
         // Allow time for the TX to complete, avoiding nonce issues.
         // TODO: Handle nonce directly instead of this.
         if (balance) {
           await setBalance(relayChainApi, account, balance);
-          console.log('set')
         }
       }
       checkFinality();

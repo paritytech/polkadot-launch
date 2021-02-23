@@ -103,8 +103,6 @@ describe("Multi Node transfer Test", async function () {
   );
   it("Sends "+NUMBER_TX+" parallel transfers to node 0 from all the other nodes", async function()  {
     this.timeout(0) //TODO add time limits
-    console.log(3)
-    //expect(false).to.be.true
     // get the nonces of each node
     let nonces: number[]
     try {
@@ -116,13 +114,10 @@ describe("Multi Node transfer Test", async function () {
     } catch(e){
       console.log('nonce error',e)
     }
-    console.log(3)
     //check initial balance and block for comparaison
     const initialBalance = await clientList[0].eth.getBalance(TEST_ACCOUNT);
-    console.log(3)
     let initialBlockNumber = (await clientList[0].eth.getBlock("latest"))
     .number;
-    console.log(3)
 
     //have all nodes send their transfers in parallel
     config.parachains.forEach((_:ParachainConfig, i:number) => {
@@ -135,7 +130,6 @@ describe("Multi Node transfer Test", async function () {
         TEST_ACCOUNT
       );
     });
-    console.log(4)
 
     // Function to check that all nodes hold the same balance of the test account
     async function checkBalanceSync(web3: Web3) {
@@ -178,20 +172,6 @@ describe("Multi Node transfer Test", async function () {
         }, 6000);
       });
     }
-    //check one last time?
-    // console.log(
-    //   "balance",
-    //   balance,
-    //   "target",
-    //   Number(initialBalance) +
-    //     NUMBER_TX * hexToNumber(value) * config.parachains.length
-    // );
-    // await new Promise<number>((resolve, reject) => {
-    //   setTimeout(async () => {
-    //     balance = await checkBalanceSync(clientList[0]);
-    //     resolve(balance);
-    //   }, 6000);
-    // });
 
     // log end of test information
     console.log(

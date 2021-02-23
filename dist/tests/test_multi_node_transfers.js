@@ -74,7 +74,9 @@ describe("Multi Node transfer Test", function () {
                         return exports.GENESIS_ACCOUNT;
                     }
                 })));
-                //send money from genesis to other accounts
+                // stake address 0 WIP
+                //api join_candidates(fee: Perbill, bond: Balance)
+                // send money from genesis to other accounts
                 for (let i = 1; i < config.parachains.length; i++) {
                     yield web3Calls_1.sendTxWrapped(clientList[0], {
                         from: exports.GENESIS_ACCOUNT,
