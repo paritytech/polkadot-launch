@@ -140,6 +140,12 @@ interface properly with your runtime.
 }
 ```
 
+Or you can specify a path to the type definition json file instead:
+
+```json
+"types": "./typedefs.json"
+```
+
 ## How Does It Work?
 
 This tool just automates the steps needed to spin up multiple relay chain nodes and parachain nodes

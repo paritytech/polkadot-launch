@@ -48,6 +48,20 @@ function sleep(ms: number) {
   });
 }
 
+function loadTypeDef(types: string | object): object {
+  if (typeof types === 'string') {
+    // Treat types as a json file path
+    try {
+      const rawdata = fs.readFileSync(types, {encoding: 'utf-8'});
+      return JSON.parse(rawdata);
+    } catch {
+      console.error("failed to load parachain typedef file");
+      process.exit(1);
+    }
+  } else {
+    return types;
+  }
+}
 
 async function main() {
   // keep track of registered parachains
@@ -84,7 +98,7 @@ async function main() {
   // Connect to the first relay chain node to submit the extrinsic.
   let relayChainApi: ApiPromise = await connect(
     config.relaychain.nodes[0].wsPort,
-    config.types
+    loadTypeDef(config.types)
   );
 
   // Then launch each parachain
