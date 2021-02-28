@@ -142,7 +142,7 @@ export function startCollator(bin:string, id:string, wsPort:number, port:number,
 		"--ws-port=" + wsPort,
 		"--port=" + port,
 		"--parachain-id=" + id,
-		"--validator",
+		"--collator",
 	];
 
 	if (chain) {
