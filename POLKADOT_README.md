@@ -91,7 +91,7 @@ These variables are fed directly into the collator binary and used to spawn a no
     --ws-port=<wsPort> \
     --port=<port> \
     --parachain-id=<id> \
-    --validator \
+    --collator \
     --chain=<chain>
     -- \
     --chain=<relaychain.chain>-raw.json \
