@@ -1,7 +1,7 @@
 "use strict";
+// This function checks that the `config.json` file has all the expected properties.
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkConfig = void 0;
-// This function checks that the `config.json` file has all the expected properties.
 // It displays a unique error message and returns `false` for any detected issues.
 function checkConfig(config) {
     if (!config) {
@@ -23,16 +23,18 @@ function checkConfig(config) {
         console.error("No relaychain nodes defined");
         return false;
     }
-    if (config.relaychain.flags && config.relaychain.flags.constructor !== Array) {
-        console.error("Parachain flags should be an array.");
-        return false;
+    for (const node of config.relaychain.nodes) {
+        if (node.flags && node.flags.constructor !== Array) {
+            console.error("Parachain flags should be an array.");
+            return false;
+        }
     }
     if (!config.parachains) {
         console.error("Missing `parachains` object");
         return false;
     }
-    if (config.parachains.length >= config.relaychain.nodes.length) {
-        console.error("Must have more relaychain nodes than parachains.");
+    if (config.parachains.length > config.relaychain.nodes.length) {
+        console.error("Must have the same or greater number of relaychain nodes than parachains.");
         return false;
     }
     for (let parachain of config.parachains) {

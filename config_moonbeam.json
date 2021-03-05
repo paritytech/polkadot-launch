@@ -23,7 +23,7 @@
   "parachains": [
     {
       "bin": "../moonbeam/target/release/moonbeam",
-      "id": "200",
+      "id": "1000",
       "rpcPort": 36846,
       "wsPort": 36946,
       "port": 36335,
@@ -39,7 +39,7 @@
     },
     {
       "bin": "../moonbeam/target/release/moonbeam",
-      "id": "200",
+      "id": "1000",
       "rpcPort": 36847,
       "wsPort": 36947,
       "port": 36336,
@@ -55,6 +55,7 @@
     }
   ],
   "simpleParachains": [],
+	"hrmpChannels": [],
   "types": {
     "Address": "MultiAddress", "LookupSource": "MultiAddress" 
   }

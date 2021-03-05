@@ -76,20 +76,10 @@ Install all NodeJS dependencies with:
 yarn
 ```
 
-This project uses ES6 syntax, which means we need to transpile it to NodeJS compatible JavaScript with [`babel`](https://babeljs.io/).
-
-To do this, you just run:
+Start the application with:
 
 ```bash
-yarn build
-```
-
-This will create a `dist` folder with JavaScript that you can run with `node`.
-
-These steps can be done for you automatically by running:
-
-```bash
-yarn start
+yarn start config.json
 ```
 
 ## FAQ

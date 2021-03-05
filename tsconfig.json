@@ -5,9 +5,11 @@
     "target": "es6",
     "module": "commonjs",
     "lib": ["esnext"],
-    "allowJs": true,
     "outDir": "dist",
-    "resolveJsonModule":true
+    "resolveJsonModule":true,
+    "strict": true,
+    "declaration":true
   },
-  "exclude": ["node_modules", "dist","test"]
+  "include":["src","scripts_moonbeam"],
+  "exclude": ["node_modules", "dist","tests"]
 }

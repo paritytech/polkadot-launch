@@ -27,6 +27,7 @@ import { connect, registerParachain, setBalance } from "../src/rpc";
 import fs from 'fs'
 import  { resolve, dirname } from 'path'
 //const fs=require('fs')
+import {LaunchConfig} from '../src/types'
 
 export const GENESIS_ACCOUNT = "0x6be02d1d3665660d22ff9624b7be0551ee1ac91b";
 //const GENESIS_ACCOUNT_BALANCE = "1152921504606846976";
@@ -84,7 +85,7 @@ export default async function main() {
     console.error("Config file does not exist: ", config_path);
     process.exit();
   }
-  let config = require(config_path);
+  let config:LaunchConfig = require(config_path);
   const relay_chain_bin = resolve(config_dir, config.relaychain.bin);
   if (!fs.existsSync(relay_chain_bin)) {
     console.error("Relay chain binary does not exist: ", relay_chain_bin);

@@ -18,9 +18,11 @@ function nameCase(string) {
 }
 // Get authority keys from within chainSpec data
 function getAuthorityKeys(chainSpec) {
-    if (chainSpec.genesis.runtime.runtime_genesis_config) {
+    // this is the most recent spec struct
+    if (chainSpec.genesis.runtime.runtime_genesis_config && chainSpec.genesis.runtime.runtime_genesis_config.palletSession) {
         return chainSpec.genesis.runtime.runtime_genesis_config.palletSession.keys;
     }
+    // Backward compatibility
     return chainSpec.genesis.runtime.palletSession.keys;
 }
 // Remove all existing keys from `session.keys`

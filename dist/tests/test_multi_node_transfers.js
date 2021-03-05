@@ -74,7 +74,9 @@ describe("Multi Node transfer Test", function () {
                         return exports.GENESIS_ACCOUNT;
                     }
                 })));
-                //send money from genesis to other accounts
+                // stake address 0 WIP
+                //api join_candidates(fee: Perbill, bond: Balance)
+                // send money from genesis to other accounts
                 for (let i = 1; i < config.parachains.length; i++) {
                     yield web3Calls_1.sendTxWrapped(clientList[0], {
                         from: exports.GENESIS_ACCOUNT,
@@ -92,8 +94,6 @@ describe("Multi Node transfer Test", function () {
         it("Sends " + NUMBER_TX + " parallel transfers to node 0 from all the other nodes", function () {
             return __awaiter(this, void 0, void 0, function* () {
                 this.timeout(0); //TODO add time limits
-                console.log(3);
-                //expect(false).to.be.true
                 // get the nonces of each node
                 let nonces;
                 try {
@@ -104,18 +104,14 @@ describe("Multi Node transfer Test", function () {
                 catch (e) {
                     console.log('nonce error', e);
                 }
-                console.log(3);
                 //check initial balance and block for comparaison
                 const initialBalance = yield clientList[0].eth.getBalance(TEST_ACCOUNT);
-                console.log(3);
                 let initialBlockNumber = (yield clientList[0].eth.getBlock("latest"))
                     .number;
-                console.log(3);
                 //have all nodes send their transfers in parallel
                 config.parachains.forEach((_, i) => {
                     testUtils_1.parallelSend(clientList[i], nonces[i], value, NUMBER_TX, accounts[i], TEST_ACCOUNT);
                 });
-                console.log(4);
                 // Function to check that all nodes hold the same balance of the test account
                 function checkBalanceSync(web3) {
                     return __awaiter(this, void 0, void 0, function* () {
@@ -146,20 +142,6 @@ describe("Multi Node transfer Test", function () {
                         }), 6000);
                     });
                 }
-                //check one last time?
-                // console.log(
-                //   "balance",
-                //   balance,
-                //   "target",
-                //   Number(initialBalance) +
-                //     NUMBER_TX * hexToNumber(value) * config.parachains.length
-                // );
-                // await new Promise<number>((resolve, reject) => {
-                //   setTimeout(async () => {
-                //     balance = await checkBalanceSync(clientList[0]);
-                //     resolve(balance);
-                //   }, 6000);
-                // });
                 // log end of test information
                 console.log("======================================= THE END ===================================================");
                 console.log("block interval ", (yield clientList[0].eth.getBlock("latest")).number, initialBlockNumber);

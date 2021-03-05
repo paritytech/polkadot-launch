@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setBalance = exports.registerParachain = exports.getHeader = exports.follow = exports.peerId = exports.connect = void 0;
+exports.sendHrmpMessage = exports.establishHrmpChannel = exports.setBalance = exports.registerParachain = exports.getHeader = exports.follow = exports.peerId = exports.connect = void 0;
 const api_1 = require("@polkadot/api");
 const api_2 = require("@polkadot/api");
 const util_crypto_1 = require("@polkadot/util-crypto");
@@ -27,14 +27,9 @@ filterConsole([
 // TODO: Add a timeout where we know something went wrong so we don't wait forever.
 function connect(port, types) {
     return __awaiter(this, void 0, void 0, function* () {
-        const provider = new api_1.WsProvider("ws://127.0.0.1:" + port);
+        const provider = new api_1.WsProvider('ws://127.0.0.1:' + port);
         const api = new api_1.ApiPromise({ provider, types });
-        try {
-            yield api.isReady;
-        }
-        catch (e) {
-            console.log("error during api is ready", e);
-        }
+        yield api.isReady;
         return api;
     });
 }
@@ -71,7 +66,7 @@ exports.getHeader = getHeader;
 // Uses the Alice account which is known to be Sudo for the relay chain.
 function registerParachain(api, id, wasm, header) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield new Promise((resolvePromise, reject) => __awaiter(this, void 0, void 0, function* () {
+        return new Promise((resolvePromise, reject) => __awaiter(this, void 0, void 0, function* () {
             yield util_crypto_1.cryptoWaitReady();
             const keyring = new api_2.Keyring({ type: "sr25519" });
             const alice = keyring.addFromUri("//Alice");
@@ -104,17 +99,13 @@ exports.registerParachain = registerParachain;
 // Set the balance of an account on the relay chain.
 function setBalance(api, who, value) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield new Promise((resolvePromise, reject) => __awaiter(this, void 0, void 0, function* () {
-            console.log("SETBALANCE");
+        return new Promise((resolvePromise, reject) => __awaiter(this, void 0, void 0, function* () {
             yield util_crypto_1.cryptoWaitReady();
             const keyring = new api_2.Keyring({ type: "sr25519" });
             const alice = keyring.addFromUri("//Alice");
             if (!nonce) {
-                console.log("ha, no nonce");
-                nonce = (yield api.query.system.account(alice.address)).nonce;
+                nonce = Number((yield api.query.system.account(alice.address)).nonce);
             }
-            //nonce =Number((await api.query.system.account(alice.address)).nonce)+1;
-            console.log("NONCE", Number((yield api.query.system.account(alice.address)).nonce));
             console.log(`--- Submitting extrinsic to set balance of ${who} to ${value}. (nonce: ${nonce}) ---`);
             //await new Promise(async(resolve,reject)=>{
             const unsub = yield api.tx.sudo
@@ -139,3 +130,58 @@ function setBalance(api, who, value) {
     });
 }
 exports.setBalance = setBalance;
+function establishHrmpChannel(api, sender, receiver, maxCapacity, maxMessageSize) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield util_crypto_1.cryptoWaitReady();
+        const keyring = new api_2.Keyring({ type: 'sr25519' });
+        const alice = keyring.addFromUri('//Alice');
+        if (!nonce) {
+            nonce = Number((yield api.query.system.account(alice.address)).nonce);
+        }
+        console.log(`--- Submitting extrinsic to establish an HRMP channel ${sender}->${receiver}. (nonce: ${nonce}) ---`);
+        const unsub = yield api.tx.sudo
+            .sudo(api.tx.parasSudoWrapper.sudoEstablishHrmpChannel(sender, receiver, maxCapacity, maxMessageSize))
+            .signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
+            console.log(`Current status is ${result.status}`);
+            if (result.status.isInBlock) {
+                console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
+            }
+            else if (result.status.isFinalized) {
+                console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
+                unsub();
+            }
+        });
+        nonce += 1;
+    });
+}
+exports.establishHrmpChannel = establishHrmpChannel;
+function sendHrmpMessage(api, recipient, data) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield util_crypto_1.cryptoWaitReady();
+        const keyring = new api_2.Keyring({ type: 'sr25519' });
+        const alice = keyring.addFromUri('//Alice');
+        if (!nonce) {
+            nonce = Number((yield api.query.system.account(alice.address)).nonce);
+        }
+        let hrmpMessage = {
+            recipient: recipient,
+            data: data,
+        };
+        let message = api.createType("OutboundHrmpMessage", hrmpMessage);
+        console.log(`--- Sending a message to ${recipient}. (nonce: ${nonce}) ---`);
+        const unsub = yield api.tx.sudo
+            .sudo(api.tx.messageBroker.sudoSendHrmpMessage(message))
+            .signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
+            console.log(`Current status is ${result.status}`);
+            if (result.status.isInBlock) {
+                console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
+            }
+            else if (result.status.isFinalized) {
+                console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
+                unsub();
+            }
+        });
+        nonce += 1;
+    });
+}
+exports.sendHrmpMessage = sendHrmpMessage;
