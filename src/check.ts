@@ -40,7 +40,7 @@ export function checkConfig(config:LaunchConfig) {
 		return false
 	}
 
-	if (config.parachains.length > config.relaychain.nodes.length) {
+	if (config.parachains.length >= config.relaychain.nodes.length) {
 		console.error("Must have the same or greater number of relaychain nodes than parachains.")
 		return false
 	}

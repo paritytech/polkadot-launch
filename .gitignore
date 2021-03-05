@@ -5,5 +5,4 @@ rococo-local.json
 rococo-local-raw.json
 configLocal.json
 bin
-.DS_Store 
-dist
+.DS_Store
