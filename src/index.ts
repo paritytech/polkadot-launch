@@ -30,26 +30,28 @@ import { LaunchConfig } from "./types";
 // relative path. So the `config.json` file is what we will be our starting point.
 const { argv } = require("yargs");
 
-const config_file = argv._[0] ? argv._[0] : null;
-if (!config_file) {
-  console.error("Missing config file argument...");
-  process.exit();
-}
-let config_path = resolve(process.cwd(), config_file);
-let config_dir = dirname(config_path);
-if (!fs.existsSync(config_path)) {
-  console.error("Config file does not exist: ", config_path);
-  process.exit();
-}
-let config: LaunchConfig = require(config_path);
 
-function sleep(ms: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
+// function sleep(ms: number) {
+//   return new Promise((resolve) => {
+//     setTimeout(resolve, ms);
+//   });
+// }
 
-async function main() {
+export async function start(_config_file?:string) {
+  console.log("_config_file",_config_file)
+  const config_file = _config_file?_config_file:argv._[0] ? argv._[0] : null;
+  console.log('config_file',config_file)
+  if (!config_file) {
+    console.error("Missing config file argument...");
+    process.exit();
+  }
+  let config_path = resolve(process.cwd(), config_file);
+  let config_dir = dirname(config_path);
+  if (!fs.existsSync(config_path)) {
+    console.error("Config file does not exist: ", config_path);
+    process.exit();
+  }
+  let config: LaunchConfig = require(config_path);
   // keep track of registered parachains
   let registeredParachains: { [key: string]: boolean } = {};
 
@@ -226,4 +228,4 @@ process.on("SIGINT", function () {
   process.exit(2);
 });
 
-main();
+// start();

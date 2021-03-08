@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.start = void 0;
 const spawn_1 = require("./spawn");
 const rpc_1 = require("./rpc");
 const check_1 = require("./check");
@@ -24,25 +25,27 @@ const fs_1 = __importDefault(require("fs"));
 // The user passes the path to `config.json`, and we use that as the starting point for any other
 // relative path. So the `config.json` file is what we will be our starting point.
 const { argv } = require("yargs");
-const config_file = argv._[0] ? argv._[0] : null;
-if (!config_file) {
-    console.error("Missing config file argument...");
-    process.exit();
-}
-let config_path = path_1.resolve(process.cwd(), config_file);
-let config_dir = path_1.dirname(config_path);
-if (!fs_1.default.existsSync(config_path)) {
-    console.error("Config file does not exist: ", config_path);
-    process.exit();
-}
-let config = require(config_path);
-function sleep(ms) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
-}
-function main() {
+// function sleep(ms: number) {
+//   return new Promise((resolve) => {
+//     setTimeout(resolve, ms);
+//   });
+// }
+function start(_config_file) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("_config_file", _config_file);
+        const config_file = _config_file ? _config_file : argv._[0] ? argv._[0] : null;
+        console.log('config_file', config_file);
+        if (!config_file) {
+            console.error("Missing config file argument...");
+            process.exit();
+        }
+        let config_path = path_1.resolve(process.cwd(), config_file);
+        let config_dir = path_1.dirname(config_path);
+        if (!fs_1.default.existsSync(config_path)) {
+            console.error("Config file does not exist: ", config_path);
+            process.exit();
+        }
+        let config = require(config_path);
         // keep track of registered parachains
         let registeredParachains = {};
         // Verify that the `config.json` has all the expected properties.
@@ -157,6 +160,7 @@ function main() {
         }
     });
 }
+exports.start = start;
 function ensureOnboarded(relayChainApi, paraId) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise(function (resolve) {
@@ -192,4 +196,4 @@ process.on("SIGINT", function () {
     console.log("SIGINT spawn");
     process.exit(2);
 });
-main();
+// start();

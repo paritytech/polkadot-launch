@@ -28,6 +28,7 @@ import fs from 'fs'
 import  { resolve, dirname } from 'path'
 //const fs=require('fs')
 import {LaunchConfig} from '../src/types'
+import { start } from "../src";
 
 export const GENESIS_ACCOUNT = "0x6be02d1d3665660d22ff9624b7be0551ee1ac91b";
 //const GENESIS_ACCOUNT_BALANCE = "1152921504606846976";
@@ -57,26 +58,14 @@ interface ParachainConfig {
   flags: string[];
 }
 
+export {start} from '../src'
+
+
+
 export default async function main() {
-  let clientList: Web3[];
-  let accounts: string[];
-  // set a value for the transfers
-  const value: string = TRANSFER_VALUE;
-  const initialNodeBalance: string = INITIAL_NODE_BALANCE;
-  console.log("transfer value is ", hexToNumber(value));
-  console.log("initial node balance is ", hexToNumber(initialNodeBalance));
-
-  // keep track of registered parachains
-  let registeredParachains: { [key: string]: boolean } = {};
-
-  // Verify that the `config.json` has all the expected properties.
-  // if (!checkConfig(config)) {
-  // 	return;
-  // }
-
-  const config_file = "config_moonbeam.json"; //argv._[0] ? argv._[0] : null;
+  const config_file = "config_moonbeam.json";
   if (!config_file) {
-    console.error("Missing config file argument...");
+    console.error("Missing config file argument... 1");
     process.exit();
   }
   let config_path = resolve(process.cwd(), config_file);
@@ -86,91 +75,16 @@ export default async function main() {
     process.exit();
   }
   let config:LaunchConfig = require(config_path);
-  const relay_chain_bin = resolve(config_dir, config.relaychain.bin);
-  if (!fs.existsSync(relay_chain_bin)) {
-    console.error("Relay chain binary does not exist: ", relay_chain_bin);
-    process.exit();
-  }
-  const chain = config.relaychain.chain;
-  await generateChainSpec(relay_chain_bin, chain);
-  clearAuthorities(`specFiles/${chain}.json`);
-  for (const node of config.relaychain.nodes) {
-    await addAuthority(`specFiles/${chain}.json`, node.name);
-  }
-  await generateChainSpecRaw(relay_chain_bin, chain);
-  const spec = resolve(`specFiles/${chain}-raw.json`);
 
-  // First we launch each of the validators for the relay chain.
-  for (const node of config.relaychain.nodes) {
-    const { name, wsPort, port, flags } = node;
-    console.log(`Starting ${name}...`);
-    // We spawn a `child_process` starting a node, and then wait until we
-    // able to connect to it using PolkadotJS in order to know its running.
-    startNode(relay_chain_bin, name, wsPort, port, spec, flags);
-  }
-
-  // Connect to the first relay chain node to submit the extrinsic.
-  let relayChainApi = await connect(
-    config.relaychain.nodes[0].wsPort,
-    config.types
-  );
-
-  // Then launch each parachain
-  await new Promise<void>(async (resolvePromise, reject) => {
-    let readyIndex = 0;
-    function checkFinality() {
-      readyIndex += 1;
-      if (readyIndex === config.parachains.length) {
-        resolvePromise();
-      }
-    }
-    for (const parachain of config.parachains) {
-      const { id, wsPort, balance, port, flags, chain } = parachain;
-      const bin = resolve(config_dir, parachain.bin);
-      if (!fs.existsSync(bin)) {
-        console.error("Parachain binary does not exist: ", bin);
-        process.exit();
-      }
-      let account = parachainAccount(id);
-      console.log(
-        `Starting a Collator for parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`
-      );
-      console.log('chain',chain)
-      await startCollator(bin, id, wsPort, port, chain, spec, flags);
-
-      // If it isn't registered yet, register the parachain on the relaychain
-      if (!registeredParachains[id]) {
-        console.log(`Registering Parachain ${id}`);
-
-        // Get the information required to register the parachain on the relay chain.
-        let genesisState;
-        let genesisWasm;
-        try {
-          genesisState = await exportGenesisState(bin, id, chain);
-          genesisWasm = await exportGenesisWasm(bin, chain);
-        } catch (err) {
-          console.error(err);
-          process.exit(1);
-        }
-        try {
-          await registerParachain(relayChainApi, id, genesisWasm, genesisState);
-          //checkFinality('isRegistered')
-        } catch (e) {
-          console.log("error during register", e);
-        }
-
-        registeredParachains[id] = true;
-
-        // Allow time for the TX to complete, avoiding nonce issues.
-        // TODO: Handle nonce directly instead of this.
-        if (balance) {
-          await setBalance(relayChainApi, account, balance);
-          //checkFinality('isBalanceSet')
-        }
-      }
-      checkFinality();
-    }
-  });
+  let clientList: Web3[];
+  let accounts: string[];
+  // set a value for the transfers
+  const value: string = TRANSFER_VALUE;
+  const initialNodeBalance: string = INITIAL_NODE_BALANCE;
+  console.log("transfer value is ", hexToNumber(value));
+  console.log("initial node balance is ", hexToNumber(initialNodeBalance));
+  console.log("config_file",config_file)
+  await start(config_file)
   console.log("ALL PARACHAINS REGISTERED");
 
   console.log("GREAT SUCCESS, nodes ready");
@@ -313,7 +227,7 @@ export default async function main() {
   //process.kill(process.pid, 'SIGINT');
   process.exit(0);
 }
-//main();
+main();
 
 // log unhandledRejection
 process.on("unhandledRejection", (error: any) => {

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GENESIS_ACCOUNT = void 0;
+exports.start = exports.GENESIS_ACCOUNT = void 0;
 const util_1 = require("@polkadot/util");
 const web3_1 = __importDefault(require("web3"));
 const testUtils_1 = require("../scripts_moonbeam/testUtils");
@@ -21,14 +21,9 @@ const watchBlock_1 = require("../scripts_moonbeam/testUtils/watchBlock");
 const web3Calls_1 = require("../scripts_moonbeam/testUtils/web3Calls");
 //import fs from "fs";
 const spawn_1 = require("../src/spawn");
-//@ts-ignore
-const spec_1 = require("../src/spec");
-//@ts-ignore
-const parachain_1 = require("../src/parachain");
-//@ts-ignore
-const rpc_1 = require("../src/rpc");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = require("path");
+const src_1 = require("../src");
 exports.GENESIS_ACCOUNT = "0x6be02d1d3665660d22ff9624b7be0551ee1ac91b";
 //const GENESIS_ACCOUNT_BALANCE = "1152921504606846976";
 const GENESIS_ACCOUNT_PRIVATE_KEY = "0x99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E342";
@@ -37,24 +32,13 @@ const TRANSFER_VALUE = "0x2000";
 const INITIAL_NODE_BALANCE = "0x200000000";
 //const { argv } = require("yargs");
 const NUMBER_TX = 10;
+var src_2 = require("../src");
+Object.defineProperty(exports, "start", { enumerable: true, get: function () { return src_2.start; } });
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        let clientList;
-        let accounts;
-        // set a value for the transfers
-        const value = TRANSFER_VALUE;
-        const initialNodeBalance = INITIAL_NODE_BALANCE;
-        console.log("transfer value is ", util_1.hexToNumber(value));
-        console.log("initial node balance is ", util_1.hexToNumber(initialNodeBalance));
-        // keep track of registered parachains
-        let registeredParachains = {};
-        // Verify that the `config.json` has all the expected properties.
-        // if (!checkConfig(config)) {
-        // 	return;
-        // }
-        const config_file = "config_moonbeam.json"; //argv._[0] ? argv._[0] : null;
+        const config_file = "config_moonbeam.json";
         if (!config_file) {
-            console.error("Missing config file argument...");
+            console.error("Missing config file argument... 1");
             process.exit();
         }
         let config_path = path_1.resolve(process.cwd(), config_file);
@@ -64,81 +48,15 @@ function main() {
             process.exit();
         }
         let config = require(config_path);
-        const relay_chain_bin = path_1.resolve(config_dir, config.relaychain.bin);
-        if (!fs_1.default.existsSync(relay_chain_bin)) {
-            console.error("Relay chain binary does not exist: ", relay_chain_bin);
-            process.exit();
-        }
-        const chain = config.relaychain.chain;
-        yield spawn_1.generateChainSpec(relay_chain_bin, chain);
-        spec_1.clearAuthorities(`specFiles/${chain}.json`);
-        for (const node of config.relaychain.nodes) {
-            yield spec_1.addAuthority(`specFiles/${chain}.json`, node.name);
-        }
-        yield spawn_1.generateChainSpecRaw(relay_chain_bin, chain);
-        const spec = path_1.resolve(`specFiles/${chain}-raw.json`);
-        // First we launch each of the validators for the relay chain.
-        for (const node of config.relaychain.nodes) {
-            const { name, wsPort, port, flags } = node;
-            console.log(`Starting ${name}...`);
-            // We spawn a `child_process` starting a node, and then wait until we
-            // able to connect to it using PolkadotJS in order to know its running.
-            spawn_1.startNode(relay_chain_bin, name, wsPort, port, spec, flags);
-        }
-        // Connect to the first relay chain node to submit the extrinsic.
-        let relayChainApi = yield rpc_1.connect(config.relaychain.nodes[0].wsPort, config.types);
-        // Then launch each parachain
-        yield new Promise((resolvePromise, reject) => __awaiter(this, void 0, void 0, function* () {
-            let readyIndex = 0;
-            function checkFinality() {
-                readyIndex += 1;
-                if (readyIndex === config.parachains.length) {
-                    resolvePromise();
-                }
-            }
-            for (const parachain of config.parachains) {
-                const { id, wsPort, balance, port, flags, chain } = parachain;
-                const bin = path_1.resolve(config_dir, parachain.bin);
-                if (!fs_1.default.existsSync(bin)) {
-                    console.error("Parachain binary does not exist: ", bin);
-                    process.exit();
-                }
-                let account = parachain_1.parachainAccount(id);
-                console.log(`Starting a Collator for parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`);
-                console.log('chain', chain);
-                yield spawn_1.startCollator(bin, id, wsPort, port, chain, spec, flags);
-                // If it isn't registered yet, register the parachain on the relaychain
-                if (!registeredParachains[id]) {
-                    console.log(`Registering Parachain ${id}`);
-                    // Get the information required to register the parachain on the relay chain.
-                    let genesisState;
-                    let genesisWasm;
-                    try {
-                        genesisState = yield spawn_1.exportGenesisState(bin, id, chain);
-                        genesisWasm = yield spawn_1.exportGenesisWasm(bin, chain);
-                    }
-                    catch (err) {
-                        console.error(err);
-                        process.exit(1);
-                    }
-                    try {
-                        yield rpc_1.registerParachain(relayChainApi, id, genesisWasm, genesisState);
-                        //checkFinality('isRegistered')
-                    }
-                    catch (e) {
-                        console.log("error during register", e);
-                    }
-                    registeredParachains[id] = true;
-                    // Allow time for the TX to complete, avoiding nonce issues.
-                    // TODO: Handle nonce directly instead of this.
-                    if (balance) {
-                        yield rpc_1.setBalance(relayChainApi, account, balance);
-                        //checkFinality('isBalanceSet')
-                    }
-                }
-                checkFinality();
-            }
-        }));
+        let clientList;
+        let accounts;
+        // set a value for the transfers
+        const value = TRANSFER_VALUE;
+        const initialNodeBalance = INITIAL_NODE_BALANCE;
+        console.log("transfer value is ", util_1.hexToNumber(value));
+        console.log("initial node balance is ", util_1.hexToNumber(initialNodeBalance));
+        console.log("config_file", config_file);
+        yield src_1.start(config_file);
         console.log("ALL PARACHAINS REGISTERED");
         console.log("GREAT SUCCESS, nodes ready");
         // instantiate apis
