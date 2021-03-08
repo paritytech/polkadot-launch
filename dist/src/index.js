@@ -32,9 +32,11 @@ const { argv } = require("yargs");
 // }
 function start(_config_file) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("_config_file", _config_file);
-        const config_file = _config_file ? _config_file : argv._[0] ? argv._[0] : null;
-        console.log('config_file', config_file);
+        const config_file = _config_file
+            ? _config_file
+            : argv._[0]
+                ? argv._[0]
+                : null;
         if (!config_file) {
             console.error("Missing config file argument...");
             process.exit();

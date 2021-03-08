@@ -42,7 +42,7 @@ function main() {
             process.exit();
         }
         let config_path = path_1.resolve(process.cwd(), config_file);
-        let config_dir = path_1.dirname(config_path);
+        // let config_dir = dirname(config_path);
         if (!fs_1.default.existsSync(config_path)) {
             console.error("Config file does not exist: ", config_path);
             process.exit();
@@ -53,9 +53,6 @@ function main() {
         // set a value for the transfers
         const value = TRANSFER_VALUE;
         const initialNodeBalance = INITIAL_NODE_BALANCE;
-        console.log("transfer value is ", util_1.hexToNumber(value));
-        console.log("initial node balance is ", util_1.hexToNumber(initialNodeBalance));
-        console.log("config_file", config_file);
         yield src_1.start(config_file);
         console.log("ALL PARACHAINS REGISTERED");
         console.log("GREAT SUCCESS, nodes ready");

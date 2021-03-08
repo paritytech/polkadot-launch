@@ -30,17 +30,18 @@ import { LaunchConfig } from "./types";
 // relative path. So the `config.json` file is what we will be our starting point.
 const { argv } = require("yargs");
 
-
 // function sleep(ms: number) {
 //   return new Promise((resolve) => {
 //     setTimeout(resolve, ms);
 //   });
 // }
 
-export async function start(_config_file?:string) {
-  console.log("_config_file",_config_file)
-  const config_file = _config_file?_config_file:argv._[0] ? argv._[0] : null;
-  console.log('config_file',config_file)
+export async function start(_config_file?: string) {
+  const config_file = _config_file
+    ? _config_file
+    : argv._[0]
+    ? argv._[0]
+    : null;
   if (!config_file) {
     console.error("Missing config file argument...");
     process.exit();
@@ -208,7 +209,7 @@ async function ensureOnboarded(relayChainApi: ApiPromise, paraId: number) {
 }
 
 // log unhandledRejection
-process.on("unhandledRejection", (error:any) => {
+process.on("unhandledRejection", (error: any) => {
   if (error.message) {
     console.trace(error);
   } else {

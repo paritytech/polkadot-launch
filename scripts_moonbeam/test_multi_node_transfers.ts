@@ -69,7 +69,7 @@ export default async function main() {
     process.exit();
   }
   let config_path = resolve(process.cwd(), config_file);
-  let config_dir = dirname(config_path);
+  // let config_dir = dirname(config_path);
   if (!fs.existsSync(config_path)) {
     console.error("Config file does not exist: ", config_path);
     process.exit();
@@ -81,9 +81,6 @@ export default async function main() {
   // set a value for the transfers
   const value: string = TRANSFER_VALUE;
   const initialNodeBalance: string = INITIAL_NODE_BALANCE;
-  console.log("transfer value is ", hexToNumber(value));
-  console.log("initial node balance is ", hexToNumber(initialNodeBalance));
-  console.log("config_file",config_file)
   await start(config_file)
   console.log("ALL PARACHAINS REGISTERED");
 
