@@ -32,6 +32,7 @@ const { argv } = require("yargs");
 // }
 function start(_config_file) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log('START');
         const config_file = _config_file
             ? _config_file
             : argv._[0]

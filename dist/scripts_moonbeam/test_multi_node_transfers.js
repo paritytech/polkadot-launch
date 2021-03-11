@@ -152,7 +152,7 @@ function main() {
     });
 }
 exports.default = main;
-main();
+// main();
 // log unhandledRejection
 process.on("unhandledRejection", (error) => {
     if (error.message) {

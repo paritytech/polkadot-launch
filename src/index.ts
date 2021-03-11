@@ -37,6 +37,7 @@ const { argv } = require("yargs");
 // }
 
 export async function start(_config_file?: string) {
+  console.log('START')
   const config_file = _config_file
     ? _config_file
     : argv._[0]
