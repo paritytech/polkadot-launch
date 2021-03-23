@@ -1,5 +1,6 @@
 // This function checks that the `config.json` file has all the expected properties.
 // It displays a unique error message and returns `false` for any detected issues.
+import { LaunchConfig } from "./types"
 export function checkConfig(config:LaunchConfig) {
 	if (!config) {
 		return false
@@ -37,7 +38,7 @@ export function checkConfig(config:LaunchConfig) {
 		return false
 	}
 
-	if (config.parachains.length > config.relaychain.nodes.length) {
+	if (config.parachains.length >= config.relaychain.nodes.length) {
 		console.error("Must have the same or greater number of relaychain nodes than parachains.")
 		return false
 	}

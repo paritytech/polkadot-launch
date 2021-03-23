@@ -1,11 +1,11 @@
-interface LaunchConfig {
+export interface LaunchConfig {
   relaychain: RelayChainConfig;
   parachains: ParachainConfig[];
   simpleParachains: SimpleParachainConfig[];
   hrmpChannels: HrmpChannelsConfig[];
   types: any;
 }
-interface ParachainConfig {
+export interface ParachainConfig {
   bin: string;
   id: string;
   rpcPort: number;
@@ -15,19 +15,19 @@ interface ParachainConfig {
   flags: string[];
   chain?: string;
 }
-interface SimpleParachainConfig {
+export interface SimpleParachainConfig {
   bin: string;
   id: string;
   port: string;
   balance: string;
 }
-interface HrmpChannelsConfig {
+export interface HrmpChannelsConfig {
   sender:number;
   recipient: number;
   maxCapacity: number;
   maxMessageSize: number;
 }
-interface RelayChainConfig {
+export interface RelayChainConfig {
   bin: string;
   chain: string;
   nodes: {
@@ -38,7 +38,7 @@ interface RelayChainConfig {
   }[];
 }
 
-interface ChainSpec {
+export interface ChainSpec {
   name: string;
   id: string;
   chainType: string;
