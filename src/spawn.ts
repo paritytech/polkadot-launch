@@ -198,7 +198,6 @@ export function startCollator(
     p[wsPort].stderr.on("data", function (chunk) {
       let message = chunk.toString();
       if (message.substring(21, 50) === "Listening for new connections") {
-		  console.log('collator started')
         resolve();
       }
       log.write(message);

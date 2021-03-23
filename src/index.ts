@@ -103,7 +103,6 @@ async function main() {
   );
 
   // Then launch each parachain
-  //await new Promise<void>(async (resolvePromise, reject) => {
   for (const parachain of config.parachains) {
     const { id, wsPort, balance, port, flags, chain } = parachain;
     const bin = resolve(config_dir, parachain.bin);
@@ -143,13 +142,9 @@ async function main() {
       }
     }
   }
-  console.log('alla para registered')
 
-  console.log(config.simpleParachains)
-  //})
   // Then launch each simple parachain (e.g. an adder-collator)
   if (config.simpleParachains) {
-    console.log('zut')
     for (const simpleParachain of config.simpleParachains) {
       const { id, port, balance } = simpleParachain;
       const bin = resolve(config_dir, simpleParachain.bin);
@@ -185,7 +180,6 @@ async function main() {
       }
     }
   }
-  console.log('ok')
   if (config.hrmpChannels) {
     for (const hrmpChannel of config.hrmpChannels) {
       await ensureOnboarded(relayChainApi, hrmpChannel.sender);

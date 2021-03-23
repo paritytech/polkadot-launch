@@ -142,7 +142,7 @@ export async function establishHrmpChannel(
 ) {
   return new Promise<void>(async (resolvePromise, reject) => {
     await cryptoWaitReady();
-console.log('ready')
+	
     const keyring = new Keyring({ type: "sr25519" });
     const alice = keyring.addFromUri("//Alice");
 
