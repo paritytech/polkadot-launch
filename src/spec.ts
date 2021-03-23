@@ -1,5 +1,6 @@
 import { Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
+import { ChainSpec } from './types';
 const fs = require('fs');
 
 function nameCase(string:string) {
