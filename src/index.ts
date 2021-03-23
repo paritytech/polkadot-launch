@@ -155,7 +155,7 @@ async function main() {
 
       let account = parachainAccount(id);
       console.log(`Starting Parachain ${id}: ${account}`);
-      startSimpleCollator(bin, id, spec, port);
+      await startSimpleCollator(bin, id, spec, port);
 
       // Get the information required to register the parachain on the relay chain.
       let genesisState;

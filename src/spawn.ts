@@ -149,7 +149,7 @@ export function startCollator(
   spec?: string,
   flags?: string[]
 ) {
-  return new Promise<void>(function (resolve, reject) {
+  return new Promise<void>(function (resolve) {
     // TODO: Make DB directory configurable rather than just `tmp`
     let args = [
       "--tmp",
@@ -211,7 +211,7 @@ export function startSimpleCollator(
   spec: string,
   port: string
 ) {
-	return new Promise<void>(function (resolve, reject) {
+	return new Promise<void>(function (resolve) {
   let args = [
     "--tmp",
     "--parachain-id=" + id,
