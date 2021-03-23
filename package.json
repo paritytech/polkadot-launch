@@ -1,30 +1,30 @@
 {
-  "name": "polkadot-launch",
-  "version": "1.2.0",
-  "main": "dist/index.js",
-  "author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
-  "license": "MIT",
-  "scripts": {
-    "build": "tsc",
-    "start": "yarn build && node dist/index.js",
-    "lint": "npx prettier --write ."
-  },
-  "dependencies": {
-    "@polkadot/api": "^3.8.1",
-    "@polkadot/util": "^5.6.1",
-    "@polkadot/util-crypto": "^5.6.1",
-    "filter-console": "^0.1.1",
-    "typescript": "^4.1.5",
-    "yargs": "^15.4.1",
-    "yarn": "^1.22.10"
-  },
-  "files": [
-    "dist"
-  ],
-  "bin": {
-    "polkadot-launch": "dist/index.js"
-  },
-  "devDependencies": {
-    "prettier": "2.2.1"
-  }
+	"name": "polkadot-launch",
+	"version": "1.2.0",
+	"main": "dist/index.js",
+	"author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
+	"license": "MIT",
+	"scripts": {
+		"build": "tsc",
+		"start": "yarn build && node dist/index.js",
+		"lint": "npx prettier --write ."
+	},
+	"dependencies": {
+		"@polkadot/api": "^3.8.1",
+		"@polkadot/util": "^5.6.1",
+		"@polkadot/util-crypto": "^5.6.1",
+		"filter-console": "^0.1.1",
+		"typescript": "^4.1.5",
+		"yargs": "^15.4.1",
+		"yarn": "^1.22.10"
+	},
+	"files": [
+		"dist"
+	],
+	"bin": {
+		"polkadot-launch": "dist/index.js"
+	},
+	"devDependencies": {
+		"prettier": "2.2.1"
+	}
 }
