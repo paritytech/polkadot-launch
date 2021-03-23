@@ -184,7 +184,7 @@ async function main() {
     for (const hrmpChannel of config.hrmpChannels) {
       await ensureOnboarded(relayChainApi, hrmpChannel.sender);
       await ensureOnboarded(relayChainApi, hrmpChannel.recipient);
-      console.log(2)
+      console.log(2);
 
       const { sender, recipient, maxCapacity, maxMessageSize } = hrmpChannel;
       await establishHrmpChannel(

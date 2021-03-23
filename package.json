@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start": "yarn build && node dist/index.js"
+    "start": "yarn build && node dist/index.js",
+    "lint": "npx prettier --write ."
   },
   "dependencies": {
     "@polkadot/api": "^3.8.1",
@@ -22,5 +23,8 @@
   ],
   "bin": {
     "polkadot-launch": "dist/index.js"
+  },
+  "devDependencies": {
+    "prettier": "2.2.1"
   }
 }

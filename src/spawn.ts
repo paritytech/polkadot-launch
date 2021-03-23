@@ -211,31 +211,31 @@ export function startSimpleCollator(
   spec: string,
   port: string
 ) {
-	return new Promise<void>(function (resolve) {
-  let args = [
-    "--tmp",
-    "--parachain-id=" + id,
-    "--port=" + port,
-    "--chain=" + spec,
-    "--execution=wasm",
-  ];
+  return new Promise<void>(function (resolve) {
+    let args = [
+      "--tmp",
+      "--parachain-id=" + id,
+      "--port=" + port,
+      "--chain=" + spec,
+      "--execution=wasm",
+    ];
 
-  p[port] = spawn(bin, args);
+    p[port] = spawn(bin, args);
 
-  let log = fs.createWriteStream(`${port}.log`);
+    let log = fs.createWriteStream(`${port}.log`);
 
-  p[port].stdout.on("data", function (chunk) {
-    let message = chunk.toString();
-    log.write(message);
+    p[port].stdout.on("data", function (chunk) {
+      let message = chunk.toString();
+      log.write(message);
+    });
+    p[port].stderr.on("data", function (chunk) {
+      let message = chunk.toString();
+      if (message.substring(21, 50) === "Listening for new connections") {
+        resolve();
+      }
+      log.write(message);
+    });
   });
-  p[port].stderr.on("data", function (chunk) {
-	let message = chunk.toString();
-	if (message.substring(21, 50) === "Listening for new connections") {
-	  resolve();
-	}
-	log.write(message);
-  });
-});
 }
 
 // Purge the chain for any node.

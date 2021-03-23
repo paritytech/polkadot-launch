@@ -22,7 +22,7 @@ export interface SimpleParachainConfig {
   balance: string;
 }
 export interface HrmpChannelsConfig {
-  sender:number;
+  sender: number;
   recipient: number;
   maxCapacity: number;
   maxMessageSize: number;
@@ -51,7 +51,7 @@ export interface ChainSpec {
   consensusEngine: null;
   lightSyncState: null;
   genesis: {
-    runtime: any;// this can change depending on the versions
+    runtime: any; // this can change depending on the versions
     raw: {
       top: {
         [key: string]: string;
