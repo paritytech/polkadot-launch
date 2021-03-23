@@ -173,7 +173,7 @@ export function startCollator(bin:string, id:string, wsPort:number, port:number,
     p[wsPort].stdout.pipe(log);
     p[wsPort].stderr.on("data", function (chunk) {
       let message = chunk.toString();
-      if (message.substring(21, 50) == "Listening for new connections") {
+      if (message.substring(21, 50) === "Listening for new connections") {
         resolve();
       }
       log.write(message);
