@@ -17,7 +17,7 @@ import {
 	establishHrmpChannel,
 } from "./rpc";
 import { checkConfig } from "./check";
-import { clearAuthorities, addAuthority } from "./spec";
+import { clearAuthorities, addAuthority, listenAddresses, addBootNodes } from "./spec";
 import { parachainAccount } from "./parachain";
 import { ApiPromise } from "@polkadot/api";
 
@@ -81,20 +81,28 @@ async function main() {
 	await generateChainSpecRaw(relay_chain_bin, chain);
 	const spec = resolve(`${chain}-raw.json`);
 
-	// First we launch each of the validators for the relay chain.
-	for (const node of config.relaychain.nodes) {
-		const { name, wsPort, port, flags } = node;
-		console.log(`Starting ${name}...`);
-		// We spawn a `child_process` starting a node, and then wait until we
-		// able to connect to it using PolkadotJS in order to know its running.
-		startNode(relay_chain_bin, name, wsPort, port, spec, flags);
-	}
-
+	const { name, wsPort, port, flags } = config.relaychain.nodes[0];
+	startNode(relay_chain_bin, name, wsPort, port, spec, flags);
 	// Connect to the first relay chain node to submit the extrinsic.
 	let relayChainApi: ApiPromise = await connect(
 		config.relaychain.nodes[0].wsPort,
 		loadTypeDef(config.types)
 	);
+
+	// First we launch each of the validators for the relay chain.
+	for (const node of config.relaychain.nodes) {
+		// do not give a bootnode to the first node we connect to (everyone else gets its bootnode)
+		if (node.name !== config.relaychain.nodes[0].name) {
+			const { name, wsPort, port, flags } = node;
+			console.log(`Starting ${name}...`);
+			let addresses = await listenAddresses(relayChainApi)
+			await addBootNodes(`${chain}-raw.json`, addresses);
+
+			// We spawn a `child_process` starting a node, and then wait until we
+			// able to connect to it using PolkadotJS in order to know its running.
+			startNode(relay_chain_bin, name, wsPort, port, spec, flags);
+		}
+	}
 
 	// Then launch each parachain
 	for (const parachain of config.parachains) {

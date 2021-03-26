@@ -74,3 +74,17 @@ export async function addAuthority(spec: string, name: string) {
 	fs.writeFileSync(spec, data);
 	console.log(`Added Authority ${name}`);
 }
+
+export async function addBootNodes(spec: any, addresses: any) {
+	let rawdata = fs.readFileSync(spec);
+	let chainSpec = JSON.parse(rawdata);
+	chainSpec.bootNodes = addresses;
+	let data = JSON.stringify(chainSpec, null, 2);
+	fs.writeFileSync(spec, data);
+	console.log(`Added Boot Nodes: ${addresses}`);
+}
+
+export async function listenAddresses(api: any) {
+	let listenAddresses = await api.rpc.system.localListenAddresses();
+	return listenAddresses.toJSON();
+}
