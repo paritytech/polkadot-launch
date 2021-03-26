@@ -54,7 +54,8 @@ export async function registerParachain(
 	api: ApiPromise,
 	id: string,
 	wasm: string,
-	header: string
+	header: string,
+	finalization: boolean = false,
 ) {
 	return new Promise<void>(async (resolvePromise, reject) => {
 		await cryptoWaitReady();
@@ -80,6 +81,12 @@ export async function registerParachain(
 					console.log(
 						`Transaction included at blockHash ${result.status.asInBlock}`
 					);
+					if (finalization) {
+						console.log("Waiting for finalization...");
+					} else {
+						unsub();
+						resolvePromise();
+					}
 				} else if (result.status.isFinalized) {
 					console.log(
 						`Transaction finalized at blockHash ${result.status.asFinalized}`
@@ -96,7 +103,12 @@ export async function registerParachain(
 }
 
 // Set the balance of an account on the relay chain.
-export async function setBalance(api: ApiPromise, who: string, value: string) {
+export async function setBalance(
+	api: ApiPromise,
+	who: string,
+	value: string,
+	finalization: boolean = false,
+) {
 	return new Promise<void>(async (resolvePromise, reject) => {
 		await cryptoWaitReady();
 
@@ -118,6 +130,12 @@ export async function setBalance(api: ApiPromise, who: string, value: string) {
 					console.log(
 						`Transaction included at blockHash ${result.status.asInBlock}`
 					);
+					if (finalization) {
+						console.log("Waiting for finalization...");
+					} else {
+						unsub();
+						resolvePromise();
+					}
 				} else if (result.status.isFinalized) {
 					console.log(
 						`Transaction finalized at blockHash ${result.status.asFinalized}`
@@ -138,7 +156,8 @@ export async function establishHrmpChannel(
 	sender: number,
 	receiver: number,
 	maxCapacity: number,
-	maxMessageSize: number
+	maxMessageSize: number,
+	finalization: boolean = false,
 ) {
 	return new Promise<void>(async (resolvePromise, reject) => {
 		await cryptoWaitReady();
@@ -151,7 +170,7 @@ export async function establishHrmpChannel(
 		}
 
 		console.log(
-			`--- Submitting extrinsic to establish an HRMP channel ${sender}->${receiver}. (nonce: ${nonce}) ---`
+			`--- Submitting extrinsic to establish an HRMP channel ${sender} -> ${receiver}. (nonce: ${nonce}) ---`
 		);
 		const unsub = await api.tx.sudo
 			.sudo(
@@ -159,7 +178,7 @@ export async function establishHrmpChannel(
 					sender,
 					receiver,
 					maxCapacity,
-					maxMessageSize
+					maxMessageSize,
 				)
 			)
 			.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
@@ -168,6 +187,12 @@ export async function establishHrmpChannel(
 					console.log(
 						`Transaction included at blockHash ${result.status.asInBlock}`
 					);
+					if (finalization) {
+						console.log("Waiting for finalization...");
+					} else {
+						unsub();
+						resolvePromise();
+					}
 				} else if (result.status.isFinalized) {
 					console.log(
 						`Transaction finalized at blockHash ${result.status.asFinalized}`
@@ -186,7 +211,8 @@ export async function establishHrmpChannel(
 export async function sendHrmpMessage(
 	api: ApiPromise,
 	recipient: string,
-	data: string
+	data: string,
+	finalization: boolean = false,
 ) {
 	return new Promise<void>(async (resolvePromise, reject) => {
 		await cryptoWaitReady();
@@ -213,6 +239,12 @@ export async function sendHrmpMessage(
 					console.log(
 						`Transaction included at blockHash ${result.status.asInBlock}`
 					);
+					if (finalization) {
+						console.log("Waiting for finalization...");
+					} else {
+						unsub();
+						resolvePromise();
+					}
 				} else if (result.status.isFinalized) {
 					console.log(
 						`Transaction finalized at blockHash ${result.status.asFinalized}`

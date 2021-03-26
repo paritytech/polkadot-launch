@@ -59,5 +59,6 @@
 			"maxMessageSize": 512
 		}
 	],
-	"types": {}
+	"types": {},
+	"finalization": false
 }

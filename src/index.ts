@@ -43,12 +43,6 @@ if (!fs.existsSync(config_path)) {
 }
 let config: LaunchConfig = require(config_path);
 
-function sleep(ms: number) {
-	return new Promise((resolve) => {
-		setTimeout(resolve, ms);
-	});
-}
-
 function loadTypeDef(types: string | object): object {
 	if (typeof types === "string") {
 		// Treat types as a json file path
@@ -131,14 +125,14 @@ async function main() {
 				process.exit(1);
 			}
 
-			await registerParachain(relayChainApi, id, genesisWasm, genesisState);
+			await registerParachain(relayChainApi, id, genesisWasm, genesisState, config.finalization);
 
 			registeredParachains[id] = true;
 
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.
 			if (balance) {
-				await setBalance(relayChainApi, account, balance);
+				await setBalance(relayChainApi, account, balance, config.finalization);
 			}
 		}
 	}
@@ -171,20 +165,20 @@ async function main() {
 			}
 
 			console.log(`Registering Parachain ${id}`);
-			await registerParachain(relayChainApi, id, genesisWasm, genesisState);
+			await registerParachain(relayChainApi, id, genesisWasm, genesisState, config.finalization);
 
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.
 			if (balance) {
-				await setBalance(relayChainApi, account, balance);
+				await setBalance(relayChainApi, account, balance, config.finalization);
 			}
 		}
 	}
 	if (config.hrmpChannels) {
 		for (const hrmpChannel of config.hrmpChannels) {
+			console.log(`Setting Up HRMP Channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`);
 			await ensureOnboarded(relayChainApi, hrmpChannel.sender);
 			await ensureOnboarded(relayChainApi, hrmpChannel.recipient);
-			console.log(2);
 
 			const { sender, recipient, maxCapacity, maxMessageSize } = hrmpChannel;
 			await establishHrmpChannel(
@@ -192,11 +186,12 @@ async function main() {
 				sender,
 				recipient,
 				maxCapacity,
-				maxMessageSize
+				maxMessageSize,
+				config.finalization,
 			);
 		}
 	}
-	console.log("START SEQUENCE OVER");
+	console.log("🚀 POLKADOT LAUNCH COMPLETE 🚀");
 }
 
 async function ensureOnboarded(relayChainApi: ApiPromise, paraId: number) {

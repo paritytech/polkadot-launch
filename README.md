@@ -148,6 +148,11 @@ Or you can specify a path to the type definition json file instead:
 "types": "./typedefs.json"
 ```
 
+#### `finalization`
+
+A simple boolean flag for whether you want to make sure all of the transactions submitted in
+polkadot-launch wait for finalization.
+
 ## How Does It Work?
 
 This tool just automates the steps needed to spin up multiple relay chain nodes and parachain nodes
@@ -157,9 +162,8 @@ in order to create a local test network.
   node:
   - We build a fresh chain spec using the `chain` parameter specified in your config. This will
     include the authorities you specified. The final file is named `<chain>-raw.json`.
-  - We spawn new node instances using the information provided in your config. Each node produces
-    a `<name>.log` file in your working directory that you can use to track the output. For
-    example:
+  - We spawn new node instances using the information provided in your config. Each node produces a
+    `<name>.log` file in your working directory that you can use to track the output. For example:
     ```bash
     tail -f alice.log # Alice validator on the relay chain
     # or
@@ -169,8 +173,8 @@ in order to create a local test network.
   their WebSocket endpoint.
   - `api.rpc.system.localPeerId()` is used to retrieve the node's PeerId.
   - `api.rpc.system.peers()` is used to retrieve connected peers to a node.
-  - `api.tx.sudo.sudo(api.tx.registrar.registerPara(id, always, wasm, header))` is used to
-    register a parachain.
+  - `api.tx.sudo.sudo(api.tx.registrar.registerPara(id, always, wasm, header))` is used to register
+    a parachain.
     - `wasm` is generated using the `<node> export-genesis-wasm` subcommand.
     - `header` is retrieved by calling `api.rpc.chain.getHeader(genesis_hash)`.
 

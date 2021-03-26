@@ -18,7 +18,6 @@ export async function generateChainSpec(bin: string, chain: string) {
 		let args = ["build-spec", "--chain=" + chain, "--disable-default-bootnode"];
 
 		p["spec"] = spawn(bin, args);
-		console.log("spawned");
 		let spec = fs.createWriteStream(`${chain}.json`);
 
 		// `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
@@ -28,7 +27,6 @@ export async function generateChainSpec(bin: string, chain: string) {
 		p["spec"].stderr.pipe(process.stderr);
 
 		p["spec"].on("close", () => {
-			console.log("resolving");
 			resolve();
 		});
 
@@ -190,14 +188,14 @@ export function startCollator(
 			console.log(`Added ${flags_collator} to collator`);
 		}
 
-		p[wsPort] = spawn(bin, args);
+		p[id] = spawn(bin, args);
 
-		let log = fs.createWriteStream(`${wsPort}.log`);
+		let log = fs.createWriteStream(`${id}.log`);
 
-		p[wsPort].stdout.pipe(log);
-		p[wsPort].stderr.on("data", function (chunk) {
+		p[id].stdout.pipe(log);
+		p[id].stderr.on("data", function (chunk) {
 			let message = chunk.toString();
-			if (message.substring(21, 50) === "Listening for new connections") {
+			if (message.includes("Listening for new connections")) {
 				resolve();
 			}
 			log.write(message);
