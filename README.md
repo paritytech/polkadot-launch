@@ -167,7 +167,7 @@ in order to create a local test network.
     ```bash
     tail -f alice.log # Alice validator on the relay chain
     # or
-    tail -f 200.log # Collator for Parachain ID 200
+    tail -f 9988.log # Collator for Parachain ID 200 on wsPort 9988
     ```
 - [`polkadot-js api`](https://polkadot.js.org/api/) is used to connect to these spawned nodes over
   their WebSocket endpoint.
