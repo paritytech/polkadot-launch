@@ -188,12 +188,12 @@ export function startCollator(
 			console.log(`Added ${flags_collator} to collator`);
 		}
 
-		p[id] = spawn(bin, args);
+		p[wsPort] = spawn(bin, args);
 
-		let log = fs.createWriteStream(`${id}.log`);
+		let log = fs.createWriteStream(`${wsPort}.log`);
 
-		p[id].stdout.pipe(log);
-		p[id].stderr.on("data", function (chunk) {
+		p[wsPort].stdout.pipe(log);
+		p[wsPort].stderr.on("data", function (chunk) {
 			let message = chunk.toString();
 			if (message.includes("Listening for new connections")) {
 				resolve();
