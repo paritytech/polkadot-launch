@@ -165,11 +165,11 @@ function startCollator(bin, id, wsPort, port, chain, spec, flags) {
             console.log(`Added ${flags_collator} to collator`);
         }
         p[wsPort] = child_process_1.spawn(bin, args);
-        let log = fs_1.default.createWriteStream(`${id}.log`);
+        let log = fs_1.default.createWriteStream(`${wsPort}.log`);
         p[wsPort].stdout.pipe(log);
         p[wsPort].stderr.on("data", function (chunk) {
             let message = chunk.toString();
-            if (message.substring(21, 50) === "Listening for new connections") {
+            if (message.substring(33, 62) === "Listening for new connections") {
                 resolve();
             }
             log.write(message);
