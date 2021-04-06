@@ -72,6 +72,9 @@ export async function registerParachain(api:ApiPromise, id:string, wasm:string, 
           console.log(
             `Transaction included at blockHash ${result.status.asInBlock}`
           );
+          unsub();
+          console.log("one REGISTRATION DONE");
+          resolvePromise();
         } else if (result.status.isFinalized) {
           console.log(
             `Transaction finalized at blockHash ${result.status.asFinalized}`
@@ -108,6 +111,9 @@ export async function setBalance(api:ApiPromise, who:string, value:string):Promi
           console.log(
             `Transaction included at blockHash ${result.status.asInBlock}`
           );
+          unsub();
+          console.log("one REGISTRATION DONE");
+          resolvePromise();
         } else if (result.status.isFinalized) {
           console.log(
             `Transaction finalized at blockHash ${result.status.asFinalized}`

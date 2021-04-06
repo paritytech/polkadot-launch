@@ -83,6 +83,9 @@ function registerParachain(api, id, wasm, header) {
                 console.log(`Current registration status is ${result.status}`);
                 if (result.status.isInBlock) {
                     console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
+                    unsub();
+                    console.log("one REGISTRATION DONE");
+                    resolvePromise();
                 }
                 else if (result.status.isFinalized) {
                     console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
@@ -114,6 +117,9 @@ function setBalance(api, who, value) {
                 console.log(`Current setBalance status is ${result.status}`);
                 if (result.status.isInBlock) {
                     console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
+                    unsub();
+                    console.log("one REGISTRATION DONE");
+                    resolvePromise();
                 }
                 else if (result.status.isFinalized) {
                     console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
