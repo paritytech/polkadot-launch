@@ -15,6 +15,7 @@
 		"@polkadot/util-crypto": "^6.1.1",
 		"filter-console": "^0.1.1",
 		"typescript": "^4.1.5",
+		"yaml": "^1.10.2",
 		"yargs": "^15.4.1",
 		"yarn": "^1.22.10"
 	},

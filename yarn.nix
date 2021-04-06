@@ -866,6 +866,14 @@
       };
     }
     {
+      name = "yaml___yaml_1.10.2.tgz";
+      path = fetchurl {
+        name = "yaml___yaml_1.10.2.tgz";
+        url  = "https://registry.yarnpkg.com/yaml/-/yaml-1.10.2.tgz";
+        sha1 = "2301c5ffbf12b467de8da2333a459e29e7920e4b";
+      };
+    }
+    {
       name = "yargs_parser___yargs_parser_18.1.3.tgz";
       path = fetchurl {
         name = "yargs_parser___yargs_parser_18.1.3.tgz";
