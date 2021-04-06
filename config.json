@@ -1,7 +1,9 @@
 {
+	"blockade": true,
 	"relaychain": {
 		"bin": "./bin/polkadot",
 		"chain": "rococo-local",
+		"dockerImage": "polkadot",
 		"nodes": [
 			{
 				"name": "alice",
@@ -28,6 +30,7 @@
 	"parachains": [
 		{
 			"bin": "./bin/rococo-collator",
+			"dockerImage": "cumulus",
 			"id": "200",
 			"wsPort": 9988,
 			"port": 31200,
@@ -36,6 +39,7 @@
 		},
 		{
 			"bin": "./bin/rococo-collator",
+			"dockerImage": "cumulus",
 			"id": "300",
 			"wsPort": 9999,
 			"port": 31300,
@@ -46,6 +50,7 @@
 	"simpleParachains": [
 		{
 			"bin": "./bin/adder-collator",
+			"dockerImage": "adder-collator",
 			"id": "400",
 			"port": "31400",
 			"balance": "1000000000000000000000"

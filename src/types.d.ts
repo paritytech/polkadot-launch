@@ -1,4 +1,5 @@
 export interface LaunchConfig {
+	blockade?: boolean;
 	relaychain: RelayChainConfig;
 	parachains: ParachainConfig[];
 	simpleParachains: SimpleParachainConfig[];
@@ -8,6 +9,7 @@ export interface LaunchConfig {
 }
 export interface ParachainConfig {
 	bin: string;
+	dockerImage?: string;
 	id: string;
 	rpcPort: number;
 	wsPort: number;
@@ -18,6 +20,7 @@ export interface ParachainConfig {
 }
 export interface SimpleParachainConfig {
 	bin: string;
+	dockerImage?: string;
 	id: string;
 	port: string;
 	balance: string;
@@ -30,6 +33,7 @@ export interface HrmpChannelsConfig {
 }
 export interface RelayChainConfig {
 	bin: string;
+	dockerImage?: string;
 	chain: string;
 	nodes: {
 		name: string;
