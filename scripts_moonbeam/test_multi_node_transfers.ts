@@ -27,7 +27,7 @@ import { connect, registerParachain, setBalance } from "../src/rpc";
 import fs from 'fs'
 import  { resolve, dirname } from 'path'
 //const fs=require('fs')
-import {LaunchConfig} from '../src/types'
+import {LaunchConfig, ParachainConfig} from '../src/types'
 import { start } from "../src";
 
 export const GENESIS_ACCOUNT = "0x6be02d1d3665660d22ff9624b7be0551ee1ac91b";
@@ -48,15 +48,16 @@ const NUMBER_TX: number = 10;
 //const config = require("../config_moonbeam_antoine.json");
 //const { resolve, dirname } = require("path");
 
-interface ParachainConfig {
-  bin: string;
-  id: string;
-  rpcPort: number;
-  wsPort: number;
-  port: number;
-  balance: string;
-  flags: string[];
-}
+// export interface ParachainConfig {
+//   bin: string;
+//   id: string;
+//   rpcPort: number;
+//   wsPort: number;
+//   port: number;
+//   balance: string;
+//   flags: string[];
+// }
+export {ParachainConfig,LaunchConfig} from '../src/types'
 
 export {start} from '../src'
 
