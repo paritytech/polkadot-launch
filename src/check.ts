@@ -46,9 +46,11 @@ export function checkConfig(config: LaunchConfig) {
 	}
 
 	for (let parachain of config.parachains) {
-		if (parachain.flags && parachain.flags.constructor !== Array) {
-			console.error("Parachain flags should be an array.");
-			return false;
+		for (let node of parachain.nodes) {
+			if (node.flags && node.flags.constructor !== Array) {
+				console.error("Parachain flags should be an array.");
+				return false;
+			}
 		}
 	}
 

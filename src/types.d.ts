@@ -6,15 +6,18 @@ export interface LaunchConfig {
 	types: any;
 	finalization: boolean;
 }
-export interface ParachainConfig {
-	bin: string;
-	id: string;
+export interface ParachainNodeConfig {
 	rpcPort: number;
 	wsPort: number;
 	port: number;
-	balance: string;
 	flags: string[];
+}
+export interface ParachainConfig {
+	bin: string;
+	id: string;
+	balance: string;
 	chain?: string;
+	nodes: ParachainNodeConfig[];
 }
 export interface SimpleParachainConfig {
 	bin: string;

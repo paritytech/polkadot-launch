@@ -98,41 +98,56 @@ async function main() {
 
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
-		const { id, wsPort, balance, port, flags, chain } = parachain;
-		const bin = resolve(config_dir, parachain.bin);
-		if (!fs.existsSync(bin)) {
-			console.error("Parachain binary does not exist: ", bin);
-			process.exit();
-		}
-		let account = parachainAccount(id);
-		console.log(
-			`Starting a Collator for parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`
-		);
-		await startCollator(bin, id, wsPort, port, chain, spec, flags);
-
-		// If it isn't registered yet, register the parachain on the relaychain
-		if (!registeredParachains[id]) {
-			console.log(`Registering Parachain ${id}`);
-
-			// Get the information required to register the parachain on the relay chain.
-			let genesisState;
-			let genesisWasm;
-			try {
-				genesisState = await exportGenesisState(bin, id, chain);
-				genesisWasm = await exportGenesisWasm(bin, chain);
-			} catch (err) {
-				console.error(err);
-				process.exit(1);
+		const { id, balance, chain } = parachain;
+		// And each node/collator of each parachain
+		for (const node of parachain.nodes) {
+			const { wsPort, port, flags } = node;
+			const bin = resolve(config_dir, parachain.bin);
+			if (!fs.existsSync(bin)) {
+				console.error("Parachain binary does not exist: ", bin);
+				process.exit();
 			}
+			let account = parachainAccount(id);
 
-			await registerParachain(relayChainApi, id, genesisWasm, genesisState, config.finalization);
+			// Starting Collator
+			console.log(
+				`Starting a Collator for parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`
+			);
+			await startCollator(bin, id, wsPort, port, chain, spec, flags);
 
-			registeredParachains[id] = true;
+			// If it isn't registered yet, register the parachain on the relaychain
+			if (!registeredParachains[id]) {
+				console.log(`Registering Parachain ${id}`);
 
-			// Allow time for the TX to complete, avoiding nonce issues.
-			// TODO: Handle nonce directly instead of this.
-			if (balance) {
-				await setBalance(relayChainApi, account, balance, config.finalization);
+				// Get the information required to register the parachain on the relay chain.
+				let genesisState;
+				let genesisWasm;
+				try {
+					genesisState = await exportGenesisState(bin, id, chain);
+					genesisWasm = await exportGenesisWasm(bin, chain);
+				} catch (err) {
+					console.error(err);
+					process.exit(1);
+				}
+
+				await registerParachain(
+					relayChainApi,
+					id,
+					genesisWasm,
+					genesisState,
+					config.finalization
+				);
+
+				registeredParachains[id] = true;
+
+				if (balance) {
+					await setBalance(
+						relayChainApi,
+						account,
+						balance,
+						config.finalization
+					);
+				}
 			}
 		}
 	}
@@ -165,7 +180,13 @@ async function main() {
 			}
 
 			console.log(`Registering Parachain ${id}`);
-			await registerParachain(relayChainApi, id, genesisWasm, genesisState, config.finalization);
+			await registerParachain(
+				relayChainApi,
+				id,
+				genesisWasm,
+				genesisState,
+				config.finalization
+			);
 
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.
@@ -176,7 +197,9 @@ async function main() {
 	}
 	if (config.hrmpChannels) {
 		for (const hrmpChannel of config.hrmpChannels) {
-			console.log(`Setting Up HRMP Channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`);
+			console.log(
+				`Setting Up HRMP Channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`
+			);
 			await ensureOnboarded(relayChainApi, hrmpChannel.sender);
 			await ensureOnboarded(relayChainApi, hrmpChannel.recipient);
 
@@ -187,7 +210,7 @@ async function main() {
 				recipient,
 				maxCapacity,
 				maxMessageSize,
-				config.finalization,
+				config.finalization
 			);
 		}
 	}
