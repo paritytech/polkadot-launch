@@ -15,10 +15,34 @@ filterConsole([
 	`Unknown types found`,
 ]);
 
+
+const RETRY_MS = 500;
+const TIMEOUT_MS = 10000;
+
+function sleep(ms: number) {
+	return new Promise((resolve) => {
+		setTimeout(resolve, ms);
+	});
+}
+
+async function waitForConnect(provider: WsProvider) {
+	while (!provider.isConnected) {
+		await provider.connectWithRetry();
+		await sleep(RETRY_MS);
+	}
+	await sleep(RETRY_MS);
+}
+
+async function waitForConnectOrTimeout(provider: WsProvider) {
+	await Promise.race([waitForConnect(provider), new Promise((_, reject) => {
+		sleep(TIMEOUT_MS).then(_ => reject("Unable to connect"));
+	})]);
+}
+
 // Connect to a local Substrate node. This function wont resolve until connected.
-// TODO: Add a timeout where we know something went wrong so we don't wait forever.
 export async function connect(port: number, types: any) {
 	const provider = new WsProvider("ws://127.0.0.1:" + port);
+	await waitForConnectOrTimeout(provider);
 	const api = new ApiPromise({ provider, types });
 	await api.isReady;
 	return api;
