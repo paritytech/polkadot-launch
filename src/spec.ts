@@ -39,8 +39,21 @@ export function clearAuthorities(spec: string) {
 	console.log(`Starting with a fresh authority set:`);
 }
 
+export function extractAuthorityBeefyKeys(spec: string) {
+	let rawdata = fs.readFileSync(spec);
+	let chainSpec;
+	try {
+		chainSpec = JSON.parse(rawdata);
+	} catch {
+		console.error("failed to parse the chain spec");
+		process.exit(1);
+	}
+	let keys = getAuthorityKeys(chainSpec)
+	return keys.map((k: { beefy: any; }[]) => k[2].beefy);
+}
+
 // Add additional authorities to chain spec in `session.keys`
-export async function addAuthority(spec: string, name: string) {
+export async function addAuthority(spec: string, name: string, beefyKey: any) {
 	await cryptoWaitReady();
 
 	const sr_keyring = new Keyring({ type: "sr25519" });
@@ -61,6 +74,7 @@ export async function addAuthority(spec: string, name: string) {
 			authority_discovery: sr_account.address,
 			para_validator: sr_account.address,
 			para_assignment: sr_account.address,
+			beefy: beefyKey
 		},
 	];
 

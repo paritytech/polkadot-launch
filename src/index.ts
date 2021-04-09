@@ -17,7 +17,7 @@ import {
 	establishHrmpChannel,
 } from "./rpc";
 import { checkConfig } from "./check";
-import { clearAuthorities, addAuthority } from "./spec";
+import { extractAuthorityBeefyKeys, clearAuthorities, addAuthority } from "./spec";
 import { parachainAccount } from "./parachain";
 import { ApiPromise } from "@polkadot/api";
 
@@ -74,9 +74,10 @@ async function main() {
 	}
 	const chain = config.relaychain.chain;
 	await generateChainSpec(relay_chain_bin, chain);
+	const beefyKeys = extractAuthorityBeefyKeys(`${chain}.json`);
 	clearAuthorities(`${chain}.json`);
-	for (const node of config.relaychain.nodes) {
-		await addAuthority(`${chain}.json`, node.name);
+	for (const [i, node] of config.relaychain.nodes.entries()) {
+		await addAuthority(`${chain}.json`, node.name, beefyKeys[i]);
 	}
 	await generateChainSpecRaw(relay_chain_bin, chain);
 	const spec = resolve(`${chain}-raw.json`);
