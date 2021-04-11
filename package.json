@@ -10,8 +10,7 @@
 		"lint": "npx prettier --write ."
 	},
 	"dependencies": {
-		"@polkadot/api": "4.4.2-4",
-		"@polkadot/keyring": "^6.0.5",
+		"@polkadot/api": "^3.8.1",
 		"@polkadot/util": "^5.6.1",
 		"@polkadot/util-crypto": "^5.6.1",
 		"filter-console": "^0.1.1",
