@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 
 import {
+	generateBlockadeConfig,
+	startBlockade,
+	stopBlockade,
+} from "./blockade";
+import {
 	startNode,
 	startCollator,
 	killAll,
@@ -73,21 +78,53 @@ async function main() {
 		process.exit();
 	}
 	const chain = config.relaychain.chain;
-	await generateChainSpec(relay_chain_bin, chain);
+
+	if (config.blockade) {
+		await generateChainSpec("docker", ["run", config.relaychain.dockerImage!], chain);
+	} else {
+		await generateChainSpec(relay_chain_bin, [], chain);
+	}
 	clearAuthorities(`${chain}.json`);
 	for (const node of config.relaychain.nodes) {
 		await addAuthority(`${chain}.json`, node.name);
 	}
-	await generateChainSpecRaw(relay_chain_bin, chain);
+
+	if (config.blockade) {
+		let chainSpecPath = resolve(process.cwd(), `${chain}.json`);
+		let args = [
+			"run",
+			"-v",
+			`${chainSpecPath}:${chainSpecPath}`,
+			config.relaychain.dockerImage!,
+		];
+		await generateChainSpecRaw("docker", args, chain, chainSpecPath);
+	} else {
+		await generateChainSpecRaw(relay_chain_bin, [], chain);
+	}
+
 	const spec = resolve(`${chain}-raw.json`);
 
-	// First we launch each of the validators for the relay chain.
-	for (const node of config.relaychain.nodes) {
-		const { name, wsPort, port, flags } = node;
-		console.log(`Starting ${name}...`);
-		// We spawn a `child_process` starting a node, and then wait until we
-		// able to connect to it using PolkadotJS in order to know its running.
-		startNode(relay_chain_bin, name, wsPort, port, spec, flags);
+	if (config.blockade) {
+		// When using blockade we will generate the blockade config and spawn
+		// all nodes at once
+		await generateBlockadeConfig(
+			config.relaychain,
+			config.parachains,
+			config.simpleParachains,
+			`${chain}-raw.json`,
+		);
+
+		// Start blockade
+		await startBlockade();
+	} else {
+		// First we launch each of the validators for the relay chain.
+		for (const node of config.relaychain.nodes) {
+			const { name, wsPort, port, flags } = node;
+			console.log(`Starting ${name}...`);
+			// We spawn a `child_process` starting a node, and then wait until we
+			// able to connect to it using PolkadotJS in order to know its running.
+			startNode(relay_chain_bin, name, wsPort, port, spec, flags);
+		}
 	}
 
 	// Connect to the first relay chain node to submit the extrinsic.
@@ -99,16 +136,26 @@ async function main() {
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
 		const { id, wsPort, balance, port, flags, chain } = parachain;
-		const bin = resolve(config_dir, parachain.bin);
-		if (!fs.existsSync(bin)) {
-			console.error("Parachain binary does not exist: ", bin);
-			process.exit();
+
+		let bin;
+		if (config.blockade) {
+			bin = "docker"
+		} else {
+			bin = resolve(config_dir, parachain.bin);
+			if (!fs.existsSync(bin)) {
+				console.error("Parachain binary does not exist: ", bin);
+				process.exit();
+			}
 		}
+
 		let account = parachainAccount(id);
 		console.log(
 			`Starting a Collator for parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`
 		);
-		await startCollator(bin, id, wsPort, port, chain, spec, flags);
+
+		if (!config.blockade) {
+			await startCollator(bin, id, wsPort, port, chain, spec, flags);
+		}
 
 		// If it isn't registered yet, register the parachain on the relaychain
 		if (!registeredParachains[id]) {
@@ -118,8 +165,10 @@ async function main() {
 			let genesisState;
 			let genesisWasm;
 			try {
-				genesisState = await exportGenesisState(bin, id, chain);
-				genesisWasm = await exportGenesisWasm(bin, chain);
+				const args = config.blockade? ["run", parachain.dockerImage!] : [];
+
+				genesisState = await exportGenesisState(bin, args, id, chain);
+				genesisWasm = await exportGenesisWasm(bin, args, chain);
 			} catch (err) {
 				console.error(err);
 				process.exit(1);
@@ -141,24 +190,35 @@ async function main() {
 	if (config.simpleParachains) {
 		for (const simpleParachain of config.simpleParachains) {
 			const { id, port, balance } = simpleParachain;
-			const bin = resolve(config_dir, simpleParachain.bin);
-			if (!fs.existsSync(bin)) {
-				console.error("Simple parachain binary does not exist: ", bin);
-				process.exit();
+
+			let bin;
+			if (config.blockade) {
+				bin = "docker"
+			} else {
+				bin = resolve(config_dir, simpleParachain.bin);
+				if (!fs.existsSync(bin)) {
+					console.error("Simple parachain binary does not exist: ", bin);
+					process.exit();
+				}
 			}
 
 			let account = parachainAccount(id);
-			console.log(`Starting Parachain ${id}: ${account}`);
-			await startSimpleCollator(bin, id, spec, port);
+
+			if (!config.blockade) {
+				console.log(`Starting Parachain ${id}: ${account}`);
+				await startSimpleCollator(bin, id, spec, port);
+			}
 
 			// Get the information required to register the parachain on the relay chain.
 			let genesisState;
 			let genesisWasm;
 			try {
+				const args = config.blockade? ["run", simpleParachain.dockerImage!] : [];
+
 				// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
 				// not necessary for it anyway), so we don't pass it here.
-				genesisState = await exportGenesisState(bin);
-				genesisWasm = await exportGenesisWasm(bin);
+				genesisState = await exportGenesisState(bin, args);
+				genesisWasm = await exportGenesisWasm(bin, args);
 			} catch (err) {
 				console.error(err);
 				process.exit(1);
@@ -212,7 +272,11 @@ async function ensureOnboarded(relayChainApi: ApiPromise, paraId: number) {
 
 // Kill all processes when exiting.
 process.on("exit", function () {
-	killAll();
+	if (config.blockade) {
+		stopBlockade();
+	} else {
+		killAll();
+	}
 });
 
 // Handle ctrl+c to trigger `exit`.

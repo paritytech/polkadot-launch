@@ -13,9 +13,9 @@ const p: { [key: string]: ChildProcessWithoutNullStreams } = {};
 const execFile = util.promisify(ex);
 
 // Output the chainspec of a node.
-export async function generateChainSpec(bin: string, chain: string) {
+export async function generateChainSpec(bin: string, argsParam: string[], chain: string) {
 	return new Promise<void>(function (resolve, reject) {
-		let args = ["build-spec", "--chain=" + chain, "--disable-default-bootnode"];
+		let args = argsParam.concat(["build-spec", "--chain=" + chain, "--disable-default-bootnode"]);
 
 		p["spec"] = spawn(bin, args);
 		let spec = fs.createWriteStream(`${chain}.json`);
@@ -37,9 +37,13 @@ export async function generateChainSpec(bin: string, chain: string) {
 }
 
 // Output the chainspec of a node using `--raw` from a JSON file.
-export async function generateChainSpecRaw(bin: string, chain: string) {
+export async function generateChainSpecRaw(bin: string, argsParam: string[], chain: string, chainSpecPath?: string) {
 	return new Promise<void>(function (resolve, reject) {
-		let args = ["build-spec", "--chain=" + chain + ".json", "--raw"];
+		if (chainSpecPath === undefined) {
+			chainSpecPath = `${chain}.json`;
+		}
+
+		let args = argsParam.concat(["build-spec", "--chain=" + chainSpecPath, "--raw"]);
 
 		p["spec"] = spawn(bin, args);
 		let spec = fs.createWriteStream(`${chain}-raw.json`);
@@ -96,9 +100,11 @@ export function startNode(
 // Used for registering the parachain on the relay chain.
 export async function exportGenesisWasm(
 	bin: string,
+	argsParam: string[],
 	chain?: string
 ): Promise<string> {
-	let args = ["export-genesis-wasm"];
+	let args = argsParam.concat(["export-genesis-wasm"]);
+
 	if (chain) {
 		args.push("--chain=" + chain);
 	}
@@ -116,10 +122,12 @@ export async function exportGenesisWasm(
 /// Export the genesis state aka genesis head.
 export async function exportGenesisState(
 	bin: string,
+	argsParam: string[],
 	id?: string,
 	chain?: string
 ): Promise<string> {
-	let args = ["export-genesis-state"];
+	let args = argsParam.concat(["export-genesis-state"]);
+
 	if (id) {
 		args.push("--parachain-id=" + id);
 	}
