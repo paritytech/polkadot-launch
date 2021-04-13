@@ -29,6 +29,7 @@ function connect(port, types) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = new api_1.WsProvider('ws://127.0.0.1:' + port);
         const api = new api_1.ApiPromise({ provider, types });
+        yield api.isReadyOrError.catch(console.error);
         yield api.isReady;
         return api;
     });

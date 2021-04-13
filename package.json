@@ -13,9 +13,9 @@
     "test": "yarn build && mkdir -p specFiles && mocha -r ts-node/register 'tests/**/*.ts'"
   },
   "dependencies": {
-    "@polkadot/api": "^4.2.1",
-    "@polkadot/util": "^6.0.5",
-    "@polkadot/util-crypto": "^6.0.5",
+    "@polkadot/api": "^4.5.1",
+    "@polkadot/util": "^6.1.1",
+    "@polkadot/util-crypto": "^6.1.1",
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.2.0",
     "chai": "^4.2.0",

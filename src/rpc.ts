@@ -20,6 +20,7 @@ filterConsole([
 export async function connect(port:number, types:any) {
 	const provider = new WsProvider('ws://127.0.0.1:' + port);
 	const api = new ApiPromise({ provider, types });
+  await api.isReadyOrError.catch(console.error);
 	await api.isReady;
 	return api;
 }
