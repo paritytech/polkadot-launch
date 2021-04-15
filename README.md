@@ -178,6 +178,73 @@ in order to create a local test network.
     - `wasm` is generated using the `<node> export-genesis-wasm` subcommand.
     - `header` is retrieved by calling `api.rpc.chain.getHeader(genesis_hash)`.
 
+## Simulating chaos
+
+By default `polkadot-launch` will spawn the nodes as regular processes on your computer, additionally it also
+supports launching the nodes as docker containers and it integrates with [blockade](https://github.com/worstcase/blockade)
+to be able to simulate arbitrary network failures.
+
+### Requirements
+
+- docker
+- blockade
+
+You'll need to have docker running on your computer and will need to have docker images available for all
+the nodes you're going to launch. Docker files for the relaychain nodes and collators are provided in the
+`docker/` folder and can be built with `./docker/build-images.sh`.
+
+To install blockade you'll need to have Python 2.7 installed and you should then be able to do:
+
+`pip install blockade`
+
+For nix users the provided `shell.nix` defines all the dependencies required to install blockade locally.
+
+### Usage
+
+Launch the network with `polkadot-launch config.json`. Once the launch process is complete you can use
+the blockade tool to generate network failures.
+
+```
+> blockade status
+NODE             CONTAINER ID    STATUS  IP              NETWORK    PARTITION
+parachain1       0bcd0e676c2e    UP      172.17.0.2      NORMAL
+parachain2       e425a139093c    UP      172.17.0.4      NORMAL
+relay1           327e79ecc829    UP      172.17.0.8      NORMAL
+relay2           5ecc3364293b    UP      172.17.0.7      NORMAL
+relay3           bd6ebe188b4a    UP      172.17.0.3      NORMAL
+relay4           225719ce1933    UP      172.17.0.5      NORMAL
+simpleParachain1 af10c596612d    UP      172.17.0.6      NORMAL
+```
+
+```
+> blockade flaky parachain1
+```
+
+This command will induce a packet loss of ~30% on the node `parachain1`. 
+
+Latency can be simulated with:
+
+```
+> blockade slow parachain1
+```
+
+And we can also add arbitrary partitions to the network:
+
+```
+blockade partition relay1,relay2,relay3,relay4
+```
+
+This will create a partition on the network where the relay chain nodes will be
+on their own partition and therefore unable to connect to the collators.
+
+To heal the partitions do:
+
+```
+> blockade join
+```
+
+For reference on how to use blockade check: https://github.com/worstcase/blockade#commands.
+
 ## Development
 
 To work on this project, you will need [`yarn`](https://yarnpkg.com/).
