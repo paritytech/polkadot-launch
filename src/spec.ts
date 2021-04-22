@@ -1,7 +1,7 @@
 import { Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { ChainSpec } from './types';
-const fs = require('fs');
+import fs from 'fs';
 
 function nameCase(string:string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
@@ -22,7 +22,7 @@ export function clearAuthorities(spec:string) {
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec;
 	try {
-		chainSpec = JSON.parse(rawdata);
+		chainSpec = JSON.parse(rawdata.toString());
 	} catch {
 		console.error("failed to parse the chain spec");
 		process.exit(1);
@@ -62,7 +62,7 @@ export async function addAuthority(spec:string, name:string) {
 	];
 
 	let rawdata = fs.readFileSync(spec);
-	let chainSpec = JSON.parse(rawdata);
+	let chainSpec = JSON.parse(rawdata.toString());
 
 	let keys = getAuthorityKeys(chainSpec);
 	keys.push(key);

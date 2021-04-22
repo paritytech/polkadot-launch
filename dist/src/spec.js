@@ -8,11 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addAuthority = exports.clearAuthorities = void 0;
 const api_1 = require("@polkadot/api");
 const util_crypto_1 = require("@polkadot/util-crypto");
-const fs = require('fs');
+const fs_1 = __importDefault(require("fs"));
 function nameCase(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -27,10 +30,10 @@ function getAuthorityKeys(chainSpec) {
 }
 // Remove all existing keys from `session.keys`
 function clearAuthorities(spec) {
-    let rawdata = fs.readFileSync(spec);
+    let rawdata = fs_1.default.readFileSync(spec);
     let chainSpec;
     try {
-        chainSpec = JSON.parse(rawdata);
+        chainSpec = JSON.parse(rawdata.toString());
     }
     catch (_a) {
         console.error("failed to parse the chain spec");
@@ -39,7 +42,7 @@ function clearAuthorities(spec) {
     let keys = getAuthorityKeys(chainSpec);
     keys.length = 0;
     let data = JSON.stringify(chainSpec, null, 2);
-    fs.writeFileSync(spec, data);
+    fs_1.default.writeFileSync(spec, data);
     console.log(`Starting with a fresh authority set:`);
 }
 exports.clearAuthorities = clearAuthorities;
@@ -65,12 +68,12 @@ function addAuthority(spec, name) {
                 "para_assignment": sr_account.address,
             }
         ];
-        let rawdata = fs.readFileSync(spec);
-        let chainSpec = JSON.parse(rawdata);
+        let rawdata = fs_1.default.readFileSync(spec);
+        let chainSpec = JSON.parse(rawdata.toString());
         let keys = getAuthorityKeys(chainSpec);
         keys.push(key);
         let data = JSON.stringify(chainSpec, null, 2);
-        fs.writeFileSync(spec, data);
+        fs_1.default.writeFileSync(spec, data);
         console.log(`Added Authority ${name}`);
     });
 }

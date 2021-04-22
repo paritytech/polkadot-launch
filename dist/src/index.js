@@ -180,14 +180,6 @@ function ensureOnboarded(relayChainApi, paraId) {
         });
     });
 }
-// log unhandledRejection
-// process.on("unhandledRejection", (error: any) => {
-//   if (error.message) {
-//     console.trace(error);
-//   } else {
-//     console.log("unhandledRejection: error thrown without a message");
-//   }
-// });
 // Kill all processes when exiting.
 process.on("exit", function () {
     console.log("exit index spawn");
