@@ -37,7 +37,7 @@ export function clearAuthorities(spec: string) {
 
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);
-	console.log(`Starting with a fresh authority set:`);
+	console.log(`\n🧹 Starting with a fresh authority set...`);
 }
 
 // Add additional authorities to chain spec in `session.keys`
@@ -77,7 +77,38 @@ export async function addAuthority(spec: string, name: string) {
 
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);
-	console.log(`Added Genesis Authority ${name}`);
+	console.log(`  👤 Added Genesis Authority ${name}`);
+}
+
+// Add parachains to the chain spec at genesis.
+export async function addGenesisParachain(
+	spec: string,
+	para_id: string,
+	head: string,
+	wasm: string,
+	parachain: boolean
+) {
+	let rawdata = fs.readFileSync(spec);
+	let chainSpec = JSON.parse(rawdata);
+
+	if (
+		chainSpec.genesis.runtime.runtime_genesis_config &&
+		chainSpec.genesis.runtime.runtime_genesis_config.parachainsParas
+	) {
+		let paras = chainSpec.genesis.runtime.runtime_genesis_config.parachainsParas.paras;
+
+		let new_para = [parseInt(para_id), {
+			"genesis_head": head,
+			"validation_code": wasm,
+			"parachain": parachain
+		}];
+
+		paras.push(new_para);
+
+		let data = JSON.stringify(chainSpec, null, 2);
+		fs.writeFileSync(spec, data);
+		console.log(`  ✓ Added Genesis Parachain ${para_id}`);
+	}
 }
 
 // Update the `parachainsConfiguration` in the genesis.
@@ -85,6 +116,8 @@ export async function addAuthority(spec: string, name: string) {
 export async function changeGenesisParachainsConfiguration(spec: string, updates: any) {
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec = JSON.parse(rawdata);
+
+	console.log(`\n⚙ Updating Parachains Genesis Configuration`);
 
 	if (
 		chainSpec.genesis.runtime.runtime_genesis_config &&
@@ -94,14 +127,13 @@ export async function changeGenesisParachainsConfiguration(spec: string, updates
 		Object.keys(updates).forEach(key => {
 			if (config.hasOwnProperty(key)) {
 				config[key] = updates[key];
-				console.log(`Updated Parachains Configuration [ ${key}: ${config[key]} ]`);
+				console.log(`  ✓ Updated Parachains Configuration [ ${key}: ${config[key]} ]`);
 			} else {
-				console.error(`!! Bad Parachains Configuration [ ${key}: ${updates[key]} ]`);
+				console.error(`  ⚠ Bad Parachains Configuration [ ${key}: ${updates[key]} ]`);
 			}
 		});
-	}
 
-	let data = JSON.stringify(chainSpec, null, 2);
-	fs.writeFileSync(spec, data);
-	console.log(`Saved Genesis Parachains Configuration`);
+		let data = JSON.stringify(chainSpec, null, 2);
+		fs.writeFileSync(spec, data);
+	}
 }
