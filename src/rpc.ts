@@ -55,7 +55,7 @@ export async function registerParachain(
 	id: string,
 	wasm: string,
 	header: string,
-	finalization: boolean = false,
+	finalization: boolean = false
 ) {
 	return new Promise<void>(async (resolvePromise, reject) => {
 		await cryptoWaitReady();
@@ -107,7 +107,7 @@ export async function setBalance(
 	api: ApiPromise,
 	who: string,
 	value: string,
-	finalization: boolean = false,
+	finalization: boolean = false
 ) {
 	return new Promise<void>(async (resolvePromise, reject) => {
 		await cryptoWaitReady();
@@ -157,7 +157,7 @@ export async function establishHrmpChannel(
 	receiver: number,
 	maxCapacity: number,
 	maxMessageSize: number,
-	finalization: boolean = false,
+	finalization: boolean = false
 ) {
 	return new Promise<void>(async (resolvePromise, reject) => {
 		await cryptoWaitReady();
@@ -178,7 +178,7 @@ export async function establishHrmpChannel(
 					sender,
 					receiver,
 					maxCapacity,
-					maxMessageSize,
+					maxMessageSize
 				)
 			)
 			.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
@@ -212,7 +212,7 @@ export async function sendHrmpMessage(
 	api: ApiPromise,
 	recipient: string,
 	data: string,
-	finalization: boolean = false,
+	finalization: boolean = false
 ) {
 	return new Promise<void>(async (resolvePromise, reject) => {
 		await cryptoWaitReady();

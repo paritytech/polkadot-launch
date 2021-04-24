@@ -17,7 +17,12 @@ import {
 	establishHrmpChannel,
 } from "./rpc";
 import { checkConfig } from "./check";
-import { clearAuthorities, addAuthority, changeGenesisParachainsConfiguration, addGenesisParachain } from "./spec";
+import {
+	clearAuthorities,
+	addAuthority,
+	changeGenesisParachainsConfiguration,
+	addGenesisParachain,
+} from "./spec";
 import { parachainAccount } from "./parachain";
 import { ApiPromise } from "@polkadot/api";
 
@@ -80,7 +85,10 @@ async function main() {
 		await addAuthority(`${chain}.json`, node.name);
 	}
 	if (config.relaychain.config) {
-		await changeGenesisParachainsConfiguration(`${chain}.json`, config.relaychain.config);
+		await changeGenesisParachainsConfiguration(
+			`${chain}.json`,
+			config.relaychain.config
+		);
 	}
 	await addParachainsToGenesis(`${chain}.json`, config.parachains);
 	// -- End Chain Spec Modify --
@@ -151,7 +159,13 @@ async function main() {
 			}
 
 			console.log(`Registering Parachain ${id}`);
-			await registerParachain(relayChainApi, id, genesisWasm, genesisState, config.finalization);
+			await registerParachain(
+				relayChainApi,
+				id,
+				genesisWasm,
+				genesisState,
+				config.finalization
+			);
 
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.
@@ -162,7 +176,9 @@ async function main() {
 	}
 	if (config.hrmpChannels) {
 		for (const hrmpChannel of config.hrmpChannels) {
-			console.log(`Setting Up HRMP Channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`);
+			console.log(
+				`Setting Up HRMP Channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`
+			);
 			await ensureOnboarded(relayChainApi, hrmpChannel.sender);
 			await ensureOnboarded(relayChainApi, hrmpChannel.recipient);
 
@@ -173,7 +189,7 @@ async function main() {
 				recipient,
 				maxCapacity,
 				maxMessageSize,
-				config.finalization,
+				config.finalization
 			);
 		}
 	}
@@ -198,10 +214,10 @@ async function ensureOnboarded(relayChainApi: ApiPromise, paraId: number) {
 
 async function addParachainsToGenesis(
 	spec: string,
-	parachains: ParachainConfig[],
+	parachains: ParachainConfig[]
 ) {
-	console.log("\n⛓ Adding Genesis Parachains")
-	for (const parachain of config.parachains) {
+	console.log("\n⛓ Adding Genesis Parachains");
+	for (const parachain of parachains) {
 		const { id, chain } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
