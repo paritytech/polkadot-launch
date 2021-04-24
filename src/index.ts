@@ -17,13 +17,18 @@ import {
 	establishHrmpChannel,
 } from "./rpc";
 import { checkConfig } from "./check";
-import { clearAuthorities, addAuthority } from "./spec";
+import {
+	clearAuthorities,
+	addAuthority,
+	changeGenesisParachainsConfiguration,
+	addGenesisParachain,
+} from "./spec";
 import { parachainAccount } from "./parachain";
 import { ApiPromise } from "@polkadot/api";
 
 import { resolve, dirname } from "path";
 import fs from "fs";
-import { LaunchConfig } from "./types";
+import { LaunchConfig, ParachainConfig } from "./types";
 
 // Special care is needed to handle paths to various files (binaries, spec, config, etc...)
 // The user passes the path to `config.json`, and we use that as the starting point for any other
@@ -58,10 +63,10 @@ function loadTypeDef(types: string | object): object {
 	}
 }
 
-async function main() {
-	// keep track of registered parachains
-	let registeredParachains: { [key: string]: boolean } = {};
+// keep track of registered parachains
+let registeredParachains: { [key: string]: boolean } = {};
 
+async function main() {
 	// Verify that the `config.json` has all the expected properties.
 	if (!checkConfig(config)) {
 		return;
@@ -74,10 +79,19 @@ async function main() {
 	}
 	const chain = config.relaychain.chain;
 	await generateChainSpec(relay_chain_bin, chain);
+	// -- Start Chain Spec Modify --
 	clearAuthorities(`${chain}.json`);
 	for (const node of config.relaychain.nodes) {
 		await addAuthority(`${chain}.json`, node.name);
 	}
+	if (config.relaychain.config) {
+		await changeGenesisParachainsConfiguration(
+			`${chain}.json`,
+			config.relaychain.config
+		);
+	}
+	await addParachainsToGenesis(`${chain}.json`, config.parachains);
+	// -- End Chain Spec Modify --
 	await generateChainSpecRaw(relay_chain_bin, chain);
 	const spec = resolve(`${chain}-raw.json`);
 
@@ -99,56 +113,25 @@ async function main() {
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
 		const { id, balance, chain } = parachain;
-		// And each node/collator of each parachain
+		const bin = resolve(config_dir, parachain.bin);
+		if (!fs.existsSync(bin)) {
+			console.error("Parachain binary does not exist: ", bin);
+			process.exit();
+		}
+		let account = parachainAccount(id);
+
 		for (const node of parachain.nodes) {
 			const { wsPort, port, flags } = node;
-			const bin = resolve(config_dir, parachain.bin);
-			if (!fs.existsSync(bin)) {
-				console.error("Parachain binary does not exist: ", bin);
-				process.exit();
-			}
-			let account = parachainAccount(id);
-
-			// Starting Collator
 			console.log(
 				`Starting a Collator for parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`
 			);
 			await startCollator(bin, id, wsPort, port, chain, spec, flags);
+		}
 
-			// If it isn't registered yet, register the parachain on the relaychain
-			if (!registeredParachains[id]) {
-				console.log(`Registering Parachain ${id}`);
-
-				// Get the information required to register the parachain on the relay chain.
-				let genesisState;
-				let genesisWasm;
-				try {
-					genesisState = await exportGenesisState(bin, id, chain);
-					genesisWasm = await exportGenesisWasm(bin, chain);
-				} catch (err) {
-					console.error(err);
-					process.exit(1);
-				}
-
-				await registerParachain(
-					relayChainApi,
-					id,
-					genesisWasm,
-					genesisState,
-					config.finalization
-				);
-
-				registeredParachains[id] = true;
-
-				if (balance) {
-					await setBalance(
-						relayChainApi,
-						account,
-						balance,
-						config.finalization
-					);
-				}
-			}
+		// Allow time for the TX to complete, avoiding nonce issues.
+		// TODO: Handle nonce directly instead of this.
+		if (balance) {
+			await setBalance(relayChainApi, account, balance, config.finalization);
 		}
 	}
 
@@ -231,6 +214,37 @@ async function ensureOnboarded(relayChainApi: ApiPromise, paraId: number) {
 			}
 		);
 	});
+}
+
+async function addParachainsToGenesis(
+	spec: string,
+	parachains: ParachainConfig[]
+) {
+	console.log("\n⛓ Adding Genesis Parachains");
+	for (const parachain of parachains) {
+		const { id, chain } = parachain;
+		const bin = resolve(config_dir, parachain.bin);
+		if (!fs.existsSync(bin)) {
+			console.error("Parachain binary does not exist: ", bin);
+			process.exit();
+		}
+		// If it isn't registered yet, register the parachain in genesis
+		if (!registeredParachains[id]) {
+			// Get the information required to register the parachain in genesis.
+			let genesisState;
+			let genesisWasm;
+			try {
+				genesisState = await exportGenesisState(bin, id, chain);
+				genesisWasm = await exportGenesisWasm(bin, chain);
+			} catch (err) {
+				console.error(err);
+				process.exit(1);
+			}
+
+			await addGenesisParachain(spec, id, genesisState, genesisWasm, true);
+			registeredParachains[id] = true;
+		}
+	}
 }
 
 // Kill all processes when exiting.

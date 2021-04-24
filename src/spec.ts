@@ -1,5 +1,6 @@
 import { Keyring } from "@polkadot/api";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
+import { encodeAddress } from "@polkadot/util-crypto";
 import { ChainSpec } from "./types";
 const fs = require("fs");
 
@@ -36,7 +37,7 @@ export function clearAuthorities(spec: string) {
 
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);
-	console.log(`Starting with a fresh authority set:`);
+	console.log(`\n🧹 Starting with a fresh authority set...`);
 }
 
 // Add additional authorities to chain spec in `session.keys`
@@ -50,6 +51,9 @@ export async function addAuthority(spec: string, name: string) {
 	const ed_keyring = new Keyring({ type: "ed25519" });
 	const ed_account = ed_keyring.createFromUri(`//${nameCase(name)}`);
 
+	const ec_keyring = new Keyring({ type: "ecdsa" });
+	const ec_account = ec_keyring.createFromUri(`//${nameCase(name)}`);
+
 	let key = [
 		sr_stash.address,
 		sr_stash.address,
@@ -61,6 +65,7 @@ export async function addAuthority(spec: string, name: string) {
 			authority_discovery: sr_account.address,
 			para_validator: sr_account.address,
 			para_assignment: sr_account.address,
+			beefy: encodeAddress(ec_account.publicKey),
 		},
 	];
 
@@ -72,5 +77,76 @@ export async function addAuthority(spec: string, name: string) {
 
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);
-	console.log(`Added Authority ${name}`);
+	console.log(`  👤 Added Genesis Authority ${name}`);
+}
+
+// Add parachains to the chain spec at genesis.
+export async function addGenesisParachain(
+	spec: string,
+	para_id: string,
+	head: string,
+	wasm: string,
+	parachain: boolean
+) {
+	let rawdata = fs.readFileSync(spec);
+	let chainSpec = JSON.parse(rawdata);
+
+	if (
+		chainSpec.genesis.runtime.runtime_genesis_config &&
+		chainSpec.genesis.runtime.runtime_genesis_config.parachainsParas
+	) {
+		let paras =
+			chainSpec.genesis.runtime.runtime_genesis_config.parachainsParas.paras;
+
+		let new_para = [
+			parseInt(para_id),
+			{
+				genesis_head: head,
+				validation_code: wasm,
+				parachain: parachain,
+			},
+		];
+
+		paras.push(new_para);
+
+		let data = JSON.stringify(chainSpec, null, 2);
+		fs.writeFileSync(spec, data);
+		console.log(`  ✓ Added Genesis Parachain ${para_id}`);
+	}
+}
+
+// Update the `parachainsConfiguration` in the genesis.
+// It will try to match keys which exist within the configuration and update the value.
+export async function changeGenesisParachainsConfiguration(
+	spec: string,
+	updates: any
+) {
+	let rawdata = fs.readFileSync(spec);
+	let chainSpec = JSON.parse(rawdata);
+
+	console.log(`\n⚙ Updating Parachains Genesis Configuration`);
+
+	if (
+		chainSpec.genesis.runtime.runtime_genesis_config &&
+		chainSpec.genesis.runtime.runtime_genesis_config.parachainsConfiguration
+	) {
+		let config =
+			chainSpec.genesis.runtime.runtime_genesis_config.parachainsConfiguration
+				.config;
+		Object.keys(updates).forEach((key) => {
+			if (config.hasOwnProperty(key)) {
+				config[key] = updates[key];
+				console.log(
+					`  ✓ Updated Parachains Configuration [ ${key}: ${config[key]} ]`
+				);
+			} else {
+				console.error(
+					`  ⚠ Bad Parachains Configuration [ ${key}: ${updates[key]} ]`
+				);
+			}
+		});
+
+		let data = JSON.stringify(chainSpec, null, 2);
+		fs.writeFileSync(spec, data);
+	}
 }

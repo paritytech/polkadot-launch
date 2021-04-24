@@ -23,7 +23,11 @@
 				"wsPort": 9977,
 				"port": 30777
 			}
-		]
+		],
+		"config": {
+			"validation_upgrade_frequency": 1,
+			"validation_upgrade_delay": 1
+		}
 	},
 	"parachains": [
 		{
