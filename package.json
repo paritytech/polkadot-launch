@@ -1,6 +1,6 @@
 {
 	"name": "polkadot-launch",
-	"version": "1.3.2",
+	"version": "1.4.0",
 	"main": "dist/index.js",
 	"author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
 	"license": "MIT",
