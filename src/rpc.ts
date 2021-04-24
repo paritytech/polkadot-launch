@@ -24,23 +24,6 @@ export async function connect(port: number, types: any) {
 	return api;
 }
 
-// Get the PeerId for a running node. Can be used when defining bootnodes for future nodes.
-export async function peerId(api: ApiPromise) {
-	let peerId = await api.rpc.system.localPeerId();
-	return peerId.toString();
-}
-
-// Track and display basic information about a chain each block it produces.
-export async function follow(name: string, api: ApiPromise) {
-	console.log(`Following ${name}`);
-	await api.rpc.chain.subscribeNewHeads(async (header) => {
-		let peers = await api.rpc.system.peers();
-		console.log(
-			`${name} is at block: #${header.number} (${peers.length} Peers)`
-		);
-	});
-}
-
 // Get the genesis header of a node. Used for registering a parachain on the relay chain.
 export async function getHeader(api: ApiPromise) {
 	let genesis_hash = await api.rpc.chain.getBlockHash(0);

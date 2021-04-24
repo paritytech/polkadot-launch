@@ -176,8 +176,13 @@ in order to create a local test network.
 
 - [`child_process`](https://nodejs.org/api/child_process.html) is used to execute commands on your
   node:
-  - We build a fresh chain spec using the `chain` parameter specified in your config. This will
-    include the authorities you specified. The final file is named `<chain>-raw.json`.
+  - We build a fresh chain spec using the `chain` parameter specified in your config.
+    - Includes the authorities you specified.
+    - Includes changes to the `parachainsConfiguration`.
+    - Includes parachains you have added.
+      - `wasm` is generated using the `<node> export-genesis-wasm` subcommand.
+      - `header` is retrieved by calling `api.rpc.chain.getHeader(genesis_hash)`.
+    - The final file is named `<chain>-raw.json`.
   - We spawn new node instances using the information provided in your config. Each node produces a
     `<name>.log` file in your working directory that you can use to track the output. For example:
     ```bash
@@ -187,13 +192,6 @@ in order to create a local test network.
     ```
 - [`polkadot-js api`](https://polkadot.js.org/api/) is used to connect to these spawned nodes over
   their WebSocket endpoint.
-  - `api.rpc.system.localPeerId()` is used to retrieve the node's PeerId.
-  - `api.rpc.system.peers()` is used to retrieve connected peers to a node.
-  - `api.tx.sudo.sudo(api.tx.registrar.registerPara(id, always, wasm, header))` is used to register
-    a parachain.
-    - `wasm` is generated using the `<node> export-genesis-wasm` subcommand.
-    - `header` is retrieved by calling `api.rpc.chain.getHeader(genesis_hash)`.
-
 ## Development
 
 To work on this project, you will need [`yarn`](https://yarnpkg.com/).
