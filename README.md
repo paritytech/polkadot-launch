@@ -25,7 +25,7 @@ with the specific flags below:
 ```bash
 git clone -b rococo-v1 https://github.com/paritytech/polkadot
 cd polkadot
-cargo build --release --features=real-overseer
+cargo build --release
 ```
 
 and
@@ -57,6 +57,9 @@ You can see an example [here](config.json).
   - `name`: Must be one of `alice`, `bob`, `charlie`, or `dave`.
   - `wsPort`: The websocket port for this node.
   - `port`: The TCP port for this node.
+- `config`: A JSON object of the properties you want to modify from
+  `parachainsConfiguration.config`. Non-specified properties will be unchanged from the original
+  genesis configuration.
 
 These variable are fed directly into the Polkadot binary and used to spawn a node:
 
@@ -68,6 +71,19 @@ These variable are fed directly into the Polkadot binary and used to spawn a nod
     --port=<port> \
     --<name> \
 ```
+
+An example of `config` is:
+
+```json
+"config": {
+  "validation_upgrade_frequency": 1,
+  "validation_upgrade_delay": 1
+}
+```
+
+All `config` properties can be found in the
+[`HostConfiguration`](https://github.com/paritytech/polkadot/blob/master/runtime/parachains/src/configuration.rs)
+of the parachains runtime.
 
 #### `parachains`
 

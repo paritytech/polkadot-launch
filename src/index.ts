@@ -17,7 +17,7 @@ import {
 	establishHrmpChannel,
 } from "./rpc";
 import { checkConfig } from "./check";
-import { clearAuthorities, addAuthority } from "./spec";
+import { clearAuthorities, addAuthority, changeGenesisParachainsConfiguration } from "./spec";
 import { parachainAccount } from "./parachain";
 import { ApiPromise } from "@polkadot/api";
 
@@ -74,10 +74,15 @@ async function main() {
 	}
 	const chain = config.relaychain.chain;
 	await generateChainSpec(relay_chain_bin, chain);
+	// -- Start Chain Spec Modify --
 	clearAuthorities(`${chain}.json`);
 	for (const node of config.relaychain.nodes) {
 		await addAuthority(`${chain}.json`, node.name);
 	}
+	if (config.relaychain.config) {
+		await changeGenesisParachainsConfiguration(`${chain}.json`, config.relaychain.config)
+	}
+	// -- End Chain Spec Modify --
 	await generateChainSpecRaw(relay_chain_bin, chain);
 	const spec = resolve(`${chain}-raw.json`);
 

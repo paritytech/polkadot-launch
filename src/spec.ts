@@ -77,5 +77,31 @@ export async function addAuthority(spec: string, name: string) {
 
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(spec, data);
-	console.log(`Added Authority ${name}`);
+	console.log(`Added Genesis Authority ${name}`);
+}
+
+// Update the `parachainsConfiguration` in the genesis.
+// It will try to match keys which exist within the configuration and update the value.
+export async function changeGenesisParachainsConfiguration(spec: string, updates: any) {
+	let rawdata = fs.readFileSync(spec);
+	let chainSpec = JSON.parse(rawdata);
+
+	if (
+		chainSpec.genesis.runtime.runtime_genesis_config &&
+		chainSpec.genesis.runtime.runtime_genesis_config.parachainsConfiguration
+	) {
+		let config = chainSpec.genesis.runtime.runtime_genesis_config.parachainsConfiguration.config;
+		Object.keys(updates).forEach(key => {
+			if (config.hasOwnProperty(key)) {
+				config[key] = updates[key];
+				console.log(`Updated Parachains Configuration [ ${key}: ${config[key]} ]`);
+			} else {
+				console.error(`!! Bad Parachains Configuration [ ${key}: ${updates[key]} ]`);
+			}
+		});
+	}
+
+	let data = JSON.stringify(chainSpec, null, 2);
+	fs.writeFileSync(spec, data);
+	console.log(`Saved Genesis Parachains Configuration`);
 }

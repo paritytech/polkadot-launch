@@ -37,6 +37,7 @@ export interface RelayChainConfig {
 		port: number;
 		flags?: string[];
 	}[];
+	config?: JSON;
 }
 
 export interface ChainSpec {
