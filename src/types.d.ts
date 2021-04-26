@@ -40,7 +40,7 @@ export interface RelayChainConfig {
 		port: number;
 		flags?: string[];
 	}[];
-	config?: JSON;
+	runtime_genesis_config?: JSON;
 }
 
 export interface ChainSpec {

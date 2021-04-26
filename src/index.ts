@@ -20,7 +20,7 @@ import { checkConfig } from "./check";
 import {
 	clearAuthorities,
 	addAuthority,
-	changeGenesisParachainsConfiguration,
+	changeGenesisConfig,
 	addGenesisParachain,
 } from "./spec";
 import { parachainAccount } from "./parachain";
@@ -84,10 +84,10 @@ async function main() {
 	for (const node of config.relaychain.nodes) {
 		await addAuthority(`${chain}.json`, node.name);
 	}
-	if (config.relaychain.config) {
-		await changeGenesisParachainsConfiguration(
+	if (config.relaychain.runtime_genesis_config) {
+		await changeGenesisConfig(
 			`${chain}.json`,
-			config.relaychain.config
+			config.relaychain.runtime_genesis_config
 		);
 	}
 	await addParachainsToGenesis(`${chain}.json`, config.parachains);
