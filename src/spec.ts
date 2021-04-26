@@ -115,9 +115,9 @@ export async function addGenesisParachain(
 	}
 }
 
-// Update the `parachainsConfiguration` in the genesis.
+// Update the `runtime_genesis_config` in the genesis.
 // It will try to match keys which exist within the configuration and update the value.
-export async function changeGenesisParachainsConfiguration(
+export async function changeGenesisConfig(
 	spec: string,
 	updates: any
 ) {
@@ -127,26 +127,35 @@ export async function changeGenesisParachainsConfiguration(
 	console.log(`\n⚙ Updating Parachains Genesis Configuration`);
 
 	if (
-		chainSpec.genesis.runtime.runtime_genesis_config &&
-		chainSpec.genesis.runtime.runtime_genesis_config.parachainsConfiguration
+		chainSpec.genesis.runtime.runtime_genesis_config
 	) {
-		let config =
-			chainSpec.genesis.runtime.runtime_genesis_config.parachainsConfiguration
-				.config;
-		Object.keys(updates).forEach((key) => {
-			if (config.hasOwnProperty(key)) {
-				config[key] = updates[key];
-				console.log(
-					`  ✓ Updated Parachains Configuration [ ${key}: ${config[key]} ]`
-				);
-			} else {
-				console.error(
-					`  ⚠ Bad Parachains Configuration [ ${key}: ${updates[key]} ]`
-				);
-			}
-		});
+		let config = chainSpec.genesis.runtime.runtime_genesis_config;
+		findAndReplaceConfig(updates, config);
 
 		let data = JSON.stringify(chainSpec, null, 2);
 		fs.writeFileSync(spec, data);
 	}
+}
+
+// Look at the key + values from `obj1` and try to replace them in `obj2`.
+function findAndReplaceConfig(obj1: any, obj2: any) {
+	// Look at keys of obj1
+	Object.keys(obj1).forEach(key => {
+		// See if obj2 also has this key
+		if (obj2.hasOwnProperty(key)) {
+			// If it goes deeper, recurse...
+			if (obj1[key].constructor === Object) {
+					findAndReplaceConfig(obj1[key], obj2[key])
+			} else {
+				obj2[key] = obj1[key];
+				console.log(
+					`  ✓ Updated Parachains Configuration [ ${key}: ${obj2[key]} ]`
+				);
+			}
+		} else {
+			console.error(
+				`  ⚠ Bad Parachains Configuration [ ${key}: ${obj1[key]} ]`
+			);
+		}
+	})
 }
