@@ -192,6 +192,7 @@ in order to create a local test network.
     ```
 - [`polkadot-js api`](https://polkadot.js.org/api/) is used to connect to these spawned nodes over
   their WebSocket endpoint.
+
 ## Development
 
 To work on this project, you will need [`yarn`](https://yarnpkg.com/).

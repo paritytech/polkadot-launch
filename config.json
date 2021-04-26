@@ -33,18 +33,26 @@
 		{
 			"bin": "./bin/rococo-collator",
 			"id": "200",
-			"wsPort": 9988,
-			"port": 31200,
 			"balance": "1000000000000000000000",
-			"flags": ["--", "--execution=wasm"]
+			"nodes": [
+				{
+					"wsPort": 9988,
+					"port": 31200,
+					"flags": ["--", "--execution=wasm"]
+				}
+			]
 		},
 		{
 			"bin": "./bin/rococo-collator",
 			"id": "300",
-			"wsPort": 9999,
-			"port": 31300,
 			"balance": "1000000000000000000000",
-			"flags": ["--", "--execution=wasm"]
+			"nodes": [
+				{
+					"wsPort": 9999,
+					"port": 31300,
+					"flags": ["--", "--execution=wasm"]
+				}
+			]
 		}
 	],
 	"simpleParachains": [

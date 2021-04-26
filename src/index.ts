@@ -112,17 +112,21 @@ async function main() {
 
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
-		const { id, wsPort, balance, port, flags, chain } = parachain;
+		const { id, balance, chain } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
 			process.exit();
 		}
 		let account = parachainAccount(id);
-		console.log(
-			`Starting a Collator for parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`
-		);
-		await startCollator(bin, id, wsPort, port, chain, spec, flags);
+
+		for (const node of parachain.nodes) {
+			const { wsPort, port, flags } = node;
+			console.log(
+				`Starting a Collator for parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`
+			);
+			await startCollator(bin, id, wsPort, port, chain, spec, flags);
+		}
 
 		// Allow time for the TX to complete, avoiding nonce issues.
 		// TODO: Handle nonce directly instead of this.
