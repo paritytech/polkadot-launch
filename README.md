@@ -71,7 +71,7 @@ These variable are fed directly into the Polkadot binary and used to spawn a nod
     --<name> \
 ```
 
-An example of `config` is:
+An example of `runtime_genesis_config` is:
 
 ```json
 "runtime_genesis_config": {
