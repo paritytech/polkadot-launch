@@ -115,16 +115,16 @@ export async function addGenesisParachain(
 	}
 }
 
-// Update the `runtime_genesis_config` in the genesis.
+// Update the `genesis` object in the chain specification.
 // It will try to match keys which exist within the configuration and update the value.
 export async function changeGenesisConfig(spec: string, updates: any) {
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec = JSON.parse(rawdata);
 
-	console.log(`\n⚙ Updating Parachains Genesis Configuration`);
+	console.log(`\n⚙ Updating Relay Chain Genesis Configuration`);
 
-	if (chainSpec.genesis.runtime.runtime_genesis_config) {
-		let config = chainSpec.genesis.runtime.runtime_genesis_config;
+	if (chainSpec.genesis) {
+		let config = chainSpec.genesis;
 		findAndReplaceConfig(updates, config);
 
 		let data = JSON.stringify(chainSpec, null, 2);
@@ -144,12 +144,12 @@ function findAndReplaceConfig(obj1: any, obj2: any) {
 			} else {
 				obj2[key] = obj1[key];
 				console.log(
-					`  ✓ Updated Parachains Configuration [ ${key}: ${obj2[key]} ]`
+					`  ✓ Updated Genesis Configuration [ ${key}: ${obj2[key]} ]`
 				);
 			}
 		} else {
 			console.error(
-				`  ⚠ Bad Parachains Configuration [ ${key}: ${obj1[key]} ]`
+				`  ⚠ Bad Genesis Configuration [ ${key}: ${obj1[key]} ]`
 			);
 		}
 	});
