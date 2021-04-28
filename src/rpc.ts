@@ -19,8 +19,11 @@ filterConsole([
 // TODO: Add a timeout where we know something went wrong so we don't wait forever.
 export async function connect(port: number, types: any) {
 	const provider = new WsProvider("ws://127.0.0.1:" + port);
-	const api = new ApiPromise({ provider, types });
-	await api.isReady;
+	const api = new ApiPromise({ provider, types, throwOnConnect: true });
+	console.log("before")
+
+	await api.isReady.catch((error) => console.log(error.error));
+	console.log("after")
 	return api;
 }
 
