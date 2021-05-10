@@ -133,63 +133,6 @@ export async function setBalance(
 	});
 }
 
-export async function establishHrmpChannel(
-	api: ApiPromise,
-	sender: number,
-	receiver: number,
-	maxCapacity: number,
-	maxMessageSize: number,
-	finalization: boolean = false
-) {
-	return new Promise<void>(async (resolvePromise, reject) => {
-		await cryptoWaitReady();
-
-		const keyring = new Keyring({ type: "sr25519" });
-		const alice = keyring.addFromUri("//Alice");
-
-		if (!nonce) {
-			nonce = Number((await api.query.system.account(alice.address)).nonce);
-		}
-
-		console.log(
-			`--- Submitting extrinsic to establish an HRMP channel ${sender} -> ${receiver}. (nonce: ${nonce}) ---`
-		);
-		const unsub = await api.tx.sudo
-			.sudo(
-				api.tx.parasSudoWrapper.sudoEstablishHrmpChannel(
-					sender,
-					receiver,
-					maxCapacity,
-					maxMessageSize
-				)
-			)
-			.signAndSend(alice, { nonce: nonce, era: 0 }, (result) => {
-				console.log(`Current status is ${result.status}`);
-				if (result.status.isInBlock) {
-					console.log(
-						`Transaction included at blockHash ${result.status.asInBlock}`
-					);
-					if (finalization) {
-						console.log("Waiting for finalization...");
-					} else {
-						unsub();
-						resolvePromise();
-					}
-				} else if (result.status.isFinalized) {
-					console.log(
-						`Transaction finalized at blockHash ${result.status.asFinalized}`
-					);
-					unsub();
-					resolvePromise();
-				} else if (result.isError) {
-					console.log(`Transaction Error`);
-					reject(`Transaction Error`);
-				}
-			});
-		nonce += 1;
-	});
-}
-
 export async function sendHrmpMessage(
 	api: ApiPromise,
 	recipient: string,

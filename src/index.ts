@@ -14,7 +14,6 @@ import {
 	connect,
 	registerParachain,
 	setBalance,
-	establishHrmpChannel,
 } from "./rpc";
 import { checkConfig } from "./check";
 import {
@@ -22,13 +21,14 @@ import {
 	addAuthority,
 	changeGenesisConfig,
 	addGenesisParachain,
+	addGenesisHrmpChannel,
 } from "./spec";
 import { parachainAccount } from "./parachain";
 import { ApiPromise } from "@polkadot/api";
 
 import { resolve, dirname } from "path";
 import fs from "fs";
-import { LaunchConfig, ParachainConfig } from "./types";
+import { LaunchConfig, ParachainConfig, HrmpChannelsConfig } from "./types";
 
 // Special care is needed to handle paths to various files (binaries, spec, config, etc...)
 // The user passes the path to `config.json`, and we use that as the starting point for any other
@@ -91,6 +91,7 @@ async function main() {
 		);
 	}
 	await addParachainsToGenesis(`${chain}.json`, config.parachains);
+	await addHrmpChannelsToGenesis(`${chain}.json`, config.hrmpChannels);
 	// -- End Chain Spec Modify --
 	await generateChainSpecRaw(relay_chain_bin, chain);
 	const spec = resolve(`${chain}-raw.json`);
@@ -178,42 +179,8 @@ async function main() {
 			}
 		}
 	}
-	if (config.hrmpChannels) {
-		for (const hrmpChannel of config.hrmpChannels) {
-			console.log(
-				`Setting Up HRMP Channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`
-			);
-			await ensureOnboarded(relayChainApi, hrmpChannel.sender);
-			await ensureOnboarded(relayChainApi, hrmpChannel.recipient);
 
-			const { sender, recipient, maxCapacity, maxMessageSize } = hrmpChannel;
-			await establishHrmpChannel(
-				relayChainApi,
-				sender,
-				recipient,
-				maxCapacity,
-				maxMessageSize,
-				config.finalization
-			);
-		}
-	}
 	console.log("🚀 POLKADOT LAUNCH COMPLETE 🚀");
-}
-
-async function ensureOnboarded(relayChainApi: ApiPromise, paraId: number) {
-	return new Promise<void>(async function (resolve) {
-		// We subscribe to the heads as a simple way to tell that the chain onboarded.
-		let unsub = await relayChainApi.query.paras.heads(
-			paraId,
-			(response: any) => {
-				if (response.isSome) {
-					// Surprisingly, this ouroboros like subscription pattern seem to work.
-					unsub();
-					resolve();
-				}
-			}
-		);
-	});
 }
 
 async function addParachainsToGenesis(
@@ -244,6 +211,16 @@ async function addParachainsToGenesis(
 			await addGenesisParachain(spec, id, genesisState, genesisWasm, true);
 			registeredParachains[id] = true;
 		}
+	}
+}
+
+async function addHrmpChannelsToGenesis(
+	spec: string,
+	hrmpChannels: HrmpChannelsConfig[]
+) {
+	console.log("⛓ Adding Genesis HRMP Channels");
+	for (const hrmpChannel of hrmpChannels) {
+		await addGenesisHrmpChannel(spec, hrmpChannel);
 	}
 }
 

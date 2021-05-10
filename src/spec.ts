@@ -1,7 +1,7 @@
 import { Keyring } from "@polkadot/api";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import { encodeAddress } from "@polkadot/util-crypto";
-import { ChainSpec } from "./types";
+import { ChainSpec, HrmpChannelsConfig } from "./types";
 const fs = require("fs");
 
 function nameCase(string: string) {
@@ -112,6 +112,31 @@ export async function addGenesisParachain(
 		let data = JSON.stringify(chainSpec, null, 2);
 		fs.writeFileSync(spec, data);
 		console.log(`  ✓ Added Genesis Parachain ${para_id}`);
+	}
+}
+
+export async function addGenesisHrmpChannel(
+	spec: string,
+	hrmpChannel: HrmpChannelsConfig
+) {
+	let rawdata = fs.readFileSync(spec);
+	let chainSpec = JSON.parse(rawdata);
+
+	let newHrmpChannel = [
+		hrmpChannel.sender,
+		hrmpChannel.recipient,
+		hrmpChannel.maxCapacity,
+		hrmpChannel.maxMessageSize
+	];
+
+	if (chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp &&
+		chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp.preopenHrmpChannels
+	) {
+		chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp.preopenHrmpChannels.push(newHrmpChannel);
+
+		let data = JSON.stringify(chainSpec, null, 2);
+		fs.writeFileSync(spec, data);
+		console.log(`  ✓ Added HRMP channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`);
 	}
 }
 
