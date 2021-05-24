@@ -17,13 +17,13 @@ npm i polkadot-launch -g
 ## Binary Files
 
 To use polkadot-launch, you need to have binary files for a `polkadot` relay chain and a
-`rococo-collator`.
+`polkadot-collator`.
 
 You can generate these files by cloning the `rococo-v1` branch of these projects and building them
 with the specific flags below:
 
 ```bash
-git clone -b rococo-v1 https://github.com/paritytech/polkadot
+git clone https://github.com/paritytech/polkadot
 cd polkadot
 cargo build --release
 ```
@@ -31,9 +31,9 @@ cargo build --release
 and
 
 ```
-git clone -b rococo-v1 https://github.com/paritytech/cumulus
+git clone https://github.com/paritytech/cumulus
 cd cumulus
-cargo build --release -p rococo-collator
+cargo build --release -p polkadot-collator
 ```
 
 ## Use

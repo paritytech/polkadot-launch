@@ -35,7 +35,7 @@
 	},
 	"parachains": [
 		{
-			"bin": "./bin/rococo-collator",
+			"bin": "./bin/polkadot-collator",
 			"id": "200",
 			"balance": "1000000000000000000000",
 			"nodes": [
@@ -47,7 +47,7 @@
 			]
 		},
 		{
-			"bin": "./bin/rococo-collator",
+			"bin": "./bin/polkadot-collator",
 			"id": "300",
 			"balance": "1000000000000000000000",
 			"nodes": [
