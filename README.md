@@ -142,7 +142,7 @@ those. Keep in mind that an HRMP channel is unidirectional and in case you need 
 ways you need to open channels in both directions.
 
 ```json
-"htmpChannels": [
+"hrmpChannels": [
     {
         "sender": "200",
         "recipient": "300",
