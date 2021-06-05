@@ -42,6 +42,7 @@
 				{
 					"wsPort": 9988,
 					"port": 31200,
+					"name": "alice",
 					"flags": ["--", "--execution=wasm"]
 				}
 			]
@@ -54,6 +55,7 @@
 				{
 					"wsPort": 9999,
 					"port": 31300,
+					"name": "alice",
 					"flags": ["--", "--execution=wasm"]
 				}
 			]
@@ -64,6 +66,7 @@
 			"bin": "./bin/adder-collator",
 			"id": "400",
 			"port": "31400",
+			"name": "alice",
 			"balance": "1000000000000000000000"
 		}
 	],

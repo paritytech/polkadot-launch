@@ -122,11 +122,11 @@ async function main() {
 		let account = parachainAccount(id);
 
 		for (const node of parachain.nodes) {
-			const { wsPort, port, flags } = node;
+			const { wsPort, port, flags, name } = node;
 			console.log(
 				`Starting a Collator for parachain ${id}: ${account}, Collator port : ${port} wsPort : ${wsPort}`
 			);
-			await startCollator(bin, id, wsPort, port, chain, spec, flags);
+			await startCollator(bin, id, wsPort, port, name, chain, spec, flags);
 		}
 
 		// Allow time for the TX to complete, avoiding nonce issues.
