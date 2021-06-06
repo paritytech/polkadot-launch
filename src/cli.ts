@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
-import {
-	killAll,
-} from "./spawn";
+import { killAll } from "./spawn";
 import { resolve, dirname } from "path";
 import fs from "fs";
 import { LaunchConfig } from "./types";

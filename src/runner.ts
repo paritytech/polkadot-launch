@@ -10,11 +10,7 @@ import {
 	exportGenesisState,
 	startSimpleCollator,
 } from "./spawn";
-import {
-	connect,
-	registerParachain,
-	setBalance,
-} from "./rpc";
+import { connect, registerParachain, setBalance } from "./rpc";
 import { checkConfig } from "./check";
 import {
 	clearAuthorities,
@@ -29,7 +25,6 @@ import { ApiPromise } from "@polkadot/api";
 import { resolve } from "path";
 import fs from "fs";
 import { LaunchConfig, ParachainConfig, HrmpChannelsConfig } from "./types";
-
 
 function loadTypeDef(types: string | object): object {
 	if (typeof types === "string") {

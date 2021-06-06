@@ -157,7 +157,7 @@ export function startCollator(
 			"--port=" + port,
 			"--parachain-id=" + id,
 			"--collator",
-			"--force-authoring"
+			"--force-authoring",
 		];
 
 		if (name) {
