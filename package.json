@@ -23,7 +23,7 @@
 		"dist"
 	],
 	"bin": {
-		"polkadot-launch": "dist/index.js"
+		"polkadot-launch": "dist/cli.js"
 	},
 	"devDependencies": {
 		"prettier": "2.2.1"
