@@ -8,7 +8,7 @@
 	"scripts": {
 		"prepare": "tsc",
 		"build": "tsc",
-		"start": "yarn build && node dist/index.js",
+		"start": "yarn build && node dist/cli.js",
 		"lint": "npx prettier --write ."
 	},
 	"dependencies": {
