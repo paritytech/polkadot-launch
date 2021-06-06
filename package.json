@@ -20,8 +20,10 @@
 		"yarn": "^1.22.10"
 	},
 	"files": [
-		"dist"
+		"dist",
+		"src/types.d.ts"
 	],
+	"types": "src/types.d.ts",
 	"bin": {
 		"polkadot-launch": "dist/cli.js"
 	},
