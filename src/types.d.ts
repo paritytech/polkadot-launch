@@ -10,6 +10,7 @@ export interface ParachainNodeConfig {
 	rpcPort: number;
 	wsPort: number;
 	port: number;
+	name?: string;
 	flags: string[];
 }
 export interface ParachainConfig {
