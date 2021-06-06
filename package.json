@@ -5,7 +5,7 @@
 	"author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
 	"license": "MIT",
 	"scripts": {
-		"preinstall": "tsc",
+		"prepare": "tsc",
 		"build": "tsc",
 		"start": "yarn build && node dist/index.js",
 		"lint": "npx prettier --write ."
