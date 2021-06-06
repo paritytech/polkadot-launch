@@ -4,4 +4,3 @@ export * from "./rpc";
 export * from "./runner";
 export * from "./spawn";
 export * from "./spec";
-export * from "./types";
