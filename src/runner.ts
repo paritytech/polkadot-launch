@@ -62,10 +62,10 @@ export async function run(config_dir: string, config: LaunchConfig) {
 	for (const node of config.relaychain.nodes) {
 		await addAuthority(`${chain}.json`, node.name);
 	}
-	if (config.relaychain.runtime_genesis_config) {
+	if (config.relaychain.genesis) {
 		await changeGenesisConfig(
 			`${chain}.json`,
-			config.relaychain.runtime_genesis_config
+			config.relaychain.genesis
 		);
 	}
 	await addParachainsToGenesis(config_dir, `${chain}.json`, config.parachains);

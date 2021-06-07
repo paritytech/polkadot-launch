@@ -57,7 +57,7 @@ You can see an example [here](config.json).
   - `name`: Must be one of `alice`, `bob`, `charlie`, or `dave`.
   - `wsPort`: The websocket port for this node.
   - `port`: The TCP port for this node.
-- `runtime_genesis_config`: A JSON object of the properties you want to modify from the genesis
+- `genesis`: A JSON object of the properties you want to modify from the genesis
   configuration. Non-specified properties will be unchanged from the original genesis configuration.
 
 These variable are fed directly into the Polkadot binary and used to spawn a node:
@@ -71,23 +71,28 @@ These variable are fed directly into the Polkadot binary and used to spawn a nod
     --<name> \
 ```
 
-An example of `runtime_genesis_config` is:
+An example of `genesis` is:
 
 ```json
-"runtime_genesis_config": {
-  "parachainsConfiguration": {
-    "config": {
-      "validation_upgrade_frequency": 1,
-      "validation_upgrade_delay": 1
-    }
-  },
-  "palletCollective": {
-    "members": ["5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", "5DbKjhNLpqX3zqZdNBc9BGb4fHU1cRBaDhJUskrvkwfraDi6"]
+"genesis": {
+  "runtime": {
+    "runtime_genesis_config": {
+      "parachainsConfiguration": {
+        "config": {
+          "validation_upgrade_frequency": 1,
+          "validation_upgrade_delay": 1
+        }
+      },
+      "palletCollective": {
+        "members": ["5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", "5DbKjhNLpqX3zqZdNBc9BGb4fHU1cRBaDhJUskrvkwfraDi6"]
+      }
+    },
+    "session_length_in_blocks": 10
   }
 }
 ```
 
-All `runtime_genesis_config` properties can be found in the chainspec output:
+All `genesis` properties can be found in the chainspec output:
 
 ```bash
 ./polkadot build-spec --chain=rococo-local --disable-default-bootnode

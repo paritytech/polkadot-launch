@@ -41,7 +41,7 @@ export interface RelayChainConfig {
 		port: number;
 		flags?: string[];
 	}[];
-	runtime_genesis_config?: JSON;
+	genesis?: JSON;
 }
 
 export interface ChainSpec {
