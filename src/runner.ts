@@ -63,10 +63,7 @@ export async function run(config_dir: string, config: LaunchConfig) {
 		await addAuthority(`${chain}.json`, node.name);
 	}
 	if (config.relaychain.genesis) {
-		await changeGenesisConfig(
-			`${chain}.json`,
-			config.relaychain.genesis
-		);
+		await changeGenesisConfig(`${chain}.json`, config.relaychain.genesis);
 	}
 	await addParachainsToGenesis(config_dir, `${chain}.json`, config.parachains);
 	await addHrmpChannelsToGenesis(`${chain}.json`, config.hrmpChannels);

@@ -10,15 +10,13 @@ function nameCase(string: string) {
 
 // Get authority keys from within chainSpec data
 function getAuthorityKeys(chainSpec: ChainSpec) {
-	// this is the most recent spec struct
-	if (
-		chainSpec.genesis.runtime.runtime_genesis_config &&
-		chainSpec.genesis.runtime.runtime_genesis_config.palletSession
-	) {
-		return chainSpec.genesis.runtime.runtime_genesis_config.palletSession.keys;
+	// Check runtime_genesis_config key for rococo compatibility.
+	const runtimeConfig =
+		chainSpec.genesis.runtime.runtime_genesis_config ||
+		chainSpec.genesis.runtime;
+	if (runtimeConfig && runtimeConfig.palletSession) {
+		return runtimeConfig.palletSession.keys;
 	}
-	// Backward compatibility
-	return chainSpec.genesis.runtime.palletSession.keys;
 }
 
 // Remove all existing keys from `session.keys`
@@ -91,12 +89,12 @@ export async function addGenesisParachain(
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec = JSON.parse(rawdata);
 
-	if (
-		chainSpec.genesis.runtime.runtime_genesis_config &&
-		chainSpec.genesis.runtime.runtime_genesis_config.parachainsParas
-	) {
-		let paras =
-			chainSpec.genesis.runtime.runtime_genesis_config.parachainsParas.paras;
+	// Check runtime_genesis_config key for rococo compatibility.
+	const runtimeConfig =
+		chainSpec.genesis.runtime.runtime_genesis_config ||
+		chainSpec.genesis.runtime;
+	if (runtimeConfig.parachainsParas) {
+		let paras = runtimeConfig.parachainsParas.paras;
 
 		let new_para = [
 			parseInt(para_id),
@@ -130,14 +128,16 @@ export async function addGenesisHrmpChannel(
 		hrmpChannel.maxMessageSize,
 	];
 
+	// Check runtime_genesis_config key for rococo compatibility.
+	const runtimeConfig =
+		chainSpec.genesis.runtime.runtime_genesis_config ||
+		chainSpec.genesis.runtime;
+
 	if (
-		chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp &&
-		chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp
-			.preopenHrmpChannels
+		runtimeConfig.parachainsHrmp &&
+		runtimeConfig.parachainsHrmp.preopenHrmpChannels
 	) {
-		chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp.preopenHrmpChannels.push(
-			newHrmpChannel
-		);
+		runtimeConfig.parachainsHrmp.preopenHrmpChannels.push(newHrmpChannel);
 
 		let data = JSON.stringify(chainSpec, null, 2);
 		fs.writeFileSync(spec, data);
@@ -147,7 +147,7 @@ export async function addGenesisHrmpChannel(
 	}
 }
 
-// Update the `runtime_genesis_config` in the genesis.
+// Update the runtime config in the genesis.
 // It will try to match keys which exist within the configuration and update the value.
 export async function changeGenesisConfig(spec: string, updates: any) {
 	let rawdata = fs.readFileSync(spec);
@@ -180,9 +180,7 @@ function findAndReplaceConfig(obj1: any, obj2: any) {
 				);
 			}
 		} else {
-			console.error(
-				`  ⚠ Bad Genesis Configuration [ ${key}: ${obj1[key]} ]`
-			);
+			console.error(`  ⚠ Bad Genesis Configuration [ ${key}: ${obj1[key]} ]`);
 		}
 	});
 }
