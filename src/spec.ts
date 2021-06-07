@@ -17,8 +17,6 @@ function getAuthorityKeys(chainSpec: ChainSpec) {
 	if (runtimeConfig && runtimeConfig.palletSession) {
 		return runtimeConfig.palletSession.keys;
 	}
-	// Backward compatibility
-	return chainSpec.genesis.runtime.palletSession.keys;
 }
 
 // Remove all existing keys from `session.keys`
