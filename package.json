@@ -2,11 +2,13 @@
 	"name": "polkadot-launch",
 	"version": "1.5.0",
 	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
 	"license": "MIT",
 	"scripts": {
+		"prepare": "tsc",
 		"build": "tsc",
-		"start": "yarn build && node dist/index.js",
+		"start": "yarn build && node dist/cli.js",
 		"lint": "npx prettier --write ."
 	},
 	"dependencies": {
@@ -22,7 +24,7 @@
 		"dist"
 	],
 	"bin": {
-		"polkadot-launch": "dist/index.js"
+		"polkadot-launch": "dist/cli.js"
 	},
 	"devDependencies": {
 		"prettier": "2.2.1"
