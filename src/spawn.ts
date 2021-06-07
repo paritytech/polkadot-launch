@@ -144,6 +144,7 @@ export function startCollator(
 	id: string,
 	wsPort: number,
 	port: number,
+	name?: string,
 	chain?: string,
 	spec?: string,
 	flags?: string[]
@@ -156,7 +157,13 @@ export function startCollator(
 			"--port=" + port,
 			"--parachain-id=" + id,
 			"--collator",
+			"--force-authoring",
 		];
+
+		if (name) {
+			args.push(`--${name.toLowerCase()}`);
+			console.log(`Added --${name.toLowerCase()}`);
+		}
 
 		if (chain) {
 			args.push("--chain=" + chain);

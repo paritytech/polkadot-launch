@@ -39,25 +39,27 @@
 	},
 	"parachains": [
 		{
-			"bin": "./bin/rococo-collator",
+			"bin": "./bin/polkadot-collator",
 			"id": "200",
 			"balance": "1000000000000000000000",
 			"nodes": [
 				{
 					"wsPort": 9988,
 					"port": 31200,
+					"name": "alice",
 					"flags": ["--", "--execution=wasm"]
 				}
 			]
 		},
 		{
-			"bin": "./bin/rococo-collator",
+			"bin": "./bin/polkadot-collator",
 			"id": "300",
 			"balance": "1000000000000000000000",
 			"nodes": [
 				{
 					"wsPort": 9999,
 					"port": 31300,
+					"name": "alice",
 					"flags": ["--", "--execution=wasm"]
 				}
 			]
@@ -68,6 +70,7 @@
 			"bin": "./bin/adder-collator",
 			"id": "400",
 			"port": "31400",
+			"name": "alice",
 			"balance": "1000000000000000000000"
 		}
 	],

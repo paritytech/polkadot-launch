@@ -127,17 +127,23 @@ export async function addGenesisHrmpChannel(
 		hrmpChannel.sender,
 		hrmpChannel.recipient,
 		hrmpChannel.maxCapacity,
-		hrmpChannel.maxMessageSize
+		hrmpChannel.maxMessageSize,
 	];
 
-	if (chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp &&
-		chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp.preopenHrmpChannels
+	if (
+		chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp &&
+		chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp
+			.preopenHrmpChannels
 	) {
-		chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp.preopenHrmpChannels.push(newHrmpChannel);
+		chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp.preopenHrmpChannels.push(
+			newHrmpChannel
+		);
 
 		let data = JSON.stringify(chainSpec, null, 2);
 		fs.writeFileSync(spec, data);
-		console.log(`  ✓ Added HRMP channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`);
+		console.log(
+			`  ✓ Added HRMP channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`
+		);
 	}
 }
 
