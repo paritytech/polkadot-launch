@@ -171,7 +171,11 @@ function findAndReplaceConfig(obj1: any, obj2: any) {
 		// See if obj2 also has this key
 		if (obj2.hasOwnProperty(key)) {
 			// If it goes deeper, recurse...
-			if (obj1[key].constructor === Object) {
+			if (
+				obj1[key] !== null &&
+				obj1[key] !== undefined &&
+				obj1[key].constructor === Object
+			) {
 				findAndReplaceConfig(obj1[key], obj2[key]);
 			} else {
 				obj2[key] = obj1[key];
