@@ -10,6 +10,7 @@ export interface ParachainNodeConfig {
 	rpcPort: number;
 	wsPort: number;
 	port: number;
+	name?: string;
 	flags: string[];
 }
 export interface ParachainConfig {
@@ -40,7 +41,7 @@ export interface RelayChainConfig {
 		port: number;
 		flags?: string[];
 	}[];
-	runtime_genesis_config?: JSON;
+	genesis?: JSON;
 }
 
 export interface ChainSpec {

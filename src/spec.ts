@@ -10,15 +10,13 @@ function nameCase(string: string) {
 
 // Get authority keys from within chainSpec data
 function getAuthorityKeys(chainSpec: ChainSpec) {
-	// this is the most recent spec struct
-	if (
-		chainSpec.genesis.runtime.runtime_genesis_config &&
-		chainSpec.genesis.runtime.runtime_genesis_config.palletSession
-	) {
-		return chainSpec.genesis.runtime.runtime_genesis_config.palletSession.keys;
+	// Check runtime_genesis_config key for rococo compatibility.
+	const runtimeConfig =
+		chainSpec.genesis.runtime.runtime_genesis_config ||
+		chainSpec.genesis.runtime;
+	if (runtimeConfig && runtimeConfig.palletSession) {
+		return runtimeConfig.palletSession.keys;
 	}
-	// Backward compatibility
-	return chainSpec.genesis.runtime.palletSession.keys;
 }
 
 // Remove all existing keys from `session.keys`
@@ -91,12 +89,12 @@ export async function addGenesisParachain(
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec = JSON.parse(rawdata);
 
-	if (
-		chainSpec.genesis.runtime.runtime_genesis_config &&
-		chainSpec.genesis.runtime.runtime_genesis_config.parachainsParas
-	) {
-		let paras =
-			chainSpec.genesis.runtime.runtime_genesis_config.parachainsParas.paras;
+	// Check runtime_genesis_config key for rococo compatibility.
+	const runtimeConfig =
+		chainSpec.genesis.runtime.runtime_genesis_config ||
+		chainSpec.genesis.runtime;
+	if (runtimeConfig.parachainsParas) {
+		let paras = runtimeConfig.parachainsParas.paras;
 
 		let new_para = [
 			parseInt(para_id),
@@ -115,6 +113,7 @@ export async function addGenesisParachain(
 	}
 }
 
+// Update the `genesis` object in the chain specification.
 export async function addGenesisHrmpChannel(
 	spec: string,
 	hrmpChannel: HrmpChannelsConfig
@@ -126,30 +125,38 @@ export async function addGenesisHrmpChannel(
 		hrmpChannel.sender,
 		hrmpChannel.recipient,
 		hrmpChannel.maxCapacity,
-		hrmpChannel.maxMessageSize
+		hrmpChannel.maxMessageSize,
 	];
 
-	if (chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp &&
-		chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp.preopenHrmpChannels
+	// Check runtime_genesis_config key for rococo compatibility.
+	const runtimeConfig =
+		chainSpec.genesis.runtime.runtime_genesis_config ||
+		chainSpec.genesis.runtime;
+
+	if (
+		runtimeConfig.parachainsHrmp &&
+		runtimeConfig.parachainsHrmp.preopenHrmpChannels
 	) {
-		chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp.preopenHrmpChannels.push(newHrmpChannel);
+		runtimeConfig.parachainsHrmp.preopenHrmpChannels.push(newHrmpChannel);
 
 		let data = JSON.stringify(chainSpec, null, 2);
 		fs.writeFileSync(spec, data);
-		console.log(`  ✓ Added HRMP channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`);
+		console.log(
+			`  ✓ Added HRMP channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`
+		);
 	}
 }
 
-// Update the `runtime_genesis_config` in the genesis.
+// Update the runtime config in the genesis.
 // It will try to match keys which exist within the configuration and update the value.
 export async function changeGenesisConfig(spec: string, updates: any) {
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec = JSON.parse(rawdata);
 
-	console.log(`\n⚙ Updating Parachains Genesis Configuration`);
+	console.log(`\n⚙ Updating Relay Chain Genesis Configuration`);
 
-	if (chainSpec.genesis.runtime.runtime_genesis_config) {
-		let config = chainSpec.genesis.runtime.runtime_genesis_config;
+	if (chainSpec.genesis) {
+		let config = chainSpec.genesis;
 		findAndReplaceConfig(updates, config);
 
 		let data = JSON.stringify(chainSpec, null, 2);
@@ -164,18 +171,20 @@ function findAndReplaceConfig(obj1: any, obj2: any) {
 		// See if obj2 also has this key
 		if (obj2.hasOwnProperty(key)) {
 			// If it goes deeper, recurse...
-			if (obj1[key].constructor === Object) {
+			if (
+				obj1[key] !== null &&
+				obj1[key] !== undefined &&
+				obj1[key].constructor === Object
+			) {
 				findAndReplaceConfig(obj1[key], obj2[key]);
 			} else {
 				obj2[key] = obj1[key];
 				console.log(
-					`  ✓ Updated Parachains Configuration [ ${key}: ${obj2[key]} ]`
+					`  ✓ Updated Genesis Configuration [ ${key}: ${obj2[key]} ]`
 				);
 			}
 		} else {
-			console.error(
-				`  ⚠ Bad Parachains Configuration [ ${key}: ${obj1[key]} ]`
-			);
+			console.error(`  ⚠ Bad Genesis Configuration [ ${key}: ${obj1[key]} ]`);
 		}
 	});
 }

@@ -7,7 +7,8 @@
 		"lib": ["esnext"],
 		"outDir": "dist",
 		"resolveJsonModule": true,
-		"strict": true
+		"strict": true,
+		"declaration": true
 	},
 	"exclude": ["node_modules", "dist", "test"]
 }
