@@ -14,8 +14,8 @@ function getAuthorityKeys(chainSpec: ChainSpec) {
 	const runtimeConfig =
 		chainSpec.genesis.runtime.runtime_genesis_config ||
 		chainSpec.genesis.runtime;
-	if (runtimeConfig && runtimeConfig.palletSession) {
-		return runtimeConfig.palletSession.keys;
+	if (runtimeConfig && runtimeConfig.session) {
+		return runtimeConfig.session.keys;
 	}
 }
 
