@@ -17,6 +17,11 @@ function getAuthorityKeys(chainSpec: ChainSpec) {
 	if (runtimeConfig && runtimeConfig.session) {
 		return runtimeConfig.session.keys;
 	}
+
+	// For retro-compatibility with substrate pre 9.5
+	if (runtimeConfig && runtimeConfig.palletSession) {
+		return runtimeConfig.palletSession.keys;
+	}
 }
 
 // Remove all existing keys from `session.keys`
