@@ -3,7 +3,6 @@
 import {
 	startNode,
 	startCollator,
-	killAll,
 	generateChainSpec,
 	generateChainSpecRaw,
 	exportGenesisWasm,
@@ -155,6 +154,9 @@ export async function run(config_dir: string, config: LaunchConfig) {
 		}
 	}
 
+	// We don't need the PolkadotJs API anymore
+	await relayChainApi.disconnect();
+	
 	console.log("🚀 POLKADOT LAUNCH COMPLETE 🚀");
 }
 
