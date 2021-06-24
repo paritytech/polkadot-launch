@@ -1,4 +1,4 @@
-# polkadot-launch
+# manta-pc-launch
 
 Simple CLI tool to launch a local [Polkadot](https://github.com/paritytech/polkadot/) test network.
 
