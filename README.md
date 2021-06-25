@@ -1,5 +1,15 @@
 # manta-pc-launch
 
+## Launch Manta Parachains
+```
+yarn start config
+```
+
+## Launch Manta Parachain and Acala Parachain
+```
+yarn start manta-acala
+```
+
 Simple CLI tool to launch a local [Polkadot](https://github.com/paritytech/polkadot/) test network.
 
 ## Install
