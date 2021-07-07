@@ -100,16 +100,22 @@ export function startNode(
 	wsPort: number,
 	port: number,
 	spec: string,
-	flags?: string[]
+	flags?: string[],
+	basePath?: string
 ) {
 	// TODO: Make DB directory configurable rather than just `tmp`
 	let args = [
 		"--chain=" + spec,
-		"--tmp",
 		"--ws-port=" + wsPort,
 		"--port=" + port,
 		"--" + name.toLowerCase(),
 	];
+
+	if (basePath) {
+		args.push("--base-path=" + basePath);
+	} else {
+		args.push("--tmp");
+	}
 
 	if (flags) {
 		// Add any additional flags to the CLI
@@ -180,17 +186,23 @@ export function startCollator(
 	chain?: string,
 	spec?: string,
 	flags?: string[],
+	basePath?: string,
 	skip_id_arg?: boolean
 ) {
 	return new Promise<void>(function (resolve) {
 		// TODO: Make DB directory configurable rather than just `tmp`
 		let args = [
-			"--tmp",
 			"--ws-port=" + wsPort,
 			"--port=" + port,
 			"--collator",
 			"--force-authoring",
 		];
+
+		if (basePath) {
+			args.push("--base-path=" + basePath);
+		} else {
+			args.push("--tmp");
+		}
 
 		if (name) {
 			args.push(`--${name.toLowerCase()}`);

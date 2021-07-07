@@ -10,6 +10,7 @@ export interface ParachainNodeConfig {
 	rpcPort: number;
 	wsPort: number;
 	port: number;
+	basePath?: string;
 	name?: string;
 	flags: string[];
 }
@@ -37,6 +38,7 @@ export interface RelayChainConfig {
 	chain: string;
 	nodes: {
 		name: string;
+		basePath?: string;
 		wsPort: number;
 		port: number;
 		flags?: string[];

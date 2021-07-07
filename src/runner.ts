@@ -72,18 +72,20 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 		await changeGenesisConfig(`${chain}.json`, config.relaychain.genesis);
 	}
 	await addParachainsToGenesis(config_dir, `${chain}.json`, config.parachains);
-	await addHrmpChannelsToGenesis(`${chain}.json`, config.hrmpChannels);
+	if (config.hrmpChannels) {
+		await addHrmpChannelsToGenesis(`${chain}.json`, config.hrmpChannels);
+	}
 	// -- End Chain Spec Modify --
 	await generateChainSpecRaw(relay_chain_bin, chain);
 	const spec = resolve(`${chain}-raw.json`);
 
 	// First we launch each of the validators for the relay chain.
 	for (const node of config.relaychain.nodes) {
-		const { name, wsPort, port, flags } = node;
+		const { name, wsPort, port, flags, basePath } = node;
 		console.log(`Starting ${name}...`);
 		// We spawn a `child_process` starting a node, and then wait until we
 		// able to connect to it using PolkadotJS in order to know its running.
-		startNode(relay_chain_bin, name, wsPort, port, spec, flags);
+		startNode(relay_chain_bin, name, wsPort, port, spec, flags, basePath);
 	}
 
 	// Connect to the first relay chain node to submit the extrinsic.
@@ -103,7 +105,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 		let account = parachainAccount(resolvedId);
 
 		for (const node of parachain.nodes) {
-			const { wsPort, port, flags, name } = node;
+			const { wsPort, port, flags, name, basePath } = node;
 			console.log(
 				`Starting a Collator for parachain ${resolvedId}: ${account}, Collator port : ${port} wsPort : ${wsPort}`
 			);
@@ -117,6 +119,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 				chain,
 				spec,
 				flags,
+				basePath,
 				skipIdArg
 			);
 		}
@@ -175,7 +178,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 
 	// We don't need the PolkadotJs API anymore
 	await relayChainApi.disconnect();
-	
+
 	console.log("🚀 POLKADOT LAUNCH COMPLETE 🚀");
 }
 
