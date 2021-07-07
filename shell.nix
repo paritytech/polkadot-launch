@@ -5,5 +5,6 @@ in
 pkgs.mkShell {
   buildInputs = [
     polkadot-launch
+    (yarn.override { nodejs = nodejs-14_x; })
   ];
 }
