@@ -3,6 +3,7 @@
 import { LaunchConfig } from "./types";
 export function checkConfig(config: LaunchConfig) {
 	if (!config) {
+		console.error("⚠ Missing config");
 		return false;
 	}
 
