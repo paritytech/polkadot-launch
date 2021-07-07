@@ -57,8 +57,11 @@ You can see an example [here](config.json).
   - `name`: Must be one of `alice`, `bob`, `charlie`, or `dave`.
   - `wsPort`: The websocket port for this node.
   - `port`: The TCP port for this node.
-- `genesis`: A JSON object of the properties you want to modify from the genesis
-  configuration. Non-specified properties will be unchanged from the original genesis configuration.
+  - `basePath`: The directory used for the blockchain db and other outputs. When unspecified, we use
+    `--tmp`.
+  - `flags`: Any additional command line flags you want to add when starting your node.
+- `genesis`: A JSON object of the properties you want to modify from the genesis configuration.
+  Non-specified properties will be unchanged from the original genesis configuration.
 
 These variable are fed directly into the Polkadot binary and used to spawn a node:
 
@@ -113,6 +116,9 @@ All `genesis` properties can be found in the chainspec output:
   account ID.
 - `chain`: (Optional) Configure an alternative chain specification to be used for launching the
   parachain.
+- `basePath`: The directory used for the blockchain db and other outputs. When unspecified, we use
+  `--tmp`.
+- `flags`: Any additional command line flags you want to add when starting your node.
 
 These variables are fed directly into the collator binary and used to spawn a node:
 
