@@ -40,7 +40,7 @@ export async function generateChainSpec(bin: string, chain: string) {
 export async function generateChainSpecRaw(bin: string, chain: string) {
 	console.log(); // Add a newline in output
 	return new Promise<void>(function (resolve, reject) {
-		let args = ["build-spec", "--chain=" + chain + ".json", "--raw"];
+		let args = ["build-spec", "--chain=" + chain, "--raw"];
 
 		p["spec"] = spawn(bin, args);
 		let spec = fs.createWriteStream(`${chain}-raw.json`);
