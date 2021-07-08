@@ -2,12 +2,17 @@
 
 ## Launch Manta Parachains
 ```
-yarn start config
+yarn start config.json
 ```
 
 ## Launch Manta Parachain and Acala Parachain
 ```
-yarn start manta-acala
+yarn start manta-acala.json
+```
+
+## Launch Calamari Parachains
+```
+yarn start calamari.json
 ```
 
 Simple CLI tool to launch a local [Polkadot](https://github.com/paritytech/polkadot/) test network.
