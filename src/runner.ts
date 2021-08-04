@@ -24,12 +24,14 @@ import { ApiPromise } from "@polkadot/api";
 
 import { resolve } from "path";
 import fs from "fs";
-import {
+import type {
 	LaunchConfig,
 	ResolvedParachainConfig,
+	ResolvedSimpleParachainConfig,
 	HrmpChannelsConfig,
 	ResolvedLaunchConfig,
 } from "./types";
+import { type } from "os";
 
 function loadTypeDef(types: string | object): object {
 	if (typeof types === "string") {
@@ -71,7 +73,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	if (config.relaychain.genesis) {
 		await changeGenesisConfig(`${chain}.json`, config.relaychain.genesis);
 	}
-	await addParachainsToGenesis(config_dir, `${chain}.json`, config.parachains);
+	await addParachainsToGenesis(config_dir, `${chain}.json`, config.parachains, config.simpleParachains);
 	if (config.hrmpChannels) {
 		await addHrmpChannelsToGenesis(`${chain}.json`, config.hrmpChannels);
 	}
@@ -146,28 +148,6 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 			const skipIdArg = !id;
 			await startSimpleCollator(bin, resolvedId, spec, port, skipIdArg);
 
-			// Get the information required to register the parachain on the relay chain.
-			let genesisState;
-			let genesisWasm;
-			try {
-				// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
-				// not necessary for it anyway), so we don't pass it here.
-				genesisState = await exportGenesisState(bin);
-				genesisWasm = await exportGenesisWasm(bin);
-			} catch (err) {
-				console.error(err);
-				process.exit(1);
-			}
-
-			console.log(`Registering Parachain ${resolvedId}`);
-			await registerParachain(
-				relayChainApi,
-				resolvedId,
-				genesisWasm,
-				genesisState,
-				config.finalization
-			);
-
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.
 			if (balance) {
@@ -182,14 +162,33 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	console.log("🚀 POLKADOT LAUNCH COMPLETE 🚀");
 }
 
+interface GenesisParachain {
+	isSimple: boolean,
+	id?: string
+	resolvedId: string,
+	chain?: string,
+	bin: string
+}
+
 async function addParachainsToGenesis(
 	config_dir: string,
 	spec: string,
-	parachains: ResolvedParachainConfig[]
+	parachains: ResolvedParachainConfig[],
+	simpleParachains: ResolvedSimpleParachainConfig[]
 ) {
 	console.log("\n⛓ Adding Genesis Parachains");
-	for (const parachain of parachains) {
-		const { id, resolvedId, chain } = parachain;
+
+	// Collect all paras into a single list
+	let x: GenesisParachain[] = parachains.map((p) => {
+		 return { isSimple: false, ...p }
+	})
+	let y: GenesisParachain[] = simpleParachains.map((p) => {
+		return { isSimple: true, ...p }
+	})
+	let paras = x.concat(y)
+
+	for (const parachain of paras) {
+		const { isSimple, id, resolvedId, chain } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
@@ -201,8 +200,15 @@ async function addParachainsToGenesis(
 			let genesisState;
 			let genesisWasm;
 			try {
-				genesisState = await exportGenesisState(bin, id, chain);
-				genesisWasm = await exportGenesisWasm(bin, chain);
+				if (isSimple) {
+					// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
+					// not necessary for it anyway), so we don't pass it here.
+					genesisState = await exportGenesisState(bin);
+					genesisWasm = await exportGenesisWasm(bin);
+				} else {
+					genesisState = await exportGenesisState(bin, id, chain);
+					genesisWasm = await exportGenesisWasm(bin, chain);
+				}
 			} catch (err) {
 				console.error(err);
 				process.exit(1);
@@ -246,6 +252,9 @@ async function resolveParachainId(
 			console.log(`  ✓ Read parachain id for ${parachain.bin}: ${paraId}`);
 			parachain.resolvedId = paraId.toString();
 		}
+	}
+	for (const parachain of resolvedConfig.simpleParachains) {
+		parachain.resolvedId = parachain.id;
 	}
 	return resolvedConfig;
 }

@@ -282,13 +282,10 @@ export function startSimpleCollator(
 
 		let log = fs.createWriteStream(`${port}.log`);
 
-		p[port].stdout.on("data", function (chunk) {
-			let message = chunk.toString();
-			log.write(message);
-		});
+		p[port].stdout.pipe(log);
 		p[port].stderr.on("data", function (chunk) {
 			let message = chunk.toString();
-			if (message.substring(21, 50) === "Listening for new connections") {
+			if (message.includes("Listening for new connections")) {
 				resolve();
 			}
 			log.write(message);
