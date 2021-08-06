@@ -1,5 +1,5 @@
 {
-	"name": "polkadot-launch",
+	"name": "manta-pc-launch",
 	"version": "1.7.0",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -24,7 +24,7 @@
 		"dist"
 	],
 	"bin": {
-		"polkadot-launch": "dist/cli.js"
+		"manta-pc-launch": "dist/cli.js"
 	},
 	"devDependencies": {
 		"prettier": "2.2.1"
