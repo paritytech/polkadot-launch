@@ -50,7 +50,7 @@
 	"parachains": [
 		{
 			"bin": "../Manta/target/release/manta-pc",
-			"id": "6666",
+			"id": "2084",
 			"chain": "manta-pc-local",
 			"nodes": [
 				{
@@ -89,14 +89,14 @@
 	],
 	"hrmpChannels": [
 		{
-			"sender": 6666,
+			"sender": 2084,
 			"recipient": 2000,
 			"maxCapacity": 8,
 			"maxMessageSize": 1024
 		},
 		{
 			"sender": 2000,
-			"recipient": 6666,
+			"recipient": 2084,
 			"maxCapacity": 8,
 			"maxMessageSize": 1024
 		}
