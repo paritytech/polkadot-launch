@@ -51,7 +51,7 @@
 		{
 			"bin": "../Manta/target/release/manta-pc",
 			"id": "2084",
-			"chain": "manta-pc-local",
+			"chain": "manta-pc-dev",
 			"nodes": [
 				{
 					"wsPort": 9988,
