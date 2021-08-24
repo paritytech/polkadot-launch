@@ -195,7 +195,6 @@ export function startCollator(
 			"--ws-port=" + wsPort,
 			"--port=" + port,
 			"--collator",
-			"--force-authoring",
 		];
 
 		if (basePath) {
