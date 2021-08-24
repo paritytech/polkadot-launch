@@ -1,0 +1,148 @@
+{
+	"relaychain": {
+		"bin": "../polkadot/target/release/polkadot",
+		"chain": "rococo-local",
+		"nodes": [
+			{
+				"name": "alice",
+				"wsPort": 9944,
+				"port": 30444,
+				"flags": [
+					"--unsafe-ws-external",
+					"--unsafe-rpc-external",
+					"--rpc-cors=all"
+				]
+			},
+			{
+				"name": "bob",
+				"wsPort": 9955,
+				"port": 30555,
+				"flags": [
+					"--unsafe-ws-external",
+					"--unsafe-rpc-external",
+					"--rpc-cors=all"
+				]
+			},
+			{
+				"name": "charlie",
+				"wsPort": 9966,
+				"port": 30666,
+				"flags": [
+					"--unsafe-ws-external",
+					"--unsafe-rpc-external",
+					"--rpc-cors=all"
+				]
+			},
+			{
+				"name": "dave",
+				"wsPort": 9977,
+				"port": 30777,
+				"flags": [
+					"--unsafe-ws-external",
+					"--unsafe-rpc-external",
+					"--rpc-cors=all"
+				]
+			},
+			{
+				"name": "eve",
+				"wsPort": 9988,
+				"port": 30888,
+				"flags": [
+					"--unsafe-ws-external",
+					"--unsafe-rpc-external",
+					"--rpc-cors=all"
+				]
+			}
+		],
+		"genesis": {
+			"runtime": {
+				"runtime_genesis_config": {
+					"parachainsConfiguration": {
+						"config": {
+							"validation_upgrade_frequency": 1,
+							"validation_upgrade_delay": 1
+						}
+					}
+				}
+			}
+		}
+	},
+	"parachains": [
+		{
+			"bin": "../Manta/target/release/calamari-pc",
+			"id": "2084",
+			"chain": "calamari-testnet",
+			"nodes": [
+				{
+					"wsPort": 9801,
+					"port": 31201,
+					"basePath": "~/blockchains/c1",
+					"flags": [
+						"--unsafe-ws-external",
+						"--unsafe-rpc-external",
+						"--rpc-cors=all",
+						"--rpc-port=9971",
+						"--",
+						"--execution=wasm"
+					]
+				},
+				{
+					"wsPort": 9802,
+					"port": 31202,
+					"basePath": "~/blockchains/c2",
+					"flags": [
+						"--unsafe-ws-external",
+						"--unsafe-rpc-external",
+						"--rpc-cors=all",
+						"--rpc-port=9972",
+						"--",
+						"--execution=wasm"
+					]
+				},
+				{
+					"wsPort": 9803,
+					"port": 31203,
+					"basePath": "~/blockchains/c3",
+					"flags": [
+						"--unsafe-ws-external",
+						"--unsafe-rpc-external",
+						"--rpc-cors=all",
+						"--rpc-port=9973",
+						"--",
+						"--execution=wasm"
+					]
+				},
+				{
+					"wsPort": 9804,
+					"port": 31204,
+					"basePath": "~/blockchains/c4",
+					"flags": [
+						"--unsafe-ws-external",
+						"--unsafe-rpc-external",
+						"--rpc-cors=all",
+						"--rpc-port=9974",
+						"--",
+						"--execution=wasm"
+					]
+				},
+				{
+					"wsPort": 9805,
+					"port": 31205,
+					"basePath": "~/blockchains/c5",
+					"flags": [
+						"--unsafe-ws-external",
+						"--unsafe-rpc-external",
+						"--rpc-cors=all",
+						"--rpc-port=9975",
+						"--",
+						"--execution=wasm"
+					]
+				}
+			]
+		}
+	],
+	"hrmpChannels": [
+	],
+	"types": {},
+	"finalization": false
+}
