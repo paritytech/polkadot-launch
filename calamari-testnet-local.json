@@ -8,8 +8,6 @@
 				"wsPort": 9944,
 				"port": 30444,
 				"flags": [
-					"--unsafe-ws-external",
-					"--unsafe-rpc-external",
 					"--rpc-cors=all"
 				]
 			},
@@ -18,8 +16,6 @@
 				"wsPort": 9955,
 				"port": 30555,
 				"flags": [
-					"--unsafe-ws-external",
-					"--unsafe-rpc-external",
 					"--rpc-cors=all"
 				]
 			},
@@ -28,8 +24,6 @@
 				"wsPort": 9966,
 				"port": 30666,
 				"flags": [
-					"--unsafe-ws-external",
-					"--unsafe-rpc-external",
 					"--rpc-cors=all"
 				]
 			},
@@ -38,8 +32,6 @@
 				"wsPort": 9977,
 				"port": 30777,
 				"flags": [
-					"--unsafe-ws-external",
-					"--unsafe-rpc-external",
 					"--rpc-cors=all"
 				]
 			},
@@ -48,8 +40,6 @@
 				"wsPort": 9988,
 				"port": 30888,
 				"flags": [
-					"--unsafe-ws-external",
-					"--unsafe-rpc-external",
 					"--rpc-cors=all"
 				]
 			}
@@ -76,10 +66,7 @@
 				{
 					"wsPort": 9801,
 					"port": 31201,
-					"basePath": "~/blockchains/c1",
 					"flags": [
-						"--unsafe-ws-external",
-						"--unsafe-rpc-external",
 						"--rpc-cors=all",
 						"--rpc-port=9971",
 						"--",
@@ -89,10 +76,7 @@
 				{
 					"wsPort": 9802,
 					"port": 31202,
-					"basePath": "~/blockchains/c2",
 					"flags": [
-						"--unsafe-ws-external",
-						"--unsafe-rpc-external",
 						"--rpc-cors=all",
 						"--rpc-port=9972",
 						"--",
@@ -102,10 +86,7 @@
 				{
 					"wsPort": 9803,
 					"port": 31203,
-					"basePath": "~/blockchains/c3",
 					"flags": [
-						"--unsafe-ws-external",
-						"--unsafe-rpc-external",
 						"--rpc-cors=all",
 						"--rpc-port=9973",
 						"--",
@@ -115,10 +96,7 @@
 				{
 					"wsPort": 9804,
 					"port": 31204,
-					"basePath": "~/blockchains/c4",
 					"flags": [
-						"--unsafe-ws-external",
-						"--unsafe-rpc-external",
 						"--rpc-cors=all",
 						"--rpc-port=9974",
 						"--",
@@ -128,10 +106,7 @@
 				{
 					"wsPort": 9805,
 					"port": 31205,
-					"basePath": "~/blockchains/c5",
 					"flags": [
-						"--unsafe-ws-external",
-						"--unsafe-rpc-external",
 						"--rpc-cors=all",
 						"--rpc-port=9975",
 						"--",
