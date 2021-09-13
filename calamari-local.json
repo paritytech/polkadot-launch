@@ -1,0 +1,143 @@
+{
+	"relaychain": {
+		"bin": "../../Parity/polkadot/target/release/polkadot",
+		"chain": "rococo-local",
+		"nodes": [
+			{
+				"name": "alice",
+				"wsPort": 9944,
+				"port": 30444,
+				"flags": [
+					"--rpc-cors=all",
+					"--execution=wasm",
+					"--wasm-execution=compiled"
+				]
+			},
+			{
+				"name": "bob",
+				"wsPort": 9955,
+				"port": 30555,
+				"flags": [
+					"--rpc-cors=all",
+					"--execution=wasm",
+					"--wasm-execution=compiled"
+				]
+			},
+			{
+				"name": "charlie",
+				"wsPort": 9966,
+				"port": 30666,
+				"flags": [
+					"--rpc-cors=all",
+					"--execution=wasm",
+					"--wasm-execution=compiled"
+				]
+			},
+			{
+				"name": "dave",
+				"wsPort": 9977,
+				"port": 30777,
+				"flags": [
+					"--rpc-cors=all",
+					"--execution=wasm",
+					"--wasm-execution=compiled"
+				]
+			}
+		],
+		"genesis": {
+			"runtime": {
+				"runtime_genesis_config": {
+					"parachainsConfiguration": {
+						"config": {
+							"validation_upgrade_frequency": 1,
+							"validation_upgrade_delay": 1
+						}
+					}
+				}
+			}
+		}
+	},
+	"parachains": [
+		{
+			"bin": "../Manta/target/release/calamari-pc",
+			"id": "2084",
+			"chain": "calamari-local",
+			"nodes": [
+				{
+					"wsPort": 9801,
+					"port": 31201,
+					"name": "alice",
+					"flags": [
+						"--rpc-cors=all",
+						"--rpc-port=9971",
+						"--execution=wasm",
+						"--wasm-execution=compiled",
+						"--",
+						"--execution=wasm",
+						"--wasm-execution=compiled"
+					]
+				},
+				{
+					"wsPort": 9802,
+					"port": 31202,
+					"name": "bob",
+					"flags": [
+						"--rpc-cors=all",
+						"--rpc-port=9972",
+						"--execution=wasm",
+						"--wasm-execution=compiled",
+						"--",
+						"--execution=wasm",
+						"--wasm-execution=compiled"
+					]
+				},
+				{
+					"wsPort": 9803,
+					"port": 31203,
+					"name": "charlie",
+					"flags": [
+						"--rpc-cors=all",
+						"--rpc-port=9973",
+						"--execution=wasm",
+						"--wasm-execution=compiled",
+						"--",
+						"--execution=wasm",
+						"--wasm-execution=compiled"
+					]
+				},
+				{
+					"wsPort": 9804,
+					"port": 31204,
+					"name": "dave",
+					"flags": [
+						"--rpc-cors=all",
+						"--rpc-port=9974",
+						"--execution=wasm",
+						"--wasm-execution=compiled",
+						"--",
+						"--execution=wasm",
+						"--wasm-execution=compiled"
+					]
+				},
+				{
+					"wsPort": 9805,
+					"port": 31205,
+					"name": "eve",
+					"flags": [
+						"--rpc-cors=all",
+						"--rpc-port=9975",
+						"--execution=wasm",
+						"--wasm-execution=compiled",
+						"--",
+						"--execution=wasm",
+						"--wasm-execution=compiled"
+					]
+				}
+			]
+		}
+	],
+	"hrmpChannels": [
+	],
+	"types": {},
+	"finalization": false
+}
