@@ -27,6 +27,7 @@
 		"polkadot-launch": "dist/cli.js"
 	},
 	"devDependencies": {
+		"@types/node": "^16.4.12",
 		"prettier": "2.2.1"
 	}
 }
