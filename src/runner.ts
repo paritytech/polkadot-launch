@@ -73,7 +73,12 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	if (config.relaychain.genesis) {
 		await changeGenesisConfig(`${chain}.json`, config.relaychain.genesis);
 	}
-	await addParachainsToGenesis(config_dir, `${chain}.json`, config.parachains, config.simpleParachains);
+	await addParachainsToGenesis(
+		config_dir,
+		`${chain}.json`,
+		config.parachains,
+		config.simpleParachains
+	);
 	if (config.hrmpChannels) {
 		await addHrmpChannelsToGenesis(`${chain}.json`, config.hrmpChannels);
 	}
@@ -163,11 +168,11 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 }
 
 interface GenesisParachain {
-	isSimple: boolean,
-	id?: string
-	resolvedId: string,
-	chain?: string,
-	bin: string
+	isSimple: boolean;
+	id?: string;
+	resolvedId: string;
+	chain?: string;
+	bin: string;
 }
 
 async function addParachainsToGenesis(
@@ -180,12 +185,12 @@ async function addParachainsToGenesis(
 
 	// Collect all paras into a single list
 	let x: GenesisParachain[] = parachains.map((p) => {
-		 return { isSimple: false, ...p }
-	})
+		return { isSimple: false, ...p };
+	});
 	let y: GenesisParachain[] = simpleParachains.map((p) => {
-		return { isSimple: true, ...p }
-	})
-	let paras = x.concat(y)
+		return { isSimple: true, ...p };
+	});
+	let paras = x.concat(y);
 
 	for (const parachain of paras) {
 		const { isSimple, id, resolvedId, chain } = parachain;
