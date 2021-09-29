@@ -889,13 +889,5 @@
         sha1 = "0d87a16de01aee9d8bec2bfbf74f67851730f4f8";
       };
     }
-    {
-      name = "yarn___yarn_1.22.10.tgz";
-      path = fetchurl {
-        name = "yarn___yarn_1.22.10.tgz";
-        url  = "https://registry.yarnpkg.com/yarn/-/yarn-1.22.10.tgz";
-        sha1 = "c99daa06257c80f8fa2c3f1490724e394c26b18c";
-      };
-    }
   ];
 }
