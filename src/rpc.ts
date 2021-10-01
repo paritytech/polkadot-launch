@@ -2,7 +2,6 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import { Keyring } from "@polkadot/api";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 
-
 const filterConsole = require("filter-console");
 
 // Hide some warning messages that are coming from Polkadot JS API.
