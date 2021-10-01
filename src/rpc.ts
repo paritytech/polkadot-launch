@@ -55,6 +55,8 @@ export async function registerParachain(
 		};
 		let genesis = api.createType("ParaGenesisArgs", paraGenesisArgs);
 
+		const nonce = Number((await api.query.system.account(alice.address)).nonce);
+
 		console.log(
 			`--- Submitting extrinsic to register parachain ${id}. (nonce: ${nonce}) ---`
 		);
@@ -83,7 +85,6 @@ export async function registerParachain(
 					reject(`Transaction Error`);
 				}
 			});
-		nonce += 1;
 	});
 }
 
