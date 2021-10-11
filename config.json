@@ -37,7 +37,7 @@
 		"genesis": {
 			"runtime": {
 				"runtime_genesis_config": {
-					"parachainsConfiguration": {
+					"configuration": {
 						"config": {
 							"validation_upgrade_frequency": 1,
 							"validation_upgrade_delay": 1
@@ -60,6 +60,7 @@
 					"flags": [
 						"--unsafe-ws-external",
 						"--unsafe-rpc-external",
+						"--force-authoring",
 						"--rpc-cors=all",
 						"--",
 						"--execution=wasm"
@@ -79,6 +80,7 @@
 					"flags": [
 						"--unsafe-ws-external",
 						"--unsafe-rpc-external",
+						"--force-authoring",
 						"--rpc-cors=all",
 						"--",
 						"--execution=wasm"
@@ -87,6 +89,7 @@
 			]
 		}
 	],
+	"simpleParachains": [],
 	"hrmpChannels": [
 		{
 			"sender": 6666,

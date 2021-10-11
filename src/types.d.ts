@@ -23,7 +23,7 @@ export interface ParachainConfig {
 }
 export interface SimpleParachainConfig {
 	bin: string;
-	id?: string;
+	id: string;
 	port: string;
 	balance: string;
 }

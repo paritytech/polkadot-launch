@@ -87,6 +87,7 @@
 			]
 		}
 	],
+	"simpleParachains": [],
 	"hrmpChannels": [
 		{
 			"sender": 2084,

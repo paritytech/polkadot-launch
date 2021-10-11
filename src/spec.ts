@@ -149,7 +149,7 @@ export async function addGenesisHrmpChannel(
 	const runtimeConfig =
 		chainSpec.genesis.runtime.runtime_genesis_config ||
 		chainSpec.genesis.runtime;
-	
+
 	let hrmp = undefined;
 
 	if (runtimeConfig.hrmp) {
@@ -160,9 +160,7 @@ export async function addGenesisHrmpChannel(
 		hrmp = runtimeConfig.parachainsHrmp;
 	}
 
-	if (
-		hrmp && hrmp.preopenHrmpChannels
-	) {
+	if (hrmp && hrmp.preopenHrmpChannels) {
 		hrmp.preopenHrmpChannels.push(newHrmpChannel);
 
 		let data = JSON.stringify(chainSpec, null, 2);
