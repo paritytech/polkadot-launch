@@ -52,6 +52,8 @@ function loadTypeDef(types: string | object): object {
 let registeredParachains: { [key: string]: boolean } = {};
 
 export async function run(config_dir: string, rawConfig: LaunchConfig) {
+	// We need to reset that variable when running a new network
+	registeredParachains = {};
 	// Verify that the `config.json` has all the expected properties.
 	if (!checkConfig(rawConfig)) {
 		return;

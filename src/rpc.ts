@@ -2,8 +2,6 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import { Keyring } from "@polkadot/api";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 
-let nonce = 0;
-
 const filterConsole = require("filter-console");
 
 // Hide some warning messages that are coming from Polkadot JS API.
@@ -56,6 +54,8 @@ export async function registerParachain(
 		};
 		let genesis = api.createType("ParaGenesisArgs", paraGenesisArgs);
 
+		const nonce = Number((await api.query.system.account(alice.address)).nonce);
+
 		console.log(
 			`--- Submitting extrinsic to register parachain ${id}. (nonce: ${nonce}) ---`
 		);
@@ -84,7 +84,6 @@ export async function registerParachain(
 					reject(`Transaction Error`);
 				}
 			});
-		nonce += 1;
 	});
 }
 
@@ -101,9 +100,7 @@ export async function setBalance(
 		const keyring = new Keyring({ type: "sr25519" });
 		const alice = keyring.addFromUri("//Alice");
 
-		if (!nonce) {
-			nonce = Number((await api.query.system.account(alice.address)).nonce);
-		}
+		const nonce = Number((await api.query.system.account(alice.address)).nonce);
 
 		console.log(
 			`--- Submitting extrinsic to set balance of ${who} to ${value}. (nonce: ${nonce}) ---`
@@ -133,7 +130,6 @@ export async function setBalance(
 					reject(`Transaction Error`);
 				}
 			});
-		nonce += 1;
 	});
 }
 
@@ -149,9 +145,7 @@ export async function sendHrmpMessage(
 		const keyring = new Keyring({ type: "sr25519" });
 		const alice = keyring.addFromUri("//Alice");
 
-		if (!nonce) {
-			nonce = Number((await api.query.system.account(alice.address)).nonce);
-		}
+		const nonce = Number((await api.query.system.account(alice.address)).nonce);
 
 		let hrmpMessage = {
 			recipient: recipient,
@@ -185,6 +179,5 @@ export async function sendHrmpMessage(
 					reject(`Transaction Error`);
 				}
 			});
-		nonce += 1;
 	});
 }
