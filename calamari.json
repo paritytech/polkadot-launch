@@ -101,6 +101,7 @@
 			"maxMessageSize": 1024
 		}
 	],
+	"simpleParachains": [],
 	"types": {},
 	"finalization": false
 }

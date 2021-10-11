@@ -95,7 +95,7 @@ An example of `genesis` is:
 "genesis": {
   "runtime": {
     "runtime_genesis_config": {
-      "parachainsConfiguration": {
+      "configuration": {
         "config": {
           "validation_upgrade_frequency": 1,
           "validation_upgrade_delay": 1
@@ -212,7 +212,7 @@ in order to create a local test network.
   node:
   - We build a fresh chain spec using the `chain` parameter specified in your config.
     - Includes the authorities you specified.
-    - Includes changes to the `parachainsConfiguration`.
+    - Includes changes to the `paras`.
     - Includes parachains you have added.
       - `wasm` is generated using the `<node> export-genesis-wasm` subcommand.
       - `header` is retrieved by calling `api.rpc.chain.getHeader(genesis_hash)`.
