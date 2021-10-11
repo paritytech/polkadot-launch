@@ -36,6 +36,10 @@ export interface HrmpChannelsConfig {
 export interface RelayChainConfig {
 	bin: string;
 	chain: string;
+	mutation: {
+		id: string;
+		name: string;
+	};
 	nodes: {
 		name: string;
 		basePath?: string;

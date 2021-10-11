@@ -15,7 +15,7 @@ import { checkConfig } from "./check";
 import {
 	clearAuthorities,
 	addAuthority,
-	changeGenesisConfig,
+	mutateConfig,
 	addGenesisParachain,
 	addGenesisHrmpChannel,
 } from "./spec";
@@ -58,7 +58,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	}
 	const config = await resolveParachainId(config_dir, rawConfig);
 
-	const relay_chain_bin = resolve(config_dir, config.relaychain.bin);
+	const relay_chain_bin = resolve(config_dir, config.relaychain.bin.replace(/^~(\/.*)$/, (_, p) => `${process.env.HOME}${p}`));
 	if (!fs.existsSync(relay_chain_bin)) {
 		console.error("Relay chain binary does not exist: ", relay_chain_bin);
 		process.exit();
@@ -71,7 +71,10 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 		await addAuthority(`${chain}.json`, node.name);
 	}
 	if (config.relaychain.genesis) {
-		await changeGenesisConfig(`${chain}.json`, config.relaychain.genesis);
+		await mutateConfig(`${chain}.json`, config.relaychain.genesis, 'Relay Chain Genesis', 'genesis');
+	}
+	if (config.relaychain.mutation) {
+		await mutateConfig(`${chain}.json`, config.relaychain.mutation, 'Relay Chain');
 	}
 	await addParachainsToGenesis(
 		config_dir,
@@ -104,12 +107,12 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
 		const { id, resolvedId, balance, chain } = parachain;
-		const bin = resolve(config_dir, parachain.bin);
+		const bin = resolve(config_dir, parachain.bin.replace(/^~(\/.*)$/, (_, p) => `${process.env.HOME}${p}`));
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
 			process.exit();
 		}
-		let account = parachainAccount(resolvedId);
+		const account = parachainAccount(resolvedId);
 
 		for (const node of parachain.nodes) {
 			const { wsPort, port, flags, name, basePath } = node;
@@ -142,13 +145,13 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	if (config.simpleParachains) {
 		for (const simpleParachain of config.simpleParachains) {
 			const { id, resolvedId, port, balance } = simpleParachain;
-			const bin = resolve(config_dir, simpleParachain.bin);
+			const bin = resolve(config_dir, simpleParachain.bin.replace(/^~(\/.*)$/, (_, p) => `${process.env.HOME}${p}`));
 			if (!fs.existsSync(bin)) {
 				console.error("Simple parachain binary does not exist: ", bin);
 				process.exit();
 			}
 
-			let account = parachainAccount(resolvedId);
+			const account = parachainAccount(resolvedId);
 			console.log(`Starting Parachain ${resolvedId}: ${account}`);
 			const skipIdArg = !id;
 			await startSimpleCollator(bin, resolvedId, spec, port, skipIdArg);
@@ -252,7 +255,7 @@ async function resolveParachainId(
 		if (parachain.id) {
 			parachain.resolvedId = parachain.id;
 		} else {
-			const bin = resolve(config_dir, parachain.bin);
+			const bin = resolve(config_dir, parachain.bin.replace(/^~(\/.*)$/, (_, p) => `${process.env.HOME}${p}`));
 			const paraId = await getParachainIdFromSpec(bin, parachain.chain);
 			console.log(`  ✓ Read parachain id for ${parachain.bin}: ${paraId}`);
 			parachain.resolvedId = paraId.toString();

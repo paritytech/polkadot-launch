@@ -8,8 +8,6 @@
 				"wsPort": 9944,
 				"port": 30444,
 				"flags": [
-					"--unsafe-ws-external",
-					"--unsafe-rpc-external",
 					"--rpc-cors=all"
 				]
 			},
@@ -18,8 +16,6 @@
 				"wsPort": 9955,
 				"port": 30555,
 				"flags": [
-					"--unsafe-ws-external",
-					"--unsafe-rpc-external",
 					"--rpc-cors=all"
 				]
 			},
@@ -28,8 +24,22 @@
 				"wsPort": 9966,
 				"port": 30666,
 				"flags": [
-					"--unsafe-ws-external",
-					"--unsafe-rpc-external",
+					"--rpc-cors=all"
+				]
+			},
+			{
+				"name": "dave",
+				"wsPort": 9977,
+				"port": 30777,
+				"flags": [
+					"--rpc-cors=all"
+				]
+			},
+			{
+				"name": "eve",
+				"wsPort": 9988,
+				"port": 30888,
+				"flags": [
 					"--rpc-cors=all"
 				]
 			}
@@ -49,37 +59,56 @@
 	},
 	"parachains": [
 		{
-			"bin": "../Manta/target/release/manta-pc",
+			"bin": "../Manta/target/release/calamari-pc",
 			"id": "2084",
-			"chain": "manta-pc-dev",
+			"chain": "calamari-testnet",
 			"nodes": [
 				{
-					"wsPort": 9988,
-					"port": 31200,
-					"name": "alice",
+					"wsPort": 9801,
+					"port": 31201,
 					"flags": [
-						"--unsafe-ws-external",
-						"--unsafe-rpc-external",
 						"--rpc-cors=all",
+						"--rpc-port=9971",
 						"--",
 						"--execution=wasm"
 					]
-				}
-			]
-		},
-		{
-			"bin": "../Acala/target/release/acala",
-			"id": "2000",
-			"chain": "karura-dev",
-			"nodes": [
+				},
 				{
-					"wsPort": 9999,
-					"port": 31300,
-					"name": "alice",
+					"wsPort": 9802,
+					"port": 31202,
 					"flags": [
-						"--unsafe-ws-external",
-						"--unsafe-rpc-external",
 						"--rpc-cors=all",
+						"--rpc-port=9972",
+						"--",
+						"--execution=wasm"
+					]
+				},
+				{
+					"wsPort": 9803,
+					"port": 31203,
+					"flags": [
+						"--rpc-cors=all",
+						"--rpc-port=9973",
+						"--",
+						"--execution=wasm"
+					]
+				},
+				{
+					"wsPort": 9804,
+					"port": 31204,
+					"flags": [
+						"--rpc-cors=all",
+						"--rpc-port=9974",
+						"--",
+						"--execution=wasm"
+					]
+				},
+				{
+					"wsPort": 9805,
+					"port": 31205,
+					"flags": [
+						"--rpc-cors=all",
+						"--rpc-port=9975",
 						"--",
 						"--execution=wasm"
 					]
@@ -87,20 +116,7 @@
 			]
 		}
 	],
-	"simpleParachains": [],
 	"hrmpChannels": [
-		{
-			"sender": 2084,
-			"recipient": 2000,
-			"maxCapacity": 8,
-			"maxMessageSize": 1024
-		},
-		{
-			"sender": 2000,
-			"recipient": 2084,
-			"maxCapacity": 8,
-			"maxMessageSize": 1024
-		}
 	],
 	"types": {},
 	"finalization": false
