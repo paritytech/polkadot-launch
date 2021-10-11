@@ -9,7 +9,7 @@
 		"prepare": "tsc",
 		"build": "tsc",
 		"start": "yarn build && node dist/cli.js",
-		"lint": "prettier -w .",
+		"lint": "prettier --check .",
 		"lint:write": "prettier --write ."
 	},
 	"dependencies": {
