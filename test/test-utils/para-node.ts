@@ -54,13 +54,13 @@ export async function findAvailablePorts(parachainCount: number = 1) {
 let nodeStarted = false;
 
 export type ParachainOptions = {
-  chain:
-    | "moonbase-local"
-    | "moonriver-local"
-    | "moonbeam-local"
-    | "moonbase"
-    | "moonriver"
-    | "moonbeam";
+  chain:"./rococo-local.json"
+    // | "moonbase-local"
+    // | "moonriver-local"
+    // | "moonbeam-local"
+    // | "moonbase"
+    // | "moonriver"
+    // | "moonbeam";
   relaychain?: "rococo-local" | "westend-local" | "kusama-local" | "polkadot-local";
   numberOfParachains?: number;
 };
@@ -74,6 +74,13 @@ export interface NodePorts {
   p2pPort: number;
   rpcPort: number;
   wsPort: number;
+}
+
+export interface HrmpChannel {
+  sender: number,
+  recipient:number,
+  maxCapacity: number,
+  maxMessageSize: number,
 }
 
 // This will start a parachain node, only 1 at a time (check every 100ms).
@@ -92,7 +99,7 @@ export async function startParachainNodes(options: ParachainOptions): Promise<{
   const relaychain = options.relaychain || "rococo-local";
   // For now we only support one, two or three parachains
   const numberOfParachains =
-    (options.numberOfParachains < 4 &&
+    (options.numberOfParachains&&options.numberOfParachains < 4 &&
       options.numberOfParachains > 0 &&
       options.numberOfParachains) ||
     1;
@@ -103,7 +110,7 @@ export async function startParachainNodes(options: ParachainOptions): Promise<{
   const ports = await findAvailablePorts(numberOfParachains);
 
   //Build hrmpChannels, all connected to first parachain
-  const hrmpChannels = [];
+  const hrmpChannels:HrmpChannel[] = [];
   new Array(numberOfParachains - 1).fill(0).forEach((_, i) => {
     hrmpChannels.push({
       sender: 1000,

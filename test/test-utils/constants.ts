@@ -4,8 +4,8 @@ export const DEBUG_MODE = process.env.DEBUG_MODE || false;
 export const DISPLAY_LOG = process.env.MOONBEAM_LOG || false;
 export const MOONBEAM_LOG = process.env.MOONBEAM_LOG || "info";
 
-export const BINARY_PATH = process.env.BINARY_PATH || `../target/release/polkadot-collator`;
-export const RELAY_BINARY_PATH = process.env.RELAY_BINARY_PATH || `../target/release/polkadot`;
+export const BINARY_PATH = process.env.BINARY_PATH || `../bin/polkadot-collator-mac`;
+export const RELAY_BINARY_PATH = process.env.RELAY_BINARY_PATH || `../bin/polkadot-relaychain-mac`;
 export const SPAWNING_TIME = 20000;
 export const ETHAPI_CMD = process.env.ETHAPI_CMD || "";
 

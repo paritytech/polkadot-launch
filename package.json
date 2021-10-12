@@ -11,7 +11,7 @@
 		"start": "yarn build && node dist/cli.js",
 		"lint": "prettier --check .",
 		"lint:write": "prettier --write .",
-		"para-test": "mocha -r ts-node/register 'tests/para-tests/**/test-*.ts'"
+		"para-test": "mocha -r ts-node/register 'test/tests/**/test-*.ts'"
 	},
 	"dependencies": {
 		"@polkadot/api": "^6.3.1",
@@ -20,9 +20,14 @@
 		"@types/chai": "^4.2.22",
 		"@types/mocha": "^9.0.0",
 		"chai": "^4.3.4",
+		"ethers": "^5.4.7",
 		"filter-console": "^0.1.1",
 		"mocha": "^9.1.2",
 		"tcp-port-used": "^1.0.2",
+		"ts-node": "^10.3.0",
+		"web3": "^1.6.0",
+		"web3-core": "^1.6.0",
+		"web3-eth": "^1.6.0",
 		"yargs": "^15.4.1"
 	},
 	"files": [
@@ -33,6 +38,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^16.4.12",
+		"@types/tcp-port-used": "^1.0.0",
 		"prettier": "^2.4.1",
 		"typescript": "^4.1.5"
 	}

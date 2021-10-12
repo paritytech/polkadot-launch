@@ -115,7 +115,7 @@ export function describeParachain(
       context.createPolkadotApiRelaychains = async () => {
         const apiPromises = await Promise.all(
           init.relayPorts.map(async (ports: NodePorts) => {
-            return await providePolkadotApi(ports.wsPort, true);
+            return await providePolkadotApi(ports.wsPort);
           })
         );
         // We keep track of the polkadotApis to close them at the end of the test
@@ -135,7 +135,9 @@ export function describeParachain(
       context.web3 = await context.createWeb3();
       context.ethers = await context.createEthers();
       debug(
+        //@ts-ignore
         `Setup ready [${/:([0-9]+)$/.exec((context.web3.currentProvider as any).host)[1]}] for ${
+          //@ts-ignore
           this.currentTest.title
         }`
       );

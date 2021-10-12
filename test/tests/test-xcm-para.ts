@@ -52,17 +52,18 @@ async function registerAssetToParachain(
       parachainApi.tx.assetManager.registerAsset(assetLocation, assetMetadata, new BN(1))
     )
   );
-  let assetId: string;
+  let assetId: string="";
   // Look for assetId in events
   eventsRegister.forEach((e) => {
     let ev = e.toHuman();
     if (ev.section === "assetManager") {
-      assetId = ev.data[0];
+      //@ts-ignore
+      assetId = (ev.data)&&ev.data[0];
     }
   });
-  if (!assetId) {
-    await new Promise((res) => setTimeout(res, 20000));
-  }
+  // if (!assetId) {
+  //   await new Promise((res) => setTimeout(res, 20000));
+  // }
   assetId = assetId.replace(/,/g, "");
 
   // setAssetUnitsPerSecond
@@ -76,13 +77,14 @@ async function registerAssetToParachain(
 
 describeParachain(
   "XCM - receive_relay_asset_from_relay",
-  { chain: "moonbase-local" },
+  { chain: "./rococo-local.json" },
   (context) => {
     it("should be able to receive an asset from relay", async function () {
       const keyring = new Keyring({ type: "sr25519" });
       const aliceRelay = keyring.addFromUri("//Alice");
+      const alicePara = keyring.addFromUri("//Alice"); // They are the same for the polkadot-launch tests
 
-      const alith = await keyring.addFromUri(ALITH_PRIV_KEY, null, "ethereum");
+      // const alith = await keyring.addFromUri(ALITH_PRIV_KEY, null, "ethereum");
 
       const parachainOne = context.polkadotApiParaone;
       const relayOne = context._polkadotApiRelaychains[0];
@@ -96,7 +98,7 @@ describeParachain(
 
       // PARACHAINS
       // registerAsset
-      const { events, assetId } = await registerAssetToParachain(parachainOne, alith);
+      const { events, assetId } = await registerAssetToParachain(parachainOne, alicePara);
 
       expect(events[0].toHuman().method).to.eq("UnitsPerSecondChanged");
       expect(events[2].toHuman().method).to.eq("ExtrinsicSuccess");
@@ -115,7 +117,7 @@ describeParachain(
           {
             V1: {
               parents: new BN(0),
-              interior: { X1: { AccountKey20: { network: "Any", key: ALITH } } },
+              interior: { X1: { AccountKey20: { network: "Any", key: alicePara.addressRaw } } },
             },
           },
           {
@@ -136,7 +138,7 @@ describeParachain(
       ).to.eq("8.9999 kUnit");
       // Alith asset balance should have been increased to 1000*e12
       expect(
-        (await parachainOne.query.assets.account(assetId, ALITH)).toHuman().balance ===
+        (await parachainOne.query.assets.account(assetId, alicePara.addressRaw)).toHuman().balance ===
           "1,000,000,000,000,000"
       ).to.eq(true);
     });

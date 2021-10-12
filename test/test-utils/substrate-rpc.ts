@@ -4,48 +4,48 @@ import { GenericExtrinsic } from "@polkadot/types";
 import { AnyTuple } from "@polkadot/types/types";
 import { Event } from "@polkadot/types/interfaces";
 import { u8aToHex } from "@polkadot/util";
-import { DevTestContext } from "./setup-dev-tests";
+// import { DevTestContext } from "./setup-dev-tests";
 const debug = require("debug")("test:substrateEvents");
 
 // DEV LOCAL TESTING
 
-export const createBlockWithExtrinsic = async <
-  Call extends SubmittableExtrinsic<ApiType>,
-  ApiType extends ApiTypes
->(
-  context: DevTestContext,
-  sender: AddressOrPair,
-  polkadotCall: Call
-) => {
-  // This should return a string, but is a bit complex to handle type properly so any will suffice
-  const extrinsicHash = (await polkadotCall.signAndSend(sender)) as any;
+// export const createBlockWithExtrinsic = async <
+//   Call extends SubmittableExtrinsic<ApiType>,
+//   ApiType extends ApiTypes
+// >(
+//   context: DevTestContext,
+//   sender: AddressOrPair,
+//   polkadotCall: Call
+// ) => {
+//   // This should return a string, but is a bit complex to handle type properly so any will suffice
+//   const extrinsicHash = (await polkadotCall.signAndSend(sender)) as any;
 
-  // We create the block which is containing the extrinsic
-  const blockResult = await context.createBlock();
+//   // We create the block which is containing the extrinsic
+//   const blockResult = await context.createBlock();
 
-  // We retrieve the events for that block
-  const allRecords = await context.polkadotApi.query.system.events.at(blockResult.block.hash);
+//   // We retrieve the events for that block
+//   const allRecords = await context.polkadotApi.query.system.events.at(blockResult.block.hash);
 
-  // We retrieve the block (including the extrinsics)
-  const blockData = await context.polkadotApi.rpc.chain.getBlock(blockResult.block.hash);
+//   // We retrieve the block (including the extrinsics)
+//   const blockData = await context.polkadotApi.rpc.chain.getBlock(blockResult.block.hash);
 
-  const extrinsicIndex = blockData.block.extrinsics.findIndex(
-    (ext) => ext.hash.toHex() == extrinsicHash
-  );
-  if (extrinsicIndex < 0) {
-    throw new Error(`Extrinsic ${extrinsicHash} is missing in the block ${blockResult.block.hash}`);
-  }
-  const extrinsic = blockData.block.extrinsics[extrinsicIndex];
+//   const extrinsicIndex = blockData.block.extrinsics.findIndex(
+//     (ext) => ext.hash.toHex() == extrinsicHash
+//   );
+//   if (extrinsicIndex < 0) {
+//     throw new Error(`Extrinsic ${extrinsicHash} is missing in the block ${blockResult.block.hash}`);
+//   }
+//   const extrinsic = blockData.block.extrinsics[extrinsicIndex];
 
-  // We retrieve the events associated with the extrinsic
-  const events = allRecords
-    .filter(
-      ({ phase }) => phase.isApplyExtrinsic && phase.asApplyExtrinsic.toNumber() == extrinsicIndex
-    )
-    .map(({ event }) => event);
+//   // We retrieve the events associated with the extrinsic
+//   const events = allRecords
+//     .filter(
+//       ({ phase }) => phase.isApplyExtrinsic && phase.asApplyExtrinsic.toNumber() == extrinsicIndex
+//     )
+//     .map(({ event }) => event);
 
-  return { extrinsic, events };
-};
+//   return { extrinsic, events };
+// };
 
 // LAUNCH BASED NETWORK TESTING (PARA TESTS)
 
