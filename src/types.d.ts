@@ -1,7 +1,7 @@
 export interface LaunchConfig {
 	relaychain: RelayChainConfig;
 	parachains: ParachainConfig[];
-	simpleParachains: SimpleParachainConfig[];
+	// simpleParachains: SimpleParachainConfig[];
 	hrmpChannels: HrmpChannelsConfig[];
 	types: any;
 	finalization: boolean;
@@ -80,5 +80,5 @@ export interface ResolvedSimpleParachainConfig extends SimpleParachainConfig {
 }
 export interface ResolvedLaunchConfig extends LaunchConfig {
 	parachains: ResolvedParachainConfig[];
-	simpleParachains: ResolvedSimpleParachainConfig[];
+	// simpleParachains: ResolvedSimpleParachainConfig[];
 }
