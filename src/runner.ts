@@ -118,18 +118,19 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 			console.log(
 				`Starting a Collator for parachain ${resolvedId}: ${account}, Collator port : ${port} wsPort : ${wsPort}`
 			);
-			const skipIdArg = !id;
+			const skip_id_arg = !id;
 			await startCollator(
 				bin,
 				resolvedId,
 				wsPort,
 				port,
-				name,
+				{name,
 				chain,
 				spec,
 				flags,
 				basePath,
-				skipIdArg
+				skip_id_arg,
+				onlyOneParachainNode:config.parachains.length===1}
 			);
 		}
 

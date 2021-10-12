@@ -5,6 +5,7 @@ import {
 } from "child_process";
 import util from "util";
 import fs from "fs";
+import { CollatorOptions } from "./types";
 
 // This tracks all the processes that we spawn from this file.
 // Used to clean up processes when exiting this program.
@@ -182,16 +183,12 @@ export function startCollator(
 	id: string,
 	wsPort: number,
 	port: number,
-	name?: string,
-	chain?: string,
-	spec?: string,
-	flags?: string[],
-	basePath?: string,
-	skip_id_arg?: boolean
+	options:CollatorOptions
 ) {
 	return new Promise<void>(function (resolve) {
 		// TODO: Make DB directory configurable rather than just `tmp`
 		let args = ["--ws-port=" + wsPort, "--port=" + port, "--collator"];
+		const{basePath,name,skip_id_arg,onlyOneParachainNode,chain,flags,spec}=options
 
 		if (basePath) {
 			args.push("--base-path=" + basePath);
@@ -206,6 +203,10 @@ export function startCollator(
 		if (!skip_id_arg) {
 			args.push("--parachain-id=" + id);
 			console.log(`Added --parachain-id=${id}`);
+		}
+		if (onlyOneParachainNode) {
+			args.push("--force-authoring");
+			console.log(`Added --force-authoring`);
 		}
 		if (chain) {
 			args.push("--chain=" + chain);
