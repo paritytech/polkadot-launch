@@ -79,8 +79,8 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	await addParachainsToGenesis(
 		config_dir,
 		`${chain}.json`,
-		config.parachains,
-		config.simpleParachains
+		config.parachains
+		// config.simpleParachains
 	);
 	if (config.hrmpChannels) {
 		await addHrmpChannelsToGenesis(`${chain}.json`, config.hrmpChannels);
@@ -142,27 +142,27 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	}
 
 	// Then launch each simple parachain (e.g. an adder-collator)
-	if (config.simpleParachains) {
-		for (const simpleParachain of config.simpleParachains) {
-			const { id, resolvedId, port, balance } = simpleParachain;
-			const bin = resolve(config_dir, simpleParachain.bin.replace(/^~(\/.*)$/, (_, p) => `${process.env.HOME}${p}`));
-			if (!fs.existsSync(bin)) {
-				console.error("Simple parachain binary does not exist: ", bin);
-				process.exit();
-			}
+	// if (config.simpleParachains) {
+	// 	for (const simpleParachain of config.simpleParachains) {
+	// 		const { id, resolvedId, port, balance } = simpleParachain;
+	// 		const bin = resolve(config_dir, simpleParachain.bin.replace(/^~(\/.*)$/, (_, p) => `${process.env.HOME}${p}`));
+	// 		if (!fs.existsSync(bin)) {
+	// 			console.error("Simple parachain binary does not exist: ", bin);
+	// 			process.exit();
+	// 		}
 
-			const account = parachainAccount(resolvedId);
-			console.log(`Starting Parachain ${resolvedId}: ${account}`);
-			const skipIdArg = !id;
-			await startSimpleCollator(bin, resolvedId, spec, port, skipIdArg);
+	// 		const account = parachainAccount(resolvedId);
+	// 		console.log(`Starting Parachain ${resolvedId}: ${account}`);
+	// 		const skipIdArg = !id;
+	// 		await startSimpleCollator(bin, resolvedId, spec, port, skipIdArg);
 
-			// Allow time for the TX to complete, avoiding nonce issues.
-			// TODO: Handle nonce directly instead of this.
-			if (balance) {
-				await setBalance(relayChainApi, account, balance, config.finalization);
-			}
-		}
-	}
+	// 		// Allow time for the TX to complete, avoiding nonce issues.
+	// 		// TODO: Handle nonce directly instead of this.
+	// 		if (balance) {
+	// 			await setBalance(relayChainApi, account, balance, config.finalization);
+	// 		}
+	// 	}
+	// }
 
 	// We don't need the PolkadotJs API anymore
 	await relayChainApi.disconnect();
@@ -182,7 +182,7 @@ async function addParachainsToGenesis(
 	config_dir: string,
 	spec: string,
 	parachains: ResolvedParachainConfig[],
-	simpleParachains: ResolvedSimpleParachainConfig[]
+	// simpleParachains: ResolvedSimpleParachainConfig[]
 ) {
 	console.log("\n⛓ Adding Genesis Parachains");
 
@@ -190,10 +190,10 @@ async function addParachainsToGenesis(
 	let x: GenesisParachain[] = parachains.map((p) => {
 		return { isSimple: false, ...p };
 	});
-	let y: GenesisParachain[] = simpleParachains.map((p) => {
-		return { isSimple: true, ...p };
-	});
-	let paras = x.concat(y);
+	// let y: GenesisParachain[] = simpleParachains.map((p) => {
+	// 	return { isSimple: true, ...p };
+	// });
+	let paras = x;
 
 	for (const parachain of paras) {
 		const { isSimple, id, resolvedId, chain } = parachain;
@@ -261,8 +261,8 @@ async function resolveParachainId(
 			parachain.resolvedId = paraId.toString();
 		}
 	}
-	for (const parachain of resolvedConfig.simpleParachains) {
-		parachain.resolvedId = parachain.id;
-	}
+	// for (const parachain of resolvedConfig.simpleParachains) {
+	// 	parachain.resolvedId = parachain.id;
+	// }
 	return resolvedConfig;
 }
