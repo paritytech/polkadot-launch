@@ -33,6 +33,9 @@ export interface HrmpChannelsConfig {
 	maxCapacity: number;
 	maxMessageSize: number;
 }
+interface ObjectJSON {
+	[key:string]:ObjectJSON|number|string
+}
 export interface RelayChainConfig {
 	bin: string;
 	chain: string;
@@ -43,7 +46,7 @@ export interface RelayChainConfig {
 		port: number;
 		flags?: string[];
 	}[];
-	genesis?: JSON;
+	genesis?: JSON|ObjectJSON;
 }
 
 export interface ChainSpec {
