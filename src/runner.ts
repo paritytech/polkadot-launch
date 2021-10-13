@@ -205,8 +205,8 @@ async function addParachainsToGenesis(
 		// If it isn't registered yet, register the parachain in genesis
 		if (!registeredParachains[resolvedId]) {
 			// Get the information required to register the parachain in genesis.
-			let genesisState;
-			let genesisWasm;
+			let genesisState:string;
+			let genesisWasm:string;
 			try {
 				if (isSimple) {
 					// adder-collator does not support `--parachain-id` for export-genesis-state (and it is

@@ -54,7 +54,7 @@ export async function findAvailablePorts(parachainCount: number = 1) {
 let nodeStarted = false;
 
 export type ParachainOptions = {
-  chain:"./rococo-local.json"
+  chain:"rococo-local"
     // | "moonbase-local"
     // | "moonriver-local"
     // | "moonbeam-local"
@@ -157,7 +157,7 @@ export async function startParachainNodes(options: ParachainOptions): Promise<{
         bin: BINARY_PATH,
         id: (1000 * (i + 1)).toString(),
         balance: "1000000000000000000000",
-        chain: options.chain,
+        // chain: options.chain, this is not supported by cumulus
         nodes: [
           {
             port: ports[i * 2 + numberOfParachains + 1].p2pPort,

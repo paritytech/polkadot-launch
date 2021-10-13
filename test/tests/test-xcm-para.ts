@@ -77,7 +77,7 @@ async function registerAssetToParachain(
 
 describeParachain(
   "XCM - receive_relay_asset_from_relay",
-  { chain: "./rococo-local.json" },
+  { chain: "rococo-local" },
   (context) => {
     it("should be able to receive an asset from relay", async function () {
       const keyring = new Keyring({ type: "sr25519" });
