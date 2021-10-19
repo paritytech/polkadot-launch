@@ -40,7 +40,7 @@ export interface RelayChainConfig {
 		name: string;
 		basePath?: string;
 		wsPort: number;
-		rpcPort?:number;
+		rpcPort?: number;
 		port: number;
 		flags?: string[];
 	}[];

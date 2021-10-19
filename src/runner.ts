@@ -91,10 +91,21 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	// First we launch each of the validators for the relay chain.
 	for (const node of config.relaychain.nodes) {
 		const { name, wsPort, rpcPort, port, flags, basePath } = node;
-		console.log(`Starting Relaychain Node ${name}... wsPort: ${wsPort} rpcPort: ${rpcPort} port: ${port}`);
+		console.log(
+			`Starting Relaychain Node ${name}... wsPort: ${wsPort} rpcPort: ${rpcPort} port: ${port}`
+		);
 		// We spawn a `child_process` starting a node, and then wait until we
 		// able to connect to it using PolkadotJS in order to know its running.
-		startNode(relay_chain_bin, name, wsPort, rpcPort,  port, spec, flags, basePath);
+		startNode(
+			relay_chain_bin,
+			name,
+			wsPort,
+			rpcPort,
+			port,
+			spec,
+			flags,
+			basePath
+		);
 	}
 
 	// Connect to the first relay chain node to submit the extrinsic.
