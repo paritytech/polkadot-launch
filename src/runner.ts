@@ -10,7 +10,7 @@ import {
 	startSimpleCollator,
 	getParachainIdFromSpec,
 } from "./spawn";
-import { connect, registerParachain, setBalance } from "./rpc";
+import { connect, setBalance } from "./rpc";
 import { checkConfig } from "./check";
 import {
 	clearAuthorities,
@@ -90,11 +90,11 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 
 	// First we launch each of the validators for the relay chain.
 	for (const node of config.relaychain.nodes) {
-		const { name, wsPort, port, flags, basePath } = node;
-		console.log(`Starting ${name}...`);
+		const { name, wsPort, rpcPort, port, flags, basePath } = node;
+		console.log(`Starting Relaychain Node ${name}... wsPort: ${wsPort} rpcPort: ${rpcPort} port: ${port}`);
 		// We spawn a `child_process` starting a node, and then wait until we
 		// able to connect to it using PolkadotJS in order to know its running.
-		startNode(relay_chain_bin, name, wsPort, port, spec, flags, basePath);
+		startNode(relay_chain_bin, name, wsPort, rpcPort,  port, spec, flags, basePath);
 	}
 
 	// Connect to the first relay chain node to submit the extrinsic.
@@ -114,15 +114,16 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 		let account = parachainAccount(resolvedId);
 
 		for (const node of parachain.nodes) {
-			const { wsPort, port, flags, name, basePath } = node;
+			const { wsPort, port, flags, name, basePath, rpcPort } = node;
 			console.log(
-				`Starting a Collator for parachain ${resolvedId}: ${account}, Collator port : ${port} wsPort : ${wsPort}`
+				`Starting a Collator for parachain ${resolvedId}: ${account}, Collator port : ${port} wsPort : ${wsPort} rpcPort : ${rpcPort}`
 			);
 			const skipIdArg = !id;
 			await startCollator(
 				bin,
 				resolvedId,
 				wsPort,
+				rpcPort,
 				port,
 				name,
 				chain,
