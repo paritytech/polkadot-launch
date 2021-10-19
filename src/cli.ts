@@ -13,25 +13,25 @@ const { argv } = require("yargs");
 
 const config_file = argv._[0] ? argv._[0] : null;
 if (!config_file) {
-	console.error("Missing config file argument...");
-	process.exit();
+  console.error("Missing config file argument...");
+  process.exit();
 }
 let config_path = resolve(process.cwd(), config_file);
 let config_dir = dirname(config_path);
 if (!fs.existsSync(config_path)) {
-	console.error("Config file does not exist: ", config_path);
-	process.exit();
+  console.error("Config file does not exist: ", config_path);
+  process.exit();
 }
 let config: LaunchConfig = require(config_path);
 
 // Kill all processes when exiting.
 process.on("exit", function () {
-	killAll();
+  killAll();
 });
 
 // Handle ctrl+c to trigger `exit`.
 process.on("SIGINT", function () {
-	process.exit(2);
+  process.exit(2);
 });
 
 run(config_dir, config);
