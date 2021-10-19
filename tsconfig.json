@@ -1,14 +1,14 @@
 {
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "target": "es6",
-    "module": "commonjs",
-    "lib": ["esnext"],
-    "outDir": "dist",
-    "resolveJsonModule": true,
-    "strict": true,
-    "declaration": true
-  },
-  "exclude": ["node_modules", "dist", "test"]
+	"compilerOptions": {
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"target": "es6",
+		"module": "commonjs",
+		"lib": ["esnext"],
+		"outDir": "dist",
+		"resolveJsonModule": true,
+		"strict": true,
+		"declaration": true
+	},
+	"exclude": ["node_modules", "dist", "test"]
 }
