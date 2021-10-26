@@ -62,5 +62,10 @@ export function checkConfig(config: LaunchConfig) {
 		}
 	}
 
+	// Allow the config to not contain `simpleParachains`
+	if (!config.simpleParachains) {
+		config.simpleParachains = [];
+	}
+
 	return true;
 }
