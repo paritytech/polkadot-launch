@@ -1,6 +1,6 @@
 {
 	"name": "polkadot-launch",
-	"version": "1.8.0",
+	"version": "1.9.0",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
@@ -9,7 +9,7 @@
 		"prepare": "tsc",
 		"build": "tsc",
 		"start": "yarn build && node dist/cli.js",
-		"lint": "prettier --check .",
+		"lint": "prettier -v && prettier --check .",
 		"lint:write": "prettier --write .",
 		"para-test": "mocha -r ts-node/register 'test/tests/**/test-*.ts'"
 	},
