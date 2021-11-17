@@ -1,3 +1,6 @@
+//This is WIP, waiting for more info on xcm with rococo
+// Skipped for now
+
 import Keyring from "@polkadot/keyring";
 import { expect } from "chai";
 import { BN, hexToU8a } from "@polkadot/util";
@@ -79,7 +82,7 @@ describeParachain(
   "XCM - receive_relay_asset_from_relay",
   { chain: "rococo-local" },
   (context) => {
-    it("should be able to receive an asset from relay", async function () {
+    it.skip("should be able to receive an asset from relay", async function () {
       const keyring = new Keyring({ type: "sr25519" });
       const aliceRelay = keyring.addFromUri("//Alice");
       const alicePara = keyring.addFromUri("//Alice"); // They are the same for the polkadot-launch tests
