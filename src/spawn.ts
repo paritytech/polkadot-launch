@@ -188,12 +188,20 @@ export function startCollator(
 	wsPort: number,
 	rpcPort: number | undefined,
 	port: number,
-	options:CollatorOptions
+	options: CollatorOptions
 ) {
 	return new Promise<void>(function (resolve) {
 		// TODO: Make DB directory configurable rather than just `tmp`
 		let args = ["--ws-port=" + wsPort, "--port=" + port];
-		const{basePath,name,skip_id_arg,onlyOneParachainNode,chain,flags,spec}=options
+		const {
+			basePath,
+			name,
+			skip_id_arg,
+			onlyOneParachainNode,
+			chain,
+			flags,
+			spec,
+		} = options;
 
 		if (rpcPort) {
 			args.push("--rpc-port=" + rpcPort);
