@@ -98,6 +98,7 @@ export function startNode(
 	bin: string,
 	name: string,
 	wsPort: number,
+	rpcPort: number | undefined,
 	port: number,
 	spec: string,
 	flags?: string[],
@@ -110,6 +111,9 @@ export function startNode(
 		"--port=" + port,
 		"--" + name.toLowerCase(),
 	];
+	if (rpcPort) {
+		args.push("--rpc-port=" + rpcPort);
+	}
 
 	if (basePath) {
 		args.push("--base-path=" + basePath);
@@ -181,6 +185,7 @@ export function startCollator(
 	bin: string,
 	id: string,
 	wsPort: number,
+	rpcPort: number | undefined,
 	port: number,
 	name?: string,
 	chain?: string,
@@ -191,7 +196,12 @@ export function startCollator(
 ) {
 	return new Promise<void>(function (resolve) {
 		// TODO: Make DB directory configurable rather than just `tmp`
-		let args = ["--ws-port=" + wsPort, "--port=" + port, "--collator"];
+		let args = ["--ws-port=" + wsPort, "--port=" + port];
+		if (rpcPort) {
+			args.push("--rpc-port=" + rpcPort);
+			console.log(`Added --rpc-port=" + ${rpcPort}`);
+		}
+		args.push("--collator");
 
 		if (basePath) {
 			args.push("--base-path=" + basePath);
