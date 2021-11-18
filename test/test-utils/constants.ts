@@ -1,8 +1,8 @@
 export const SPECS_PATH = `./moonbeam-test-specs`;
 
 export const DEBUG_MODE = process.env.DEBUG_MODE || false;
-export const DISPLAY_LOG = process.env.MOONBEAM_LOG || false;
-export const MOONBEAM_LOG = process.env.MOONBEAM_LOG || "info";
+export const DISPLAY_LOG = process.env.PARACHAIN_LOG || false;
+export const PARACHAIN_LOG = process.env.PARACHAIN_LOG || "info";
 
 export const BINARY_PATH =
 	process.env.BINARY_PATH || `../bin/polkadot-collator-mac`;
