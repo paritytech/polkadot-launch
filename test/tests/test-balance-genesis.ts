@@ -1,7 +1,6 @@
 import Keyring from "@polkadot/keyring";
 import { expect } from "chai";
 
-//import { ALITH, GENESIS_ACCOUNT, GENESIS_ACCOUNT_BALANCE } from "../../util/constants";
 import { describeParachain } from "../test-utils/setup-para-tests";
 
 describeParachain("Balance genesis", { chain: "rococo-local" }, (context) => {

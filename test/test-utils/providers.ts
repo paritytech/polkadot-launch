@@ -1,6 +1,5 @@
 import Web3 from "web3";
 import { ApiPromise, WsProvider } from "@polkadot/api";
-// import { typesBundle } from "../../moonbeam-types-bundle";
 import { JsonRpcResponse } from "web3-core-helpers";
 import { ethers } from "ethers";
 import { GENESIS_ACCOUNT_PRIVATE_KEY } from "./constants";
@@ -89,16 +88,10 @@ export const provideWeb3Api = async (
 };
 
 export const providePolkadotApi = async (port: number) => {
-	// return isNotMoonbeam
-	//   ?
 	return await ApiPromise.create({
 		initWasm: false,
 		provider: new WsProvider(`ws://localhost:${port}`),
 	});
-	// : await ApiPromise.create({
-	//     provider: new WsProvider(`ws://localhost:${port}`),
-	//     typesBundle: typesBundle as any,
-	//   });
 };
 
 export const provideEthersApi = async (port: number) => {
