@@ -22,7 +22,7 @@ import {
 } from "./spec";
 import { parachainAccount } from "./parachain";
 import { ApiPromise } from "@polkadot/api";
-import { randomAsHex } from '@polkadot/util-crypto';
+import { randomAsHex } from "@polkadot/util-crypto";
 
 import { resolve } from "path";
 import fs from "fs";
@@ -285,18 +285,25 @@ async function resolveParachainId(
 	return resolvedConfig;
 }
 
-async function generateNodeKeys(config: ResolvedLaunchConfig): Promise<string[]> {
-	var bootnodes = []
+async function generateNodeKeys(
+	config: ResolvedLaunchConfig
+): Promise<string[]> {
+	var bootnodes = [];
 	for (const node of config.relaychain.nodes) {
 		if (!node.nodeKey) {
 			node.nodeKey = hexStripPrefix(randomAsHex(32));
 		}
 
-		let pair = await libp2pKeys
-			.generateKeyPairFromSeed("Ed25519", hexToU8a(hexAddPrefix(node.nodeKey!)), 1024)
+		let pair = await libp2pKeys.generateKeyPairFromSeed(
+			"Ed25519",
+			hexToU8a(hexAddPrefix(node.nodeKey!)),
+			1024
+		);
 		let peerId: PeerId = await PeerId.createFromPrivKey(pair.bytes);
-		bootnodes.push(`/ip4/127.0.0.1/tcp/${node.port}/p2p/${peerId.toB58String()}`);
+		bootnodes.push(
+			`/ip4/127.0.0.1/tcp/${node.port}/p2p/${peerId.toB58String()}`
+		);
 	}
 
-	return bootnodes
+	return bootnodes;
 }
