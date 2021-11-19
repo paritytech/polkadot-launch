@@ -41,6 +41,7 @@ export interface RelayChainConfig {
 		basePath?: string;
 		wsPort: number;
 		rpcPort?: number;
+		nodeKey?: string;
 		port: number;
 		flags?: string[];
 	}[];
