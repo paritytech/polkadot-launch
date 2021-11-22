@@ -100,6 +100,7 @@ export function startNode(
 	wsPort: number,
 	rpcPort: number | undefined,
 	port: number,
+	nodeKey: string,
 	spec: string,
 	flags?: string[],
 	basePath?: string
@@ -109,6 +110,7 @@ export function startNode(
 		"--chain=" + spec,
 		"--ws-port=" + wsPort,
 		"--port=" + port,
+		"--node-key=" + nodeKey,
 		"--" + name.toLowerCase(),
 	];
 	if (rpcPort) {
