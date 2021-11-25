@@ -219,3 +219,12 @@ function findAndReplaceConfig(obj1: any, obj2: any, name: string) {
 		}
 	});
 }
+
+export async function addBootNodes(spec: any, addresses: any) {
+	let rawdata = fs.readFileSync(spec);
+	let chainSpec = JSON.parse(rawdata);
+	chainSpec.bootNodes = addresses;
+	let data = JSON.stringify(chainSpec, null, 2);
+	fs.writeFileSync(spec, data);
+	console.log(`Added Boot Nodes: ${addresses}`);
+}

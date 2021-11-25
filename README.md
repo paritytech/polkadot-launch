@@ -72,6 +72,7 @@ You can see an example [here](config.json).
   - `name`: Must be one of `alice`, `bob`, `charlie`, or `dave`.
   - `wsPort`: The websocket port for this node.
   - `port`: The TCP port for this node.
+  - `nodeKey`: a secret key used for generating libp2p peer identifier. Optional.
   - `basePath`: The directory used for the blockchain db and other outputs. When unspecified, we use
     `--tmp`.
   - `flags`: Any additional command line flags you want to add when starting your node.

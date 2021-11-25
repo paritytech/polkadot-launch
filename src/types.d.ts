@@ -1,13 +1,13 @@
 export interface LaunchConfig {
 	relaychain: RelayChainConfig;
 	parachains: ParachainConfig[];
-	// simpleParachains: SimpleParachainConfig[];
+	simpleParachains: SimpleParachainConfig[];
 	hrmpChannels: HrmpChannelsConfig[];
 	types: any;
 	finalization: boolean;
 }
 export interface ParachainNodeConfig {
-	rpcPort: number;
+	rpcPort?: number;
 	wsPort: number;
 	port: number;
 	basePath?: string;
@@ -44,6 +44,8 @@ export interface RelayChainConfig {
 		name: string;
 		basePath?: string;
 		wsPort: number;
+		rpcPort?: number;
+		nodeKey?: string;
 		port: number;
 		flags?: string[];
 	}[];
