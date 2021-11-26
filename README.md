@@ -45,8 +45,13 @@ polkadot-launch config.json
 ### Configuration File
 
 The required configuration file defines the properties of the network you want to set up.
+You may use a json or a js file.
 
-You can see an example [here](config.json).
+You can see the examples:
+- [config.json](config.json)
+- [config.js](config.js)
+
+You may find the .js alternative more convenient if you need comments, trailing commas or if you prefer do dedup some portions of the config.
 
 #### `relaychain`
 
