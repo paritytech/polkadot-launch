@@ -22,7 +22,6 @@ if (!fs.existsSync(config_path)) {
 	console.error("Config file does not exist: ", config_path);
 	process.exit();
 }
-
 let config: LaunchConfig = require(config_path);
 
 // Kill all processes when exiting.
