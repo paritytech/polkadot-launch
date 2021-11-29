@@ -1,6 +1,6 @@
 {
 	"name": "polkadot-launch",
-	"version": "1.8.0",
+	"version": "1.9.0",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
@@ -9,7 +9,7 @@
 		"prepare": "tsc",
 		"build": "tsc",
 		"start": "yarn build && node dist/cli.js",
-		"lint": "prettier --check .",
+		"lint": "prettier -v && prettier --check .",
 		"lint:write": "prettier --write ."
 	},
 	"dependencies": {
@@ -17,6 +17,8 @@
 		"@polkadot/util": "^7.4.1",
 		"@polkadot/util-crypto": "^7.4.1",
 		"filter-console": "^0.1.1",
+		"libp2p-crypto": "^0.20.0",
+		"peer-id": "^0.15.3",
 		"yargs": "^15.4.1"
 	},
 	"files": [

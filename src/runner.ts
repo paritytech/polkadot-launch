@@ -10,7 +10,7 @@ import {
 	startSimpleCollator,
 	getParachainIdFromSpec,
 } from "./spawn";
-import { connect, registerParachain, setBalance } from "./rpc";
+import { connect, setBalance } from "./rpc";
 import { checkConfig } from "./check";
 import {
 	clearAuthorities,
@@ -18,9 +18,11 @@ import {
 	changeGenesisConfig,
 	addGenesisParachain,
 	addGenesisHrmpChannel,
+	addBootNodes,
 } from "./spec";
 import { parachainAccount } from "./parachain";
 import { ApiPromise } from "@polkadot/api";
+import { randomAsHex } from "@polkadot/util-crypto";
 
 import { resolve } from "path";
 import fs from "fs";
@@ -31,7 +33,9 @@ import type {
 	HrmpChannelsConfig,
 	ResolvedLaunchConfig,
 } from "./types";
-import { type } from "os";
+import { keys as libp2pKeys } from "libp2p-crypto";
+import { hexAddPrefix, hexStripPrefix, hexToU8a } from "@polkadot/util";
+import PeerId from "peer-id";
 
 function loadTypeDef(types: string | object): object {
 	if (typeof types === "string") {
@@ -59,6 +63,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 		return;
 	}
 	const config = await resolveParachainId(config_dir, rawConfig);
+	var bootnodes = await generateNodeKeys(config);
 
 	const relay_chain_bin = resolve(config_dir, config.relaychain.bin);
 	if (!fs.existsSync(relay_chain_bin)) {
@@ -84,17 +89,30 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	if (config.hrmpChannels) {
 		await addHrmpChannelsToGenesis(`${chain}.json`, config.hrmpChannels);
 	}
+	addBootNodes(`${chain}.json`, bootnodes);
 	// -- End Chain Spec Modify --
 	await generateChainSpecRaw(relay_chain_bin, chain);
 	const spec = resolve(`${chain}-raw.json`);
 
 	// First we launch each of the validators for the relay chain.
 	for (const node of config.relaychain.nodes) {
-		const { name, wsPort, port, flags, basePath } = node;
-		console.log(`Starting ${name}...`);
+		const { name, wsPort, rpcPort, port, flags, basePath, nodeKey } = node;
+		console.log(
+			`Starting Relaychain Node ${name}... wsPort: ${wsPort} rpcPort: ${rpcPort} port: ${port} nodeKey: ${nodeKey}`
+		);
 		// We spawn a `child_process` starting a node, and then wait until we
 		// able to connect to it using PolkadotJS in order to know its running.
-		startNode(relay_chain_bin, name, wsPort, port, spec, flags, basePath);
+		startNode(
+			relay_chain_bin,
+			name,
+			wsPort,
+			rpcPort,
+			port,
+			nodeKey!, // by the time the control flow gets here it should be assigned.
+			spec,
+			flags,
+			basePath
+		);
 	}
 
 	// Connect to the first relay chain node to submit the extrinsic.
@@ -114,15 +132,16 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 		let account = parachainAccount(resolvedId);
 
 		for (const node of parachain.nodes) {
-			const { wsPort, port, flags, name, basePath } = node;
+			const { wsPort, port, flags, name, basePath, rpcPort } = node;
 			console.log(
-				`Starting a Collator for parachain ${resolvedId}: ${account}, Collator port : ${port} wsPort : ${wsPort}`
+				`Starting a Collator for parachain ${resolvedId}: ${account}, Collator port : ${port} wsPort : ${wsPort} rpcPort : ${rpcPort}`
 			);
 			const skipIdArg = !id;
 			await startCollator(
 				bin,
 				resolvedId,
 				wsPort,
+				rpcPort,
 				port,
 				name,
 				chain,
@@ -264,4 +283,27 @@ async function resolveParachainId(
 		parachain.resolvedId = parachain.id;
 	}
 	return resolvedConfig;
+}
+
+async function generateNodeKeys(
+	config: ResolvedLaunchConfig
+): Promise<string[]> {
+	var bootnodes = [];
+	for (const node of config.relaychain.nodes) {
+		if (!node.nodeKey) {
+			node.nodeKey = hexStripPrefix(randomAsHex(32));
+		}
+
+		let pair = await libp2pKeys.generateKeyPairFromSeed(
+			"Ed25519",
+			hexToU8a(hexAddPrefix(node.nodeKey!)),
+			1024
+		);
+		let peerId: PeerId = await PeerId.createFromPrivKey(pair.bytes);
+		bootnodes.push(
+			`/ip4/127.0.0.1/tcp/${node.port}/p2p/${peerId.toB58String()}`
+		);
+	}
+
+	return bootnodes;
 }
