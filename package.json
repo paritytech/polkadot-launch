@@ -17,6 +17,8 @@
 		"@polkadot/util": "^7.4.1",
 		"@polkadot/util-crypto": "^7.4.1",
 		"filter-console": "^0.1.1",
+		"libp2p-crypto": "^0.20.0",
+		"peer-id": "^0.15.3",
 		"yargs": "^15.4.1"
 	},
 	"files": [
