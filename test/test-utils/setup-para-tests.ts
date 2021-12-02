@@ -141,8 +141,8 @@ export function describeParachain(
 			context.web3 = await context.createWeb3();
 			context.ethers = await context.createEthers();
 			debug(
-				//@ts-ignore
 				`Setup ready [${
+					//@ts-ignore
 					/:([0-9]+)$/.exec((context.web3.currentProvider as any).host)[1]
 				}] for ${
 					//@ts-ignore
