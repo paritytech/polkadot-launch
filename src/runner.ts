@@ -19,6 +19,7 @@ import {
 	addGenesisParachain,
 	addGenesisHrmpChannel,
 	addBootNodes,
+	updateParachainGenesis,
 } from "./spec";
 import { parachainAccount } from "./parachain";
 import { ApiPromise } from "@polkadot/api";
@@ -32,6 +33,7 @@ import type {
 	ResolvedSimpleParachainConfig,
 	HrmpChannelsConfig,
 	ResolvedLaunchConfig,
+	GenesisParachain,
 } from "./types";
 import { keys as libp2pKeys } from "libp2p-crypto";
 import { hexAddPrefix, hexStripPrefix, hexToU8a } from "@polkadot/util";
@@ -80,7 +82,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	if (config.relaychain.genesis) {
 		await changeGenesisConfig(`${chain}.json`, config.relaychain.genesis);
 	}
-	await addParachainsToGenesis(
+	const paraChainSpecRaws = await addParachainsToGenesis(
 		config_dir,
 		`${chain}.json`,
 		config.parachains,
@@ -91,14 +93,15 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	}
 	addBootNodes(`${chain}.json`, bootnodes);
 	// -- End Chain Spec Modify --
-	await generateChainSpecRaw(relay_chain_bin, chain);
-	const spec = resolve(`${chain}-raw.json`);
+	const chainSpecRawPath = `${chain}-raw.json`;
+	await generateChainSpecRaw(relay_chain_bin, {type: 'chainType', chain}, chainSpecRawPath);
 
+	const spec = resolve(chainSpecRawPath);
 	// First we launch each of the validators for the relay chain.
 	for (const node of config.relaychain.nodes) {
 		const { name, wsPort, rpcPort, port, flags, basePath, nodeKey } = node;
 		console.log(
-			`Starting Relaychain Node ${name}... wsPort: ${wsPort} rpcPort: ${rpcPort} port: ${port} nodeKey: ${nodeKey}`
+			`Starting a Relaychain Node ${name}... wsPort: ${wsPort}, rpcPort: ${rpcPort}, port: ${port}, nodeKey: ${nodeKey}`
 		);
 		// We spawn a `child_process` starting a node, and then wait until we
 		// able to connect to it using PolkadotJS in order to know its running.
@@ -123,27 +126,26 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
-		const { id, resolvedId, balance, chain } = parachain;
+		const { id, resolvedId, balance } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
 			process.exit();
 		}
-		let account = parachainAccount(resolvedId);
+		const account = parachainAccount(resolvedId);
+		const chain = paraChainSpecRaws.get(parseInt(resolvedId));
 
 		for (const node of parachain.nodes) {
 			const { wsPort, port, flags, name, basePath, rpcPort } = node;
 			console.log(
-				`Starting a Collator for parachain ${resolvedId}: ${account}, Collator port : ${port} wsPort : ${wsPort} rpcPort : ${rpcPort}`
+				`Starting a Collator for Parachain ${resolvedId}: ${account}, wsPort: ${wsPort}, rpcPort: ${rpcPort}, port: ${port}`
 			);
-			const skip_id_arg = !id;
 			await startCollator(bin, resolvedId, wsPort, rpcPort, port, {
 				name,
 				chain,
 				spec,
 				flags,
 				basePath,
-				skip_id_arg,
 				onlyOneParachainNode: config.parachains.length === 1,
 			});
 		}
@@ -184,20 +186,12 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	console.log("🚀 POLKADOT LAUNCH COMPLETE 🚀");
 }
 
-interface GenesisParachain {
-	isSimple: boolean;
-	id?: string;
-	resolvedId: string;
-	chain?: string;
-	bin: string;
-}
-
 async function addParachainsToGenesis(
 	config_dir: string,
 	spec: string,
 	parachains: ResolvedParachainConfig[],
 	simpleParachains: ResolvedSimpleParachainConfig[]
-) {
+): Promise<Map<number, string>> {
 	console.log("\n⛓ Adding Genesis Parachains");
 
 	// Collect all paras into a single list
@@ -208,9 +202,10 @@ async function addParachainsToGenesis(
 		return { isSimple: true, ...p };
 	});
 	let paras = x.concat(y);
+	let chainSpecRawPathMap = new Map();
 
 	for (const parachain of paras) {
-		const { isSimple, id, resolvedId, chain } = parachain;
+		const { isSimple, id, resolvedId, protocolId, chain } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
@@ -218,19 +213,22 @@ async function addParachainsToGenesis(
 		}
 		// If it isn't registered yet, register the parachain in genesis
 		if (!registeredParachains[resolvedId]) {
+			// Build the genesis
+			const chainSpecPath = `${resolvedId}.json`;
+			const chainSpecRawPath = `${resolvedId}-raw.json`;
+			await generateChainSpec(bin, "local", chainSpecPath);
+			// Need to read the generated spec file and update the paraID inside
+			await updateParachainGenesis(chainSpecPath, resolvedId, protocolId);
+			await generateChainSpecRaw(bin, {type: 'path', chain: chainSpecPath}, chainSpecRawPath);
+
 			// Get the information required to register the parachain in genesis.
 			let genesisState: string;
 			let genesisWasm: string;
 			try {
-				if (isSimple) {
-					// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
-					// not necessary for it anyway), so we don't pass it here.
-					genesisState = await exportGenesisState(bin);
-					genesisWasm = await exportGenesisWasm(bin);
-				} else {
-					genesisState = await exportGenesisState(bin, id, chain);
-					genesisWasm = await exportGenesisWasm(bin, chain);
-				}
+				// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
+				// not necessary for it anyway), so we don't pass it here.
+				genesisState = await exportGenesisState(bin, isSimple ? undefined : chainSpecRawPath);
+				genesisWasm = await exportGenesisWasm(bin, isSimple ? undefined : chainSpecRawPath);
 			} catch (err) {
 				console.error(err);
 				process.exit(1);
@@ -243,9 +241,13 @@ async function addParachainsToGenesis(
 				genesisWasm,
 				true
 			);
+
+			// Some data keeping
 			registeredParachains[resolvedId] = true;
+			chainSpecRawPathMap.set(resolvedId, chainSpecRawPath);
 		}
 	}
+	return chainSpecRawPathMap;
 }
 
 async function addHrmpChannelsToGenesis(

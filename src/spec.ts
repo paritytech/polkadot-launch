@@ -224,3 +224,25 @@ export async function addBootNodes(spec: any, addresses: any) {
 	fs.writeFileSync(spec, data);
 	console.log(`Added Boot Nodes: ${addresses}`);
 }
+
+export async function updateParachainGenesis(specPath: string, paraId: string, protocolId?: string) {
+	console.log(`specPath: ${specPath}, paraId: ${paraId}`)
+	let rawdata = fs.readFileSync(specPath);
+	let chainSpec = JSON.parse(rawdata);
+
+	// Update the ParaId
+	chainSpec['para_id'] = paraId;
+	chainSpec.genesis.runtime.parachainInfo.parachainId = paraId;
+
+	// Update the protocolId
+	if (protocolId) {
+		chainSpec['protocolId'] = protocolId;
+	}
+
+	let data = JSON.stringify(chainSpec, null, 2);
+	fs.writeFileSync(specPath, data);
+
+	const protocolIdPrompt = protocolId ? ` and protocolId: ${protocolId}` : null;
+
+	console.log(`Updated Parachain Genesis for ParaId: ${paraId}${protocolIdPrompt}`);
+}

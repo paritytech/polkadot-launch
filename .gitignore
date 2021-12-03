@@ -6,3 +6,13 @@ rococo-local.json
 rococo-local-raw.json
 configLocal.json
 bin
+
+# Ignore file for non-zero install
+# ref: https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

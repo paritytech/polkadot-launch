@@ -4,7 +4,6 @@ export interface CollatorOptions {
 	spec?: string;
 	flags?: string[];
 	basePath?: string;
-	skip_id_arg?: boolean;
 	onlyOneParachainNode?: boolean;
 }
 
@@ -81,6 +80,15 @@ export interface ChainSpec {
 			};
 		};
 	};
+}
+
+export interface GenesisParachain {
+	isSimple: boolean;
+	id?: string;
+	resolvedId: string;
+	chain?: string;
+	protocolId?: string;
+	bin: string;
 }
 
 export interface ResolvedParachainConfig extends ParachainConfig {

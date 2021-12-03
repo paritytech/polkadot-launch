@@ -14,12 +14,12 @@ const p: { [key: string]: ChildProcessWithoutNullStreams } = {};
 const execFile = util.promisify(ex);
 
 // Output the chainspec of a node.
-export async function generateChainSpec(bin: string, chain: string) {
+export async function generateChainSpec(bin: string, chainType: string, outPath?: string) {
 	return new Promise<void>(function (resolve, reject) {
-		let args = ["build-spec", "--chain=" + chain, "--disable-default-bootnode"];
+		let args = ["build-spec", `--chain=${chainType}`, "--disable-default-bootnode"];
 
 		p["spec"] = spawn(bin, args);
-		let spec = fs.createWriteStream(`${chain}.json`);
+		let spec = fs.createWriteStream(outPath || `${chainType}.json`);
 
 		// `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
 		// before we resolve the promise.
@@ -38,15 +38,20 @@ export async function generateChainSpec(bin: string, chain: string) {
 }
 
 // Output the chainspec of a node using `--raw` from a JSON file.
-export async function generateChainSpecRaw(bin: string, chain: string) {
+interface GenerateChainSpecRawIn {
+	type: 'path' | 'chainType',
+	chain: string
+};
+
+export async function generateChainSpecRaw(bin: string, chainIn: GenerateChainSpecRawIn, chainOut: string) {
 	console.log(); // Add a newline in output
 	return new Promise<void>(function (resolve, reject) {
-		let args = ["build-spec", "--chain=" + chain + ".json", "--raw"];
-
+		const rsChainIn = chainIn.type === 'chainType' ? `${chainIn.chain}.json` : chainIn.chain;
+		let args = ["build-spec", `--chain=${rsChainIn}`, "--raw"];
 		p["spec"] = spawn(bin, args);
-		let spec = fs.createWriteStream(`${chain}-raw.json`);
+		let spec = fs.createWriteStream(chainOut);
 
-		// `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
+		// `pipe` since it deals with flushing and we need to guarantee that the data is flushed
 		// before we resolve the promise.
 		p["spec"].stdout.pipe(spec);
 		p["spec"].stderr.pipe(process.stderr);
@@ -145,9 +150,7 @@ export async function exportGenesisWasm(
 	chain?: string
 ): Promise<string> {
 	let args = ["export-genesis-wasm"];
-	if (chain) {
-		args.push("--chain=" + chain);
-	}
+	chain && args.push("--chain=" + chain);
 
 	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
 	// advance. Hopefully, this generous limit will be enough.
@@ -162,24 +165,16 @@ export async function exportGenesisWasm(
 /// Export the genesis state aka genesis head.
 export async function exportGenesisState(
 	bin: string,
-	id?: string,
 	chain?: string
 ): Promise<string> {
 	let args = ["export-genesis-state"];
-	if (id) {
-		args.push("--parachain-id=" + id);
-	}
-	if (chain) {
-		args.push("--chain=" + chain);
-	}
+	chain && args.push("--chain=" + chain);
 
 	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
 	// advance. Hopefully, this generous limit will be enough.
 	let opts = { maxBuffer: 5 * 1024 * 1024 };
 	let { stdout, stderr } = await execFile(bin, args, opts);
-	if (stderr) {
-		console.error(stderr);
-	}
+	stderr && console.error(stderr);
 	return stdout.trim();
 }
 
@@ -198,7 +193,6 @@ export function startCollator(
 		const {
 			basePath,
 			name,
-			skip_id_arg,
 			onlyOneParachainNode,
 			chain,
 			flags,
@@ -210,20 +204,11 @@ export function startCollator(
 			console.log(`Added --rpc-port=" + ${rpcPort}`);
 		}
 		args.push("--collator");
-
-		if (basePath) {
-			args.push("--base-path=" + basePath);
-		} else {
-			args.push("--tmp");
-		}
+		basePath ? args.push("--base-path=" + basePath) : args.push("--tmp");
 
 		if (name) {
 			args.push(`--${name.toLowerCase()}`);
 			console.log(`Added --${name.toLowerCase()}`);
-		}
-		if (!skip_id_arg) {
-			args.push("--parachain-id=" + id);
-			console.log(`Added --parachain-id=${id}`);
 		}
 		if (onlyOneParachainNode) {
 			args.push("--force-authoring");
