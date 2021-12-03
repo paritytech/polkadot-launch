@@ -184,6 +184,7 @@ export async function changeGenesisConfig(spec: string, updates: any) {
 
 	if (chainSpec.genesis) {
 		let config = chainSpec.genesis;
+		console.log("config",config)
 		findAndReplaceConfig(updates, config);
 
 		let data = JSON.stringify(chainSpec, null, 2);

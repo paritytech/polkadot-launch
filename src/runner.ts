@@ -124,6 +124,12 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
 		const { id, resolvedId, balance, chain } = parachain;
+
+		if (resolvedId) {
+			console.log("resolvedId",resolvedId)
+			await changeGenesisConfig(`${chain}.json`, {});
+		}
+
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
