@@ -136,20 +136,16 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 			console.log(
 				`Starting a Collator for parachain ${resolvedId}: ${account}, Collator port : ${port} wsPort : ${wsPort} rpcPort : ${rpcPort}`
 			);
-			const skipIdArg = !id;
-			await startCollator(
-				bin,
-				resolvedId,
-				wsPort,
-				rpcPort,
-				port,
+			const skip_id_arg = !id;
+			await startCollator(bin, resolvedId, wsPort, rpcPort, port, {
 				name,
 				chain,
 				spec,
 				flags,
 				basePath,
-				skipIdArg
-			);
+				skip_id_arg,
+				onlyOneParachainNode: config.parachains.length === 1,
+			});
 		}
 
 		// Allow time for the TX to complete, avoiding nonce issues.
@@ -223,8 +219,8 @@ async function addParachainsToGenesis(
 		// If it isn't registered yet, register the parachain in genesis
 		if (!registeredParachains[resolvedId]) {
 			// Get the information required to register the parachain in genesis.
-			let genesisState;
-			let genesisWasm;
+			let genesisState: string;
+			let genesisWasm: string;
 			try {
 				if (isSimple) {
 					// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
