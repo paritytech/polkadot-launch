@@ -123,15 +123,9 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
-		const {
-			id,
-			resolvedId,
-			balance,
-			// chain
-		} = parachain;
+		const { id, resolvedId, balance } = parachain;
 
 		if (resolvedId) {
-			console.log("resolvedId", resolvedId);
 			await changeGenesisConfig(`${chain}.json`, {});
 		}
 
