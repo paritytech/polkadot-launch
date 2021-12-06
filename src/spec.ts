@@ -122,6 +122,7 @@ export async function addGenesisParachain(
 		paras.push(new_para);
 
 		let data = JSON.stringify(chainSpec, null, 2);
+
 		fs.writeFileSync(spec, data);
 		console.log(`  ✓ Added Genesis Parachain ${para_id}`);
 	} else {
@@ -184,7 +185,6 @@ export async function changeGenesisConfig(spec: string, updates: any) {
 
 	if (chainSpec.genesis) {
 		let config = chainSpec.genesis;
-		console.log("config",config)
 		findAndReplaceConfig(updates, config);
 
 		let data = JSON.stringify(chainSpec, null, 2);

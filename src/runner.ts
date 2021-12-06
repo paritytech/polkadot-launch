@@ -123,10 +123,15 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
-		const { id, resolvedId, balance, chain } = parachain;
+		const {
+			id,
+			resolvedId,
+			balance,
+			// chain
+		} = parachain;
 
 		if (resolvedId) {
-			console.log("resolvedId",resolvedId)
+			console.log("resolvedId", resolvedId);
 			await changeGenesisConfig(`${chain}.json`, {});
 		}
 
@@ -145,11 +150,9 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 			const skip_id_arg = !id;
 			await startCollator(bin, resolvedId, wsPort, rpcPort, port, {
 				name,
-				chain,
 				spec,
 				flags,
 				basePath,
-				skip_id_arg,
 				onlyOneParachainNode: config.parachains.length === 1,
 			});
 		}
@@ -228,15 +231,8 @@ async function addParachainsToGenesis(
 			let genesisState: string;
 			let genesisWasm: string;
 			try {
-				if (isSimple) {
-					// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
-					// not necessary for it anyway), so we don't pass it here.
-					genesisState = await exportGenesisState(bin);
-					genesisWasm = await exportGenesisWasm(bin);
-				} else {
-					genesisState = await exportGenesisState(bin, id, chain);
-					genesisWasm = await exportGenesisWasm(bin, chain);
-				}
+				genesisState = await exportGenesisState(bin);
+				genesisWasm = await exportGenesisWasm(bin);
 			} catch (err) {
 				console.error(err);
 				process.exit(1);

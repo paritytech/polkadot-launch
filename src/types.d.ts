@@ -1,10 +1,8 @@
 export interface CollatorOptions {
 	name?: string;
-	chain?: string;
 	spec?: string;
 	flags?: string[];
 	basePath?: string;
-	skip_id_arg?: boolean;
 	onlyOneParachainNode?: boolean;
 }
 

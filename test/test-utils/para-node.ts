@@ -4,8 +4,6 @@ import { killAll, run } from "../../src"; //"polkadot-launch";
 import {
 	BINARY_PATH,
 	RELAY_BINARY_PATH,
-	DISPLAY_LOG,
-	SPAWNING_TIME,
 	RELAY_CHAIN_NODE_NAMES,
 } from "./constants";
 const debug = require("debug")("test:para-node");
@@ -156,7 +154,6 @@ export async function startParachainNodes(options: ParachainOptions): Promise<{
 				bin: BINARY_PATH,
 				id: (1000 * (i + 1)).toString(),
 				balance: "1000000000000000000000",
-				// chain: options.chain, this is not supported by cumulus
 				nodes: [
 					{
 						port: ports[i * 2 + numberOfParachains + 1].p2pPort,
