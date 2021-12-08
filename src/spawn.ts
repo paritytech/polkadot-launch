@@ -157,8 +157,15 @@ export async function exportGenesisWasm(
 }
 
 /// Export the genesis state aka genesis head.
-export async function exportGenesisState(bin: string): Promise<string> {
+export async function exportGenesisState(
+	bin: string,
+	chain?: string
+): Promise<string> {
 	let args = ["export-genesis-state"];
+
+	if (chain) {
+		args.push("--chain=" + chain);
+	}
 
 	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
 	// advance. Hopefully, this generous limit will be enough.
@@ -173,7 +180,6 @@ export async function exportGenesisState(bin: string): Promise<string> {
 // Start a collator node for a parachain.
 export function startCollator(
 	bin: string,
-	id: string,
 	wsPort: number,
 	rpcPort: number | undefined,
 	port: number,

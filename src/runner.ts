@@ -125,10 +125,6 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	for (const parachain of config.parachains) {
 		const { id, resolvedId, balance } = parachain;
 
-		if (resolvedId) {
-			await changeGenesisConfig(`${chain}.json`, {});
-		}
-
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
@@ -142,7 +138,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 				`Starting a Collator for parachain ${resolvedId}: ${account}, Collator port : ${port} wsPort : ${wsPort} rpcPort : ${rpcPort}`
 			);
 			const skip_id_arg = !id;
-			await startCollator(bin, resolvedId, wsPort, rpcPort, port, {
+			await startCollator(bin, wsPort, rpcPort, port, {
 				name,
 				spec,
 				flags,
@@ -189,7 +185,6 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 
 interface GenesisParachain {
 	isSimple: boolean;
-	id?: string;
 	resolvedId: string;
 	chain?: string;
 	bin: string;
@@ -213,7 +208,7 @@ async function addParachainsToGenesis(
 	let paras = x.concat(y);
 
 	for (const parachain of paras) {
-		const { isSimple, id, resolvedId, chain } = parachain;
+		const { resolvedId, chain } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
@@ -225,7 +220,7 @@ async function addParachainsToGenesis(
 			let genesisState: string;
 			let genesisWasm: string;
 			try {
-				genesisState = await exportGenesisState(bin);
+				genesisState = await exportGenesisState(bin, chain);
 				genesisWasm = await exportGenesisWasm(bin);
 			} catch (err) {
 				console.error(err);
