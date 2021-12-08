@@ -24,7 +24,7 @@ export interface ParachainNodeConfig {
 }
 export interface ParachainConfig {
 	bin: string;
-	id?: string;
+	// id?: string;
 	balance: string;
 	chain?: string;
 	nodes: ParachainNodeConfig[];

@@ -89,7 +89,7 @@ export async function addAuthority(spec: string, name: string) {
 // Add parachains to the chain spec at genesis.
 export async function addGenesisParachain(
 	spec: string,
-	para_id: string,
+	index: number,
 	head: string,
 	wasm: string,
 	parachain: boolean
@@ -111,7 +111,7 @@ export async function addGenesisParachain(
 	}
 	if (paras) {
 		let new_para = [
-			parseInt(para_id),
+			index,
 			{
 				genesis_head: head,
 				validation_code: wasm,
@@ -124,7 +124,7 @@ export async function addGenesisParachain(
 		let data = JSON.stringify(chainSpec, null, 2);
 
 		fs.writeFileSync(spec, data);
-		console.log(`  ✓ Added Genesis Parachain ${para_id}`);
+		console.log(`  ✓ Added Genesis Parachain # ${index}`);
 	} else {
 		console.error("  ⚠ paras not found in runtimeConfig");
 		process.exit(1);

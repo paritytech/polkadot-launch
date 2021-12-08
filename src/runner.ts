@@ -32,6 +32,8 @@ import type {
 	ResolvedSimpleParachainConfig,
 	HrmpChannelsConfig,
 	ResolvedLaunchConfig,
+	ParachainConfig,
+	SimpleParachainConfig,
 } from "./types";
 import { keys as libp2pKeys } from "libp2p-crypto";
 import { hexAddPrefix, hexStripPrefix, hexToU8a } from "@polkadot/util";
@@ -55,14 +57,14 @@ function loadTypeDef(types: string | object): object {
 // keep track of registered parachains
 let registeredParachains: { [key: string]: boolean } = {};
 
-export async function run(config_dir: string, rawConfig: LaunchConfig) {
+export async function run(config_dir: string, config: LaunchConfig) {
 	// We need to reset that variable when running a new network
 	registeredParachains = {};
 	// Verify that the `config.json` has all the expected properties.
-	if (!checkConfig(rawConfig)) {
+	if (!checkConfig(config)) {
 		return;
 	}
-	const config = await resolveParachainId(config_dir, rawConfig);
+	// const config = await resolveParachainId(config_dir, rawConfig);
 	var bootnodes = await generateNodeKeys(config);
 
 	const relay_chain_bin = resolve(config_dir, config.relaychain.bin);
@@ -122,27 +124,22 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	);
 
 	// Then launch each parachain
-	for (const parachain of config.parachains) {
-		const { id, resolvedId, balance } = parachain;
-
-		if (resolvedId) {
-			await changeGenesisConfig(`${chain}.json`, {});
-		}
+	config.parachains.forEach(async (parachain,index) =>{
+		// const { resolvedId, balance } = parachain;
 
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
 			process.exit();
 		}
-		let account = parachainAccount(resolvedId);
+		// let account = parachainAccount(resolvedId);
 
 		for (const node of parachain.nodes) {
 			const { wsPort, port, flags, name, basePath, rpcPort } = node;
 			console.log(
-				`Starting a Collator for parachain ${resolvedId}: ${account}, Collator port : ${port} wsPort : ${wsPort} rpcPort : ${rpcPort}`
+				`Starting a Collator for parachain #${index}, Collator port : ${port} wsPort : ${wsPort} rpcPort : ${rpcPort}`
 			);
-			const skip_id_arg = !id;
-			await startCollator(bin, resolvedId, wsPort, rpcPort, port, {
+			await startCollator(bin, wsPort, rpcPort, port, {
 				name,
 				spec,
 				flags,
@@ -153,32 +150,32 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 
 		// Allow time for the TX to complete, avoiding nonce issues.
 		// TODO: Handle nonce directly instead of this.
-		if (balance) {
-			await setBalance(relayChainApi, account, balance, config.finalization);
-		}
-	}
+		// if (balance) {
+		// 	await setBalance(relayChainApi, account, balance, config.finalization);
+		// }
+	})
 
 	// Then launch each simple parachain (e.g. an adder-collator)
 	if (config.simpleParachains) {
-		for (const simpleParachain of config.simpleParachains) {
-			const { id, resolvedId, port, balance } = simpleParachain;
+		config.simpleParachains.forEach( async(simpleParachain,index) =>{
+			const { id,  port, balance } = simpleParachain;
 			const bin = resolve(config_dir, simpleParachain.bin);
 			if (!fs.existsSync(bin)) {
 				console.error("Simple parachain binary does not exist: ", bin);
 				process.exit();
 			}
 
-			let account = parachainAccount(resolvedId);
-			console.log(`Starting Parachain ${resolvedId}: ${account}`);
+			// let account = parachainAccount(resolvedId);
+			console.log(`Starting Simple Parachain #${index}`);
 			const skipIdArg = !id;
-			await startSimpleCollator(bin, resolvedId, spec, port, skipIdArg);
+			await startSimpleCollator(bin, spec, port);
 
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.
-			if (balance) {
-				await setBalance(relayChainApi, account, balance, config.finalization);
-			}
-		}
+			// if (balance) {
+			// 	await setBalance(relayChainApi, account, balance, config.finalization);
+			// }
+		})
 	}
 
 	// We don't need the PolkadotJs API anymore
@@ -190,7 +187,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 interface GenesisParachain {
 	isSimple: boolean;
 	id?: string;
-	resolvedId: string;
+	// resolvedId: string;
 	chain?: string;
 	bin: string;
 }
@@ -198,8 +195,8 @@ interface GenesisParachain {
 async function addParachainsToGenesis(
 	config_dir: string,
 	spec: string,
-	parachains: ResolvedParachainConfig[],
-	simpleParachains: ResolvedSimpleParachainConfig[]
+	parachains: ParachainConfig[],
+	simpleParachains: SimpleParachainConfig[]
 ) {
 	console.log("\n⛓ Adding Genesis Parachains");
 
@@ -212,15 +209,15 @@ async function addParachainsToGenesis(
 	});
 	let paras = x.concat(y);
 
-	for (const parachain of paras) {
-		const { isSimple, id, resolvedId, chain } = parachain;
+	paras.forEach(async(parachain,i) =>{
+		const { isSimple, id,  chain } = parachain;
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
 			process.exit();
 		}
 		// If it isn't registered yet, register the parachain in genesis
-		if (!registeredParachains[resolvedId]) {
+		if (!registeredParachains[i]) {
 			// Get the information required to register the parachain in genesis.
 			let genesisState: string;
 			let genesisWasm: string;
@@ -234,14 +231,14 @@ async function addParachainsToGenesis(
 
 			await addGenesisParachain(
 				spec,
-				resolvedId,
+				i,
 				genesisState,
 				genesisWasm,
 				true
 			);
-			registeredParachains[resolvedId] = true;
+			registeredParachains[i] = true;
 		}
-	}
+	})
 }
 
 async function addHrmpChannelsToGenesis(
@@ -255,30 +252,30 @@ async function addHrmpChannelsToGenesis(
 }
 
 // Resolves parachain id from chain spec if not specified
-async function resolveParachainId(
-	config_dir: string,
-	config: LaunchConfig
-): Promise<ResolvedLaunchConfig> {
-	console.log(`\n🧹 Resolving parachain id...`);
-	const resolvedConfig = config as ResolvedLaunchConfig;
-	for (const parachain of resolvedConfig.parachains) {
-		if (parachain.id) {
-			parachain.resolvedId = parachain.id;
-		} else {
-			const bin = resolve(config_dir, parachain.bin);
-			const paraId = await getParachainIdFromSpec(bin, parachain.chain);
-			console.log(`  ✓ Read parachain id for ${parachain.bin}: ${paraId}`);
-			parachain.resolvedId = paraId.toString();
-		}
-	}
-	for (const parachain of resolvedConfig.simpleParachains) {
-		parachain.resolvedId = parachain.id;
-	}
-	return resolvedConfig;
-}
+// async function resolveParachainId(
+// 	config_dir: string,
+// 	config: LaunchConfig
+// ): Promise<ResolvedLaunchConfig> {
+// 	console.log(`\n🧹 Resolving parachain id...`);
+// 	const resolvedConfig = config as ResolvedLaunchConfig;
+// 	for (const parachain of resolvedConfig.parachains) {
+// 		// if (parachain.id) {
+// 		// 	parachain.resolvedId = parachain.id;
+// 		// } else {
+// 			const bin = resolve(config_dir, parachain.bin);
+// 			const paraId = await getParachainIdFromSpec(bin, parachain.chain);
+// 			console.log(`  ✓ Read parachain id for ${parachain.bin}: ${paraId}`);
+// 			parachain.resolvedId = paraId.toString();
+// 		// }
+// 	}
+// 	for (const parachain of resolvedConfig.simpleParachains) {
+// 		parachain.resolvedId = parachain.id;
+// 	}
+// 	return resolvedConfig;
+// }
 
 async function generateNodeKeys(
-	config: ResolvedLaunchConfig
+	config: LaunchConfig
 ): Promise<string[]> {
 	var bootnodes = [];
 	for (const node of config.relaychain.nodes) {

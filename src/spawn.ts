@@ -173,7 +173,6 @@ export async function exportGenesisState(bin: string): Promise<string> {
 // Start a collator node for a parachain.
 export function startCollator(
 	bin: string,
-	id: string,
 	wsPort: number,
 	rpcPort: number | undefined,
 	port: number,
@@ -249,10 +248,8 @@ export function startCollator(
 
 export function startSimpleCollator(
 	bin: string,
-	id: string,
 	spec: string,
-	port: string,
-	skip_id_arg?: boolean
+	port: string
 ) {
 	return new Promise<void>(function (resolve) {
 		let args = [
@@ -261,11 +258,6 @@ export function startSimpleCollator(
 			"--chain=" + spec,
 			"--execution=wasm",
 		];
-
-		if (!skip_id_arg) {
-			args.push("--parachain-id=" + id);
-			console.log(`Added --parachain-id=${id}`);
-		}
 
 		p[port] = spawn(bin, args);
 
