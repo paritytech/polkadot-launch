@@ -5,7 +5,8 @@ import {
 } from "child_process";
 import util from "util";
 import fs from "fs";
-import { CollatorOptions } from "./types";
+import path from "path";
+import { CollatorOptions, RunConfig } from "./types";
 
 // This tracks all the processes that we spawn from this file.
 // Used to clean up processes when exiting this program.
@@ -14,12 +15,11 @@ const p: { [key: string]: ChildProcessWithoutNullStreams } = {};
 const execFile = util.promisify(ex);
 
 // Output the chainspec of a node.
-export async function generateChainSpec(bin: string, chainType: string, outPath?: string) {
+export async function generateChainSpec(bin: string, chainType: string, outPath: string, runConfig: RunConfig) {
 	return new Promise<void>(function (resolve, reject) {
 		let args = ["build-spec", `--chain=${chainType}`, "--disable-default-bootnode"];
-
-		p["spec"] = spawn(bin, args);
-		let spec = fs.createWriteStream(outPath || `${chainType}.json`);
+		p["spec"] = spawnCmd(bin, args, runConfig.verbose);
+		let spec = fs.createWriteStream(`${runConfig.out}/outPath`);
 
 		// `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
 		// before we resolve the promise.
@@ -43,12 +43,17 @@ interface GenerateChainSpecRawIn {
 	chain: string
 };
 
-export async function generateChainSpecRaw(bin: string, chainIn: GenerateChainSpecRawIn, chainOut: string) {
+export async function generateChainSpecRaw(
+	bin: string,
+	chainIn: GenerateChainSpecRawIn,
+	chainOut: string,
+	runConfig: RunConfig
+) {
 	console.log(); // Add a newline in output
 	return new Promise<void>(function (resolve, reject) {
 		const rsChainIn = chainIn.type === 'chainType' ? `${chainIn.chain}.json` : chainIn.chain;
 		let args = ["build-spec", `--chain=${rsChainIn}`, "--raw"];
-		p["spec"] = spawn(bin, args);
+		p["spec"] = spawnCmd(bin, args, runConfig.verbose);
 		let spec = fs.createWriteStream(chainOut);
 
 		// `pipe` since it deals with flushing and we need to guarantee that the data is flushed
@@ -68,7 +73,8 @@ export async function generateChainSpecRaw(bin: string, chainIn: GenerateChainSp
 
 export async function getParachainIdFromSpec(
 	bin: string,
-	chain?: string
+	chain: string,
+	runConfig: RunConfig,
 ): Promise<number> {
 	const data = await new Promise<string>(function (resolve, reject) {
 		let args = ["build-spec"];
@@ -78,7 +84,7 @@ export async function getParachainIdFromSpec(
 
 		let data = "";
 
-		p["spec"] = spawn(bin, args);
+		p["spec"] = spawnCmd(bin, args, runConfig.verbose);
 		p["spec"].stdout.on("data", (chunk) => {
 			data += chunk;
 		});
@@ -108,8 +114,9 @@ export function startNode(
 	port: number,
 	nodeKey: string,
 	spec: string,
-	flags?: string[],
-	basePath?: string
+	flags: string[],
+	basePath: string | undefined,
+	runConfig: RunConfig
 ) {
 	// TODO: Make DB directory configurable rather than just `tmp`
 	let args = [
@@ -135,9 +142,9 @@ export function startNode(
 		console.log(`Added ${flags}`);
 	}
 
-	p[name] = spawn(bin, args);
-
-	let log = fs.createWriteStream(`${name}.log`);
+	p[name] = spawnCmd(bin, args, runConfig.verbose);
+	const logPath = path.resolve(runConfig.out, 'logs', `${name}.log`)
+	const log = fs.createWriteStream(logPath);
 
 	p[name].stdout.pipe(log);
 	p[name].stderr.pipe(log);
@@ -165,7 +172,7 @@ export async function exportGenesisWasm(
 /// Export the genesis state aka genesis head.
 export async function exportGenesisState(
 	bin: string,
-	chain?: string
+	chain?: string,
 ): Promise<string> {
 	let args = ["export-genesis-state"];
 	chain && args.push("--chain=" + chain);
@@ -185,7 +192,8 @@ export function startCollator(
 	wsPort: number,
 	rpcPort: number | undefined,
 	port: number,
-	options: CollatorOptions
+	options: CollatorOptions,
+	runConfig: RunConfig
 ) {
 	return new Promise<void>(function (resolve) {
 		// TODO: Make DB directory configurable rather than just `tmp`
@@ -245,9 +253,10 @@ export function startCollator(
 			console.log(`Added ${flags_collator} to collator`);
 		}
 
-		p[wsPort] = spawn(bin, args);
+		p[wsPort] = spawnCmd(bin, args, runConfig.verbose);
 
-		let log = fs.createWriteStream(`${wsPort}.log`);
+		const logPath = path.resolve(runConfig.out, 'logs', `${wsPort}.log`)
+		const log = fs.createWriteStream(logPath);
 
 		p[wsPort].stdout.pipe(log);
 		p[wsPort].stderr.on("data", function (chunk) {
@@ -263,15 +272,16 @@ export function startCollator(
 export function startSimpleCollator(
 	bin: string,
 	id: string,
-	spec: string,
+	chainType: string,
 	port: string,
-	skip_id_arg?: boolean
+	skip_id_arg: boolean,
+	runConfig: RunConfig
 ) {
 	return new Promise<void>(function (resolve) {
 		let args = [
 			"--tmp",
 			"--port=" + port,
-			"--chain=" + spec,
+			"--chain=" + chainType,
 			"--execution=wasm",
 		];
 
@@ -280,9 +290,10 @@ export function startSimpleCollator(
 			console.log(`Added --parachain-id=${id}`);
 		}
 
-		p[port] = spawn(bin, args);
+		p[port] = spawnCmd(bin, args, runConfig.verbose);
 
-		let log = fs.createWriteStream(`${port}.log`);
+		const logPath = path.resolve(runConfig.out, 'logs', `${port}.log`)
+		const log = fs.createWriteStream(logPath);
 
 		p[port].stdout.pipe(log);
 		p[port].stderr.on("data", function (chunk) {
@@ -298,7 +309,7 @@ export function startSimpleCollator(
 // Purge the chain for any node.
 // You shouldn't need to use this function since every node starts with `--tmp`
 // TODO: Make DB directory configurable rather than just `tmp`
-export function purgeChain(bin: string, spec: string) {
+export function purgeChain(bin: string, spec: string, runConfig: RunConfig) {
 	console.log("Purging Chain...");
 	let args = ["purge-chain"];
 
@@ -309,7 +320,7 @@ export function purgeChain(bin: string, spec: string) {
 	// Avoid prompt to confirm.
 	args.push("-y");
 
-	p["purge"] = spawn(bin, args);
+	p["purge"] = spawnCmd(bin, args, runConfig.verbose);
 
 	p["purge"].stdout.on("data", function (chunk) {
 		let message = chunk.toString();
@@ -328,4 +339,9 @@ export function killAll() {
 	for (const key of Object.keys(p)) {
 		p[key].kill();
 	}
+}
+
+function spawnCmd(cmd: string, args: Array<string>, verbose: number) {
+	verbose > 0 && console.debug(`Running cmd: ${cmd} ${args.join(' ')}`);
+	return spawn(cmd, args);
 }

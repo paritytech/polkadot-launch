@@ -6,7 +6,6 @@ export interface CollatorOptions {
 	basePath?: string;
 	onlyOneParachainNode?: boolean;
 }
-
 export interface LaunchConfig {
 	relaychain: RelayChainConfig;
 	parachains: ParachainConfig[];
@@ -14,6 +13,10 @@ export interface LaunchConfig {
 	hrmpChannels: HrmpChannelsConfig[];
 	types: any;
 	finalization: boolean;
+}
+export interface RunConfig {
+	verbose: number;
+	out: string;
 }
 export interface ParachainNodeConfig {
 	rpcPort?: number;

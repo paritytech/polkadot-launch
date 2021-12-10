@@ -25,10 +25,11 @@ import { parachainAccount } from "./parachain";
 import { ApiPromise } from "@polkadot/api";
 import { randomAsHex } from "@polkadot/util-crypto";
 
-import { resolve } from "path";
+import path from "path";
 import fs from "fs";
 import type {
 	LaunchConfig,
+	RunConfig,
 	ResolvedParachainConfig,
 	ResolvedSimpleParachainConfig,
 	HrmpChannelsConfig,
@@ -57,49 +58,50 @@ function loadTypeDef(types: string | object): object {
 // keep track of registered parachains
 let registeredParachains: { [key: string]: boolean } = {};
 
-export async function run(config_dir: string, rawConfig: LaunchConfig) {
+export async function run(config_dir: string, rawConfig: LaunchConfig, runConfig: RunConfig) {
 	// We need to reset that variable when running a new network
 	registeredParachains = {};
 	// Verify that the `config.json` has all the expected properties.
 	if (!checkConfig(rawConfig)) {
 		return;
 	}
-	const config = await resolveParachainId(config_dir, rawConfig);
+	const config = await resolveParachainId(config_dir, rawConfig, runConfig);
 	var bootnodes = await generateNodeKeys(config);
 
-	const relay_chain_bin = resolve(config_dir, config.relaychain.bin);
+	const relay_chain_bin = path.resolve(config_dir, config.relaychain.bin);
 	if (!fs.existsSync(relay_chain_bin)) {
 		console.error("Relay chain binary does not exist: ", relay_chain_bin);
 		process.exit();
 	}
-	const chain = config.relaychain.chain;
-	await generateChainSpec(relay_chain_bin, chain);
+	const relayChainType = config.relaychain.chain;
+	const relayChainSpecPath = path.resolve(runConfig.out, `${relayChainType}.json`);
+	await generateChainSpec(relay_chain_bin, relayChainType, relayChainSpecPath, runConfig);
 	// -- Start Chain Spec Modify --
-	clearAuthorities(`${chain}.json`);
+	clearAuthorities(relayChainSpecPath);
 	for (const node of config.relaychain.nodes) {
-		await addAuthority(`${chain}.json`, node.name);
+		await addAuthority(relayChainSpecPath, node.name);
 	}
 	if (config.relaychain.genesis) {
-		await changeGenesisConfig(`${chain}.json`, config.relaychain.genesis);
+		await changeGenesisConfig(relayChainSpecPath, config.relaychain.genesis);
 	}
-	const paraChainSpecRaws = await addParachainsToGenesis(
+	const paraChainSpecRawPaths = await addParachainsToGenesis(
 		config_dir,
-		`${chain}.json`,
+		relayChainSpecPath,
 		config.parachains,
-		config.simpleParachains
+		config.simpleParachains,
+		runConfig
 	);
 	if (config.hrmpChannels) {
-		await addHrmpChannelsToGenesis(`${chain}.json`, config.hrmpChannels);
+		await addHrmpChannelsToGenesis(relayChainSpecPath, config.hrmpChannels);
 	}
-	addBootNodes(`${chain}.json`, bootnodes);
+	addBootNodes(relayChainSpecPath, bootnodes);
 	// -- End Chain Spec Modify --
-	const chainSpecRawPath = `${chain}-raw.json`;
-	await generateChainSpecRaw(relay_chain_bin, {type: 'chainType', chain}, chainSpecRawPath);
+	const relayChainSpecRawPath = path.resolve(runConfig.out, `${relayChainType}-raw.json`);
+	await generateChainSpecRaw(relay_chain_bin, {type: 'chainType', chain: relayChainType}, relayChainSpecRawPath, runConfig);
 
-	const spec = resolve(chainSpecRawPath);
 	// First we launch each of the validators for the relay chain.
 	for (const node of config.relaychain.nodes) {
-		const { name, wsPort, rpcPort, port, flags, basePath, nodeKey } = node;
+		const { name, wsPort, rpcPort, port, flags = [], basePath, nodeKey } = node;
 		console.log(
 			`Starting a Relaychain Node ${name}... wsPort: ${wsPort}, rpcPort: ${rpcPort}, port: ${port}, nodeKey: ${nodeKey}`
 		);
@@ -112,9 +114,10 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 			rpcPort,
 			port,
 			nodeKey!, // by the time the control flow gets here it should be assigned.
-			spec,
+			relayChainSpecRawPath,
 			flags,
-			basePath
+			basePath,
+			runConfig
 		);
 	}
 
@@ -127,27 +130,26 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
 		const { id, resolvedId, balance } = parachain;
-		const bin = resolve(config_dir, parachain.bin);
+		const bin = path.resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
 			process.exit();
 		}
 		const account = parachainAccount(resolvedId);
-		const chain = paraChainSpecRaws.get(parseInt(resolvedId));
-
 		for (const node of parachain.nodes) {
 			const { wsPort, port, flags, name, basePath, rpcPort } = node;
 			console.log(
-				`Starting a Collator for Parachain ${resolvedId}: ${account}, wsPort: ${wsPort}, rpcPort: ${rpcPort}, port: ${port}`
+				`Starting a Collator for Parachain ${resolvedId} (${account}) - wsPort: ${wsPort}, rpcPort: ${rpcPort}, port: ${port}`
 			);
 			await startCollator(bin, resolvedId, wsPort, rpcPort, port, {
 				name,
-				chain,
-				spec,
+				chain: relayChainType,
+				spec: paraChainSpecRawPaths.get(parseInt(resolvedId)),
 				flags,
 				basePath,
 				onlyOneParachainNode: config.parachains.length === 1,
-			});
+			},
+			runConfig);
 		}
 
 		// Allow time for the TX to complete, avoiding nonce issues.
@@ -161,7 +163,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	if (config.simpleParachains) {
 		for (const simpleParachain of config.simpleParachains) {
 			const { id, resolvedId, port, balance } = simpleParachain;
-			const bin = resolve(config_dir, simpleParachain.bin);
+			const bin = path.resolve(config_dir, simpleParachain.bin);
 			if (!fs.existsSync(bin)) {
 				console.error("Simple parachain binary does not exist: ", bin);
 				process.exit();
@@ -170,7 +172,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 			let account = parachainAccount(resolvedId);
 			console.log(`Starting Parachain ${resolvedId}: ${account}`);
 			const skipIdArg = !id;
-			await startSimpleCollator(bin, resolvedId, spec, port, skipIdArg);
+			await startSimpleCollator(bin, resolvedId, "local", port, skipIdArg, runConfig);
 
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.
@@ -190,7 +192,8 @@ async function addParachainsToGenesis(
 	config_dir: string,
 	spec: string,
 	parachains: ResolvedParachainConfig[],
-	simpleParachains: ResolvedSimpleParachainConfig[]
+	simpleParachains: ResolvedSimpleParachainConfig[],
+	runConfig: RunConfig,
 ): Promise<Map<number, string>> {
 	console.log("\n⛓ Adding Genesis Parachains");
 
@@ -202,11 +205,11 @@ async function addParachainsToGenesis(
 		return { isSimple: true, ...p };
 	});
 	let paras = x.concat(y);
-	let chainSpecRawPathMap = new Map();
+	let paraChainSpecRawPaths = new Map();
 
 	for (const parachain of paras) {
-		const { isSimple, id, resolvedId, protocolId, chain } = parachain;
-		const bin = resolve(config_dir, parachain.bin);
+		const { isSimple, id, resolvedId, protocolId, chain = "local" } = parachain;
+		const bin = path.resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
 			process.exit();
@@ -214,12 +217,17 @@ async function addParachainsToGenesis(
 		// If it isn't registered yet, register the parachain in genesis
 		if (!registeredParachains[resolvedId]) {
 			// Build the genesis
-			const chainSpecPath = `${resolvedId}.json`;
-			const chainSpecRawPath = `${resolvedId}-raw.json`;
-			await generateChainSpec(bin, "local", chainSpecPath);
+			const paraChainSpecPath = path.resolve(runConfig.out, `${resolvedId}.json`);
+			const paraChainSpecRawPath = path.resolve(runConfig.out, `${resolvedId}-raw.json`);
+			await generateChainSpec(bin, chain, paraChainSpecPath, runConfig);
 			// Need to read the generated spec file and update the paraID inside
-			await updateParachainGenesis(chainSpecPath, resolvedId, protocolId);
-			await generateChainSpecRaw(bin, {type: 'path', chain: chainSpecPath}, chainSpecRawPath);
+			await updateParachainGenesis(paraChainSpecPath, resolvedId, protocolId);
+			await generateChainSpecRaw(
+				bin,
+				{type: 'path', chain: paraChainSpecPath},
+				paraChainSpecRawPath,
+				runConfig
+			);
 
 			// Get the information required to register the parachain in genesis.
 			let genesisState: string;
@@ -227,8 +235,8 @@ async function addParachainsToGenesis(
 			try {
 				// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
 				// not necessary for it anyway), so we don't pass it here.
-				genesisState = await exportGenesisState(bin, isSimple ? undefined : chainSpecRawPath);
-				genesisWasm = await exportGenesisWasm(bin, isSimple ? undefined : chainSpecRawPath);
+				genesisState = await exportGenesisState(bin, isSimple ? undefined : paraChainSpecRawPath);
+				genesisWasm = await exportGenesisWasm(bin, isSimple ? undefined : paraChainSpecRawPath);
 			} catch (err) {
 				console.error(err);
 				process.exit(1);
@@ -244,10 +252,10 @@ async function addParachainsToGenesis(
 
 			// Some data keeping
 			registeredParachains[resolvedId] = true;
-			chainSpecRawPathMap.set(resolvedId, chainSpecRawPath);
+			paraChainSpecRawPaths.set(resolvedId, paraChainSpecRawPath);
 		}
 	}
-	return chainSpecRawPathMap;
+	return paraChainSpecRawPaths;
 }
 
 async function addHrmpChannelsToGenesis(
@@ -263,7 +271,8 @@ async function addHrmpChannelsToGenesis(
 // Resolves parachain id from chain spec if not specified
 async function resolveParachainId(
 	config_dir: string,
-	config: LaunchConfig
+	config: LaunchConfig,
+	runConfig: RunConfig
 ): Promise<ResolvedLaunchConfig> {
 	console.log(`\n🧹 Resolving parachain id...`);
 	const resolvedConfig = config as ResolvedLaunchConfig;
@@ -271,8 +280,9 @@ async function resolveParachainId(
 		if (parachain.id) {
 			parachain.resolvedId = parachain.id;
 		} else {
-			const bin = resolve(config_dir, parachain.bin);
-			const paraId = await getParachainIdFromSpec(bin, parachain.chain);
+			const bin = path.resolve(config_dir, parachain.bin);
+			const paraChainType = parachain.chain || 'local';
+			const paraId = await getParachainIdFromSpec(bin, paraChainType, runConfig);
 			console.log(`  ✓ Read parachain id for ${parachain.bin}: ${paraId}`);
 			parachain.resolvedId = paraId.toString();
 		}

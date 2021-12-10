@@ -52,27 +52,36 @@ const config = {
 			balance: "1000000000000000000000",
 			nodes: [
 				{
+					name: "alice",
 					wsPort: 9988,
 					rpcPort: 9888,
 					port: 31200,
-					name: "alice",
+					flags,
+				},
+		// 		{
+		// 			wsPort: 9999,
+		// 			rpcPort: 9899,
+		// 			port: 31300,
+		// 			name: "bob",
+		// 			flags,
+		// 		},
+		// 	],
+		},
+		{
+			bin: "/home/jimmychu/remote-builds/substrate-parachain-template/target/release/parachain-collator",
+			id: 300,
+			protocolId: "para-second",
+			balance: "1000000000000000000000",
+			nodes: [
+				{
+					name: "bob",
+					wsPort: 9999,
+					rpcPort: 9899,
+					port: 31300,
 					flags,
 				},
 			],
 		},
-		// {
-		// 	bin: "./bin/polkadot-collator",
-		// 	id: "300",
-		// 	balance: "1000000000000000000000",
-		// 	nodes: [
-		// 		{
-		// 			wsPort: 9999,
-		// 			port: 31300,
-		// 			name: "alice",
-		// 			flags,
-		// 		},
-		// 	],
-		// },
 	],
 	simpleParachains: [
 		// {
