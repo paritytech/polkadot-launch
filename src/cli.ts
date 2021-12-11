@@ -2,8 +2,8 @@
 import { resolve, dirname } from "path";
 import fs from "fs";
 import path from "path";
-import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 
 import { killAll } from "./spawn";
 import { LaunchConfig, RunConfig } from "./types";
@@ -14,51 +14,59 @@ import { run } from "./runner";
 // relative path. So the `config.json` file is what we will be our starting point.
 
 yargs(hideBin(process.argv))
-	.command('$0 [options] <config_file>', 'Launching Polkadot network locally', () => {}, argv => {
-		const { verbose, config_file: configFile } = argv;
-		const configPath = resolve(process.cwd(), configFile as string);
-		const configDir = dirname(configPath);
-		if (!fs.existsSync(configPath)) {
-			console.error("Config file does not exist: ", configPath);
-			process.exit();
+	.command(
+		"$0 [options] <config_file>",
+		"Launching Polkadot network locally",
+		() => {},
+		(argv) => {
+			const { verbose, config_file: configFile } = argv;
+			const configPath = resolve(process.cwd(), configFile as string);
+			const configDir = dirname(configPath);
+			if (!fs.existsSync(configPath)) {
+				console.error("Config file does not exist: ", configPath);
+				process.exit();
+			}
+
+			const launchConfig: LaunchConfig = require(configPath);
+
+			// runConfig initialization
+			const runConfig: RunConfig = {
+				verbose: (verbose as number) || 0,
+				out: (argv.out as string) || process.cwd(),
+			};
+
+			// folder creation. Creating the inner folder `./logs` also create the parent folder.
+			const folderPath = path.resolve(runConfig.out, "logs");
+			try {
+				createFolder(folderPath);
+			} catch (err) {
+				console.error(
+					`Cannot create output folder at ${runConfig.out}. Err: ${(
+						err as Error
+					).toString()}`
+				);
+				process.exit();
+			}
+
+			// Run the main process
+			run(configDir, launchConfig, runConfig);
 		}
-
-		const launchConfig: LaunchConfig = require(configPath);
-
-		// runConfig initialization
-		const runConfig: RunConfig = {
-			verbose: verbose as number || 0,
-			out: argv.out as string || process.cwd()
-		};
-
-		// folder creation. Creating the inner folder `./logs` also create the parent folder.
-		const folderPath = path.resolve(runConfig.out, 'logs');
-		try {
-			createFolder(folderPath);
-		} catch (err) {
-			console.error(`Cannot create output folder at ${runConfig.out}. Err: ${(err as Error).toString()}`);
-			process.exit();
-		}
-
-		// Run the main process
-		run(configDir, launchConfig, runConfig);
+	)
+	.option("verbose", {
+		alias: "v",
+		describe: "Verbose logging",
+		count: true,
 	})
-	.option('verbose', {
-		alias: 'v',
-		describe: 'Verbose logging',
-		count: true
+	.option("out", {
+		alias: "o",
+		describe: "Folder that assets and logs output to",
+		normalize: true,
 	})
-	.option('out', {
-		alias: 'o',
-		describe: 'Folder that assets and logs output to',
-		normalize: true
-	})
-	.option('help', {
-		alias: 'h',
-		describe: 'Show help',
-		help: true
-	})
-	.argv;
+	.option("help", {
+		alias: "h",
+		describe: "Show help",
+		help: true,
+	}).argv;
 
 // Kill all processes when exiting.
 process.on("exit", function () {

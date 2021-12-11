@@ -165,7 +165,9 @@ export async function addGenesisHrmpChannel(
 
 		let data = JSON.stringify(chainSpec, null, 2);
 		fs.writeFileSync(spec, data);
-		console.log(`  ✅ Added HRMP channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`);
+		console.log(
+			`  ✅ Added HRMP channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`
+		);
 	} else {
 		console.error("  ⚠️ hrmp not found in runtimeConfig");
 		process.exit(1);
@@ -204,7 +206,9 @@ function findAndReplaceConfig(obj1: any, obj2: any) {
 				findAndReplaceConfig(obj1[key], obj2[key]);
 			} else {
 				obj2[key] = obj1[key];
-				console.log(`  ✅ Updated Genesis Configuration [ ${key}: ${obj2[key]} ]`);
+				console.log(
+					`  ✅ Updated Genesis Configuration [ ${key}: ${obj2[key]} ]`
+				);
 			}
 		} else {
 			console.error(`  ⚠️ Bad Genesis Configuration [ ${key}: ${obj1[key]} ]`);
@@ -221,18 +225,22 @@ export async function addBootNodes(spec: any, addresses: any) {
 	console.log(`Added Boot Nodes: ${addresses}`);
 }
 
-export async function updateParachainGenesis(specPath: string, paraId: string, protocolId?: string) {
-	console.log(`specPath: ${specPath}, paraId: ${paraId}`)
+export async function updateParachainGenesis(
+	specPath: string,
+	paraId: string,
+	protocolId?: string
+) {
+	console.log(`specPath: ${specPath}, paraId: ${paraId}`);
 	let rawdata = fs.readFileSync(specPath);
 	let chainSpec = JSON.parse(rawdata);
 
 	// Update the ParaId
-	chainSpec['para_id'] = paraId;
+	chainSpec["para_id"] = paraId;
 	chainSpec.genesis.runtime.parachainInfo.parachainId = paraId;
 
 	// Update the protocolId
 	if (protocolId) {
-		chainSpec['protocolId'] = protocolId;
+		chainSpec["protocolId"] = protocolId;
 	}
 
 	let data = JSON.stringify(chainSpec, null, 2);
@@ -240,5 +248,7 @@ export async function updateParachainGenesis(specPath: string, paraId: string, p
 
 	const protocolIdPrompt = protocolId ? ` and protocolId: ${protocolId}` : null;
 
-	console.log(`Updated Parachain Genesis for ParaId: ${paraId}${protocolIdPrompt}`);
+	console.log(
+		`Updated Parachain Genesis for ParaId: ${paraId}${protocolIdPrompt}`
+	);
 }

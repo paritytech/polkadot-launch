@@ -14,9 +14,18 @@ import { CollatorOptions, RunConfig } from "./types";
 const p: { [key: string]: ChildProcessWithoutNullStreams } = {};
 
 // Output the chainspec of a node.
-export async function generateChainSpec(bin: string, chainType: string, outPath: string, runConfig: RunConfig) {
+export async function generateChainSpec(
+	bin: string,
+	chainType: string,
+	outPath: string,
+	runConfig: RunConfig
+) {
 	return new Promise<void>(function (resolve, reject) {
-		let args = ["build-spec", `--chain=${chainType}`, "--disable-default-bootnode"];
+		let args = [
+			"build-spec",
+			`--chain=${chainType}`,
+			"--disable-default-bootnode",
+		];
 		p["spec"] = spawnCmd(bin, args, runConfig.verbose);
 		let spec = fs.createWriteStream(path.resolve(outPath));
 
@@ -38,9 +47,9 @@ export async function generateChainSpec(bin: string, chainType: string, outPath:
 
 // Output the chainspec of a node using `--raw` from a JSON file.
 interface GenerateChainSpecRawIn {
-	type: 'path' | 'chainType',
-	chain: string
-};
+	type: "path" | "chainType";
+	chain: string;
+}
 
 export async function generateChainSpecRaw(
 	bin: string,
@@ -50,7 +59,8 @@ export async function generateChainSpecRaw(
 ) {
 	console.log(); // Add a newline in output
 	return new Promise<void>(function (resolve, reject) {
-		const rsChainIn = chainIn.type === 'chainType' ? `${chainIn.chain}.json` : chainIn.chain;
+		const rsChainIn =
+			chainIn.type === "chainType" ? `${chainIn.chain}.json` : chainIn.chain;
 		let args = ["build-spec", `--chain=${rsChainIn}`, "--raw"];
 		p["spec"] = spawnCmd(bin, args, runConfig.verbose);
 		let spec = fs.createWriteStream(chainOut);
@@ -73,7 +83,7 @@ export async function generateChainSpecRaw(
 export async function getParachainIdFromSpec(
 	bin: string,
 	chain: string,
-	runConfig: RunConfig,
+	runConfig: RunConfig
 ): Promise<number> {
 	const data = await new Promise<string>(function (resolve, reject) {
 		let args = ["build-spec"];
@@ -142,7 +152,7 @@ export function startNode(
 	}
 
 	p[name] = spawnCmd(bin, args, runConfig.verbose);
-	const logPath = path.resolve(runConfig.out, 'logs', `${name}.log`)
+	const logPath = path.resolve(runConfig.out, "logs", `${name}.log`);
 	const log = fs.createWriteStream(logPath);
 
 	p[name].stdout.pipe(log);
@@ -150,7 +160,8 @@ export function startNode(
 }
 
 async function execFile(file: string, args: Array<string>, verbose: number) {
-	verbose > 0 && console.debug(`Running: ${chalk.green(`${file} ${args.join(' ')}`)}`);
+	verbose > 0 &&
+		console.debug(`Running: ${chalk.green(`${file} ${args.join(" ")}`)}`);
 
 	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
 	// advance. Hopefully, this generous limit will be enough.
@@ -210,7 +221,7 @@ export function startCollator(
 
 		rpcPort && args.push("--rpc-port=" + rpcPort);
 		args.push("--collator");
-		args.push(basePath ? `--base-path=${basePath}` : '--tmp');
+		args.push(basePath ? `--base-path=${basePath}` : "--tmp");
 		name && args.push(`--${name.toLowerCase()}`);
 		onlyOneParachainNode && args.push("--force-authoring");
 		paraChainSpecRawPath && args.push("--chain=" + paraChainSpecRawPath);
@@ -237,7 +248,7 @@ export function startCollator(
 
 		p[wsPort] = spawnCmd(bin, args, runConfig.verbose);
 
-		const logPath = path.resolve(runConfig.out, 'logs', `${wsPort}.log`)
+		const logPath = path.resolve(runConfig.out, "logs", `${wsPort}.log`);
 		const log = fs.createWriteStream(logPath);
 
 		p[wsPort].stdout.pipe(log);
@@ -260,17 +271,13 @@ export function startSimpleCollator(
 	runConfig: RunConfig
 ) {
 	return new Promise<void>(function (resolve) {
-		let args = [
-			"--tmp",
-			`--port=${port}`,
-			"--execution=wasm",
-		];
+		let args = ["--tmp", `--port=${port}`, "--execution=wasm"];
 
 		!skip_id_arg && args.push("--parachain-id=" + id);
 
 		p[port] = spawnCmd(bin, args, runConfig.verbose);
 
-		const logPath = path.resolve(runConfig.out, 'logs', `${port}.log`)
+		const logPath = path.resolve(runConfig.out, "logs", `${port}.log`);
 		const log = fs.createWriteStream(logPath);
 
 		p[port].stdout.pipe(log);
@@ -320,7 +327,7 @@ export function killAll() {
 }
 
 function spawnCmd(cmd: string, args: Array<string>, verbose: number) {
-	verbose > 0 && console.debug(`Running: ${chalk.green(`${cmd} ${args.join(' ')}`)}`);
+	verbose > 0 &&
+		console.debug(`Running: ${chalk.green(`${cmd} ${args.join(" ")}`)}`);
 	return spawn(cmd, args);
 }
-

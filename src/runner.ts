@@ -58,7 +58,11 @@ function loadTypeDef(types: string | object): object {
 // keep track of registered parachains
 let registeredParachains: { [key: string]: boolean } = {};
 
-export async function run(config_dir: string, rawConfig: LaunchConfig, runConfig: RunConfig) {
+export async function run(
+	config_dir: string,
+	rawConfig: LaunchConfig,
+	runConfig: RunConfig
+) {
 	// We need to reset that variable when running a new network
 	registeredParachains = {};
 	// Verify that the `config.json` has all the expected properties.
@@ -74,9 +78,17 @@ export async function run(config_dir: string, rawConfig: LaunchConfig, runConfig
 		process.exit();
 	}
 	const relayChainType = config.relaychain.chain;
-	const relayChainSpecPath = path.resolve(runConfig.out, `${relayChainType}.json`);
+	const relayChainSpecPath = path.resolve(
+		runConfig.out,
+		`${relayChainType}.json`
+	);
 
-	await generateChainSpec(relay_chain_bin, relayChainType, relayChainSpecPath, runConfig);
+	await generateChainSpec(
+		relay_chain_bin,
+		relayChainType,
+		relayChainSpecPath,
+		runConfig
+	);
 
 	// -- Start Chain Spec Modify --
 	clearAuthorities(relayChainSpecPath);
@@ -103,8 +115,16 @@ export async function run(config_dir: string, rawConfig: LaunchConfig, runConfig
 	addBootNodes(relayChainSpecPath, bootnodes);
 
 	// -- End Chain Spec Modify --
-	const relayChainSpecRawPath = path.resolve(runConfig.out, `${relayChainType}-raw.json`);
-	await generateChainSpecRaw(relay_chain_bin, {type: 'path', chain: relayChainSpecPath}, relayChainSpecRawPath, runConfig);
+	const relayChainSpecRawPath = path.resolve(
+		runConfig.out,
+		`${relayChainType}-raw.json`
+	);
+	await generateChainSpecRaw(
+		relay_chain_bin,
+		{ type: "path", chain: relayChainSpecPath },
+		relayChainSpecRawPath,
+		runConfig
+	);
 
 	// First we launch each of the validators for the relay chain.
 	for (const node of config.relaychain.nodes) {
@@ -148,15 +168,24 @@ export async function run(config_dir: string, rawConfig: LaunchConfig, runConfig
 			console.log(
 				`Starting a Collator for Parachain ${resolvedId} (${account}) - wsPort: ${wsPort}, rpcPort: ${rpcPort}, port: ${port}`
 			);
-			await startCollator(bin, resolvedId, wsPort, rpcPort, port, {
-				name,
-				paraChainSpecRawPath: paraChainSpecRawPaths.get(parseInt(resolvedId)) as string,
-				relayChainSpecRawPath,
-				flags,
-				basePath,
-				onlyOneParachainNode: config.parachains.length === 1,
-			},
-			runConfig);
+			await startCollator(
+				bin,
+				resolvedId,
+				wsPort,
+				rpcPort,
+				port,
+				{
+					name,
+					paraChainSpecRawPath: paraChainSpecRawPaths.get(
+						parseInt(resolvedId)
+					) as string,
+					relayChainSpecRawPath,
+					flags,
+					basePath,
+					onlyOneParachainNode: config.parachains.length === 1,
+				},
+				runConfig
+			);
 		}
 
 		// Allow time for the TX to complete, avoiding nonce issues.
@@ -177,9 +206,18 @@ export async function run(config_dir: string, rawConfig: LaunchConfig, runConfig
 			}
 
 			let account = parachainAccount(resolvedId);
-			console.log(`Starting Simple Parachain ${resolvedId}: ${account} - port: ${port}`);
+			console.log(
+				`Starting Simple Parachain ${resolvedId}: ${account} - port: ${port}`
+			);
 			const skipIdArg = !id;
-			await startSimpleCollator(bin, resolvedId, "local", port, skipIdArg, runConfig);
+			await startSimpleCollator(
+				bin,
+				resolvedId,
+				"local",
+				port,
+				skipIdArg,
+				runConfig
+			);
 
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.
@@ -192,7 +230,9 @@ export async function run(config_dir: string, rawConfig: LaunchConfig, runConfig
 	// We don't need the PolkadotJs API anymore
 	await relayChainApi.disconnect();
 
-	console.log(`🚀 === ${chalk.yellow.inverse.bold('POLKADOT LAUNCH COMPLETE')} === 🚀`);
+	console.log(
+		`🚀 === ${chalk.yellow.inverse.bold("POLKADOT LAUNCH COMPLETE")} === 🚀`
+	);
 }
 
 async function addParachainsToGenesis(
@@ -200,7 +240,7 @@ async function addParachainsToGenesis(
 	spec: string,
 	parachains: ResolvedParachainConfig[],
 	simpleParachains: ResolvedSimpleParachainConfig[],
-	runConfig: RunConfig,
+	runConfig: RunConfig
 ): Promise<Map<number, string>> {
 	console.log("\n⛓ Adding Genesis Parachains");
 
@@ -229,13 +269,16 @@ async function addParachainsToGenesis(
 			if (!isSimple) {
 				// Build the genesis
 				paraChainSpecPath = path.resolve(runConfig.out, `${resolvedId}.json`);
-				paraChainSpecRawPath = path.resolve(runConfig.out, `${resolvedId}-raw.json`);
+				paraChainSpecRawPath = path.resolve(
+					runConfig.out,
+					`${resolvedId}-raw.json`
+				);
 				await generateChainSpec(bin, chain, paraChainSpecPath, runConfig);
 				// Need to read the generated spec file and update the paraID inside
 				await updateParachainGenesis(paraChainSpecPath, resolvedId, protocolId);
 				await generateChainSpecRaw(
 					bin,
-					{type: 'path', chain: paraChainSpecPath},
+					{ type: "path", chain: paraChainSpecPath },
 					paraChainSpecRawPath,
 					runConfig
 				);
@@ -247,8 +290,16 @@ async function addParachainsToGenesis(
 			try {
 				// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
 				// not necessary for it anyway), so we don't pass it here.
-				genesisState = await exportGenesisState(bin, paraChainSpecRawPath, runConfig);
-				genesisWasm = await exportGenesisWasm(bin, paraChainSpecRawPath, runConfig);
+				genesisState = await exportGenesisState(
+					bin,
+					paraChainSpecRawPath,
+					runConfig
+				);
+				genesisWasm = await exportGenesisWasm(
+					bin,
+					paraChainSpecRawPath,
+					runConfig
+				);
 			} catch (err) {
 				console.error(err);
 				process.exit(1);
@@ -293,8 +344,12 @@ async function resolveParachainId(
 			parachain.resolvedId = parachain.id;
 		} else {
 			const bin = path.resolve(config_dir, parachain.bin);
-			const paraChainType = parachain.chain || 'local';
-			const paraId = await getParachainIdFromSpec(bin, paraChainType, runConfig);
+			const paraChainType = parachain.chain || "local";
+			const paraId = await getParachainIdFromSpec(
+				bin,
+				paraChainType,
+				runConfig
+			);
 			console.log(`  ✓ Read parachain id for ${parachain.bin}: ${paraId}`);
 			parachain.resolvedId = paraId.toString();
 		}
