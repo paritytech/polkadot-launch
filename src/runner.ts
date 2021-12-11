@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+import path from "path";
+import fs from "fs";
+import { keys as libp2pKeys } from "libp2p-crypto";
+import { hexAddPrefix, hexStripPrefix, hexToU8a } from "@polkadot/util";
+import PeerId from "peer-id";
+import chalk from "chalk";
 
 import {
 	startNode,
@@ -24,9 +30,6 @@ import {
 import { parachainAccount } from "./parachain";
 import { ApiPromise } from "@polkadot/api";
 import { randomAsHex } from "@polkadot/util-crypto";
-
-import path from "path";
-import fs from "fs";
 import type {
 	LaunchConfig,
 	RunConfig,
@@ -36,9 +39,6 @@ import type {
 	ResolvedLaunchConfig,
 	GenesisParachain,
 } from "./types";
-import { keys as libp2pKeys } from "libp2p-crypto";
-import { hexAddPrefix, hexStripPrefix, hexToU8a } from "@polkadot/util";
-import PeerId from "peer-id";
 
 function loadTypeDef(types: string | object): object {
 	if (typeof types === "string") {
@@ -75,15 +75,19 @@ export async function run(config_dir: string, rawConfig: LaunchConfig, runConfig
 	}
 	const relayChainType = config.relaychain.chain;
 	const relayChainSpecPath = path.resolve(runConfig.out, `${relayChainType}.json`);
+
 	await generateChainSpec(relay_chain_bin, relayChainType, relayChainSpecPath, runConfig);
+
 	// -- Start Chain Spec Modify --
 	clearAuthorities(relayChainSpecPath);
 	for (const node of config.relaychain.nodes) {
 		await addAuthority(relayChainSpecPath, node.name);
 	}
+
 	if (config.relaychain.genesis) {
 		await changeGenesisConfig(relayChainSpecPath, config.relaychain.genesis);
 	}
+
 	const paraChainSpecRawPaths = await addParachainsToGenesis(
 		config_dir,
 		relayChainSpecPath,
@@ -91,13 +95,16 @@ export async function run(config_dir: string, rawConfig: LaunchConfig, runConfig
 		config.simpleParachains,
 		runConfig
 	);
+
 	if (config.hrmpChannels) {
 		await addHrmpChannelsToGenesis(relayChainSpecPath, config.hrmpChannels);
 	}
+
 	addBootNodes(relayChainSpecPath, bootnodes);
+
 	// -- End Chain Spec Modify --
 	const relayChainSpecRawPath = path.resolve(runConfig.out, `${relayChainType}-raw.json`);
-	await generateChainSpecRaw(relay_chain_bin, {type: 'chainType', chain: relayChainType}, relayChainSpecRawPath, runConfig);
+	await generateChainSpecRaw(relay_chain_bin, {type: 'path', chain: relayChainSpecPath}, relayChainSpecRawPath, runConfig);
 
 	// First we launch each of the validators for the relay chain.
 	for (const node of config.relaychain.nodes) {
@@ -143,8 +150,8 @@ export async function run(config_dir: string, rawConfig: LaunchConfig, runConfig
 			);
 			await startCollator(bin, resolvedId, wsPort, rpcPort, port, {
 				name,
-				chain: relayChainType,
-				spec: paraChainSpecRawPaths.get(parseInt(resolvedId)),
+				paraChainSpecRawPath: paraChainSpecRawPaths.get(parseInt(resolvedId)) as string,
+				relayChainSpecRawPath,
 				flags,
 				basePath,
 				onlyOneParachainNode: config.parachains.length === 1,
@@ -170,7 +177,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig, runConfig
 			}
 
 			let account = parachainAccount(resolvedId);
-			console.log(`Starting Parachain ${resolvedId}: ${account}`);
+			console.log(`Starting Simple Parachain ${resolvedId}: ${account} - port: ${port}`);
 			const skipIdArg = !id;
 			await startSimpleCollator(bin, resolvedId, "local", port, skipIdArg, runConfig);
 
@@ -185,7 +192,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig, runConfig
 	// We don't need the PolkadotJs API anymore
 	await relayChainApi.disconnect();
 
-	console.log("🚀 POLKADOT LAUNCH COMPLETE 🚀");
+	console.log(`🚀 === ${chalk.yellow.inverse.bold('POLKADOT LAUNCH COMPLETE')} === 🚀`);
 }
 
 async function addParachainsToGenesis(
@@ -216,18 +223,23 @@ async function addParachainsToGenesis(
 		}
 		// If it isn't registered yet, register the parachain in genesis
 		if (!registeredParachains[resolvedId]) {
-			// Build the genesis
-			const paraChainSpecPath = path.resolve(runConfig.out, `${resolvedId}.json`);
-			const paraChainSpecRawPath = path.resolve(runConfig.out, `${resolvedId}-raw.json`);
-			await generateChainSpec(bin, chain, paraChainSpecPath, runConfig);
-			// Need to read the generated spec file and update the paraID inside
-			await updateParachainGenesis(paraChainSpecPath, resolvedId, protocolId);
-			await generateChainSpecRaw(
-				bin,
-				{type: 'path', chain: paraChainSpecPath},
-				paraChainSpecRawPath,
-				runConfig
-			);
+			let paraChainSpecPath;
+			let paraChainSpecRawPath;
+
+			if (!isSimple) {
+				// Build the genesis
+				paraChainSpecPath = path.resolve(runConfig.out, `${resolvedId}.json`);
+				paraChainSpecRawPath = path.resolve(runConfig.out, `${resolvedId}-raw.json`);
+				await generateChainSpec(bin, chain, paraChainSpecPath, runConfig);
+				// Need to read the generated spec file and update the paraID inside
+				await updateParachainGenesis(paraChainSpecPath, resolvedId, protocolId);
+				await generateChainSpecRaw(
+					bin,
+					{type: 'path', chain: paraChainSpecPath},
+					paraChainSpecRawPath,
+					runConfig
+				);
+			}
 
 			// Get the information required to register the parachain in genesis.
 			let genesisState: string;
@@ -235,8 +247,8 @@ async function addParachainsToGenesis(
 			try {
 				// adder-collator does not support `--parachain-id` for export-genesis-state (and it is
 				// not necessary for it anyway), so we don't pass it here.
-				genesisState = await exportGenesisState(bin, isSimple ? undefined : paraChainSpecRawPath);
-				genesisWasm = await exportGenesisWasm(bin, isSimple ? undefined : paraChainSpecRawPath);
+				genesisState = await exportGenesisState(bin, paraChainSpecRawPath, runConfig);
+				genesisWasm = await exportGenesisWasm(bin, paraChainSpecRawPath, runConfig);
 			} catch (err) {
 				console.error(err);
 				process.exit(1);

@@ -14,10 +14,7 @@ import { run } from "./runner";
 // relative path. So the `config.json` file is what we will be our starting point.
 
 yargs(hideBin(process.argv))
-	.command('$0 <config_file>', 'Launching Polkadot network locally', () => {}, argv => {
-		console.log(argv);
-		console.log(argv);
-
+	.command('$0 [options] <config_file>', 'Launching Polkadot network locally', () => {}, argv => {
 		const { verbose, config_file: configFile } = argv;
 		const configPath = resolve(process.cwd(), configFile as string);
 		const configDir = dirname(configPath);

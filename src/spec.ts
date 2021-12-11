@@ -23,7 +23,7 @@ function getAuthorityKeys(chainSpec: ChainSpec) {
 		return runtimeConfig.palletSession.keys;
 	}
 
-	console.error("  ⚠ session not found in runtimeConfig");
+	console.error("  ⚠️ session not found in runtimeConfig");
 	process.exit(1);
 }
 
@@ -34,7 +34,7 @@ export function clearAuthorities(spec: string) {
 	try {
 		chainSpec = JSON.parse(rawdata);
 	} catch {
-		console.error("  ⚠ failed to parse the chain spec");
+		console.error("  ⚠️ failed to parse the chain spec");
 		process.exit(1);
 	}
 
@@ -123,9 +123,9 @@ export async function addGenesisParachain(
 
 		let data = JSON.stringify(chainSpec, null, 2);
 		fs.writeFileSync(spec, data);
-		console.log(`  ✓ Added Genesis Parachain ${para_id}`);
+		console.log(`  ✅ Added Genesis Parachain ${para_id}`);
 	} else {
-		console.error("  ⚠ paras not found in runtimeConfig");
+		console.error("  ⚠️ paras not found in runtimeConfig");
 		process.exit(1);
 	}
 }
@@ -165,11 +165,9 @@ export async function addGenesisHrmpChannel(
 
 		let data = JSON.stringify(chainSpec, null, 2);
 		fs.writeFileSync(spec, data);
-		console.log(
-			`  ✓ Added HRMP channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`
-		);
+		console.log(`  ✅ Added HRMP channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`);
 	} else {
-		console.error("  ⚠ hrmp not found in runtimeConfig");
+		console.error("  ⚠️ hrmp not found in runtimeConfig");
 		process.exit(1);
 	}
 }
@@ -180,7 +178,7 @@ export async function changeGenesisConfig(spec: string, updates: any) {
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec = JSON.parse(rawdata);
 
-	console.log(`\n⚙ Updating Relay Chain Genesis Configuration`);
+	console.log(`\n⚙️ Updating Relay Chain Genesis Configuration`);
 
 	if (chainSpec.genesis) {
 		let config = chainSpec.genesis;
@@ -206,12 +204,10 @@ function findAndReplaceConfig(obj1: any, obj2: any) {
 				findAndReplaceConfig(obj1[key], obj2[key]);
 			} else {
 				obj2[key] = obj1[key];
-				console.log(
-					`  ✓ Updated Genesis Configuration [ ${key}: ${obj2[key]} ]`
-				);
+				console.log(`  ✅ Updated Genesis Configuration [ ${key}: ${obj2[key]} ]`);
 			}
 		} else {
-			console.error(`  ⚠ Bad Genesis Configuration [ ${key}: ${obj1[key]} ]`);
+			console.error(`  ⚠️ Bad Genesis Configuration [ ${key}: ${obj1[key]} ]`);
 		}
 	});
 }

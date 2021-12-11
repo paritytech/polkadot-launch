@@ -6,20 +6,19 @@ import {
 import util from "util";
 import fs from "fs";
 import path from "path";
+import chalk from "chalk";
 import { CollatorOptions, RunConfig } from "./types";
 
 // This tracks all the processes that we spawn from this file.
 // Used to clean up processes when exiting this program.
 const p: { [key: string]: ChildProcessWithoutNullStreams } = {};
 
-const execFile = util.promisify(ex);
-
 // Output the chainspec of a node.
 export async function generateChainSpec(bin: string, chainType: string, outPath: string, runConfig: RunConfig) {
 	return new Promise<void>(function (resolve, reject) {
 		let args = ["build-spec", `--chain=${chainType}`, "--disable-default-bootnode"];
 		p["spec"] = spawnCmd(bin, args, runConfig.verbose);
-		let spec = fs.createWriteStream(`${runConfig.out}/outPath`);
+		let spec = fs.createWriteStream(path.resolve(outPath));
 
 		// `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
 		// before we resolve the promise.
@@ -150,39 +149,41 @@ export function startNode(
 	p[name].stderr.pipe(log);
 }
 
+async function execFile(file: string, args: Array<string>, verbose: number) {
+	verbose > 0 && console.debug(`Running: ${chalk.green(`${file} ${args.join(' ')}`)}`);
+
+	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
+	// advance. Hopefully, this generous limit will be enough.
+	const opts = { maxBuffer: 10 * 1024 * 1024 };
+	const execOut = await util.promisify(ex)(file, args, opts);
+	const stdout = execOut.stdout.toString().trim();
+	const stderr = execOut.stderr.toString().trim();
+
+	stderr.length > 0 && console.error(stderr);
+	return stdout;
+}
+
 // Export the genesis wasm for a parachain and return it as a hex encoded string starting with 0x.
 // Used for registering the parachain on the relay chain.
 export async function exportGenesisWasm(
 	bin: string,
-	chain?: string
+	chain: string | undefined,
+	runConfig: RunConfig
 ): Promise<string> {
-	let args = ["export-genesis-wasm"];
+	const args = ["export-genesis-wasm"];
 	chain && args.push("--chain=" + chain);
-
-	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
-	// advance. Hopefully, this generous limit will be enough.
-	let opts = { maxBuffer: 10 * 1024 * 1024 };
-	let { stdout, stderr } = await execFile(bin, args, opts);
-	if (stderr) {
-		console.error(stderr);
-	}
-	return stdout.trim();
+	return execFile(bin, args, runConfig.verbose);
 }
 
 /// Export the genesis state aka genesis head.
 export async function exportGenesisState(
 	bin: string,
-	chain?: string,
+	chain: string | undefined,
+	runConfig: RunConfig
 ): Promise<string> {
 	let args = ["export-genesis-state"];
 	chain && args.push("--chain=" + chain);
-
-	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
-	// advance. Hopefully, this generous limit will be enough.
-	let opts = { maxBuffer: 5 * 1024 * 1024 };
-	let { stdout, stderr } = await execFile(bin, args, opts);
-	stderr && console.error(stderr);
-	return stdout.trim();
+	return execFile(bin, args, runConfig.verbose);
 }
 
 // Start a collator node for a parachain.
@@ -197,35 +198,22 @@ export function startCollator(
 ) {
 	return new Promise<void>(function (resolve) {
 		// TODO: Make DB directory configurable rather than just `tmp`
-		let args = ["--ws-port=" + wsPort, "--port=" + port];
+		let args = [`--ws-port=${wsPort}`, `--port=${port}`];
 		const {
 			basePath,
 			name,
 			onlyOneParachainNode,
-			chain,
+			paraChainSpecRawPath,
+			relayChainSpecRawPath,
 			flags,
-			spec,
 		} = options;
 
-		if (rpcPort) {
-			args.push("--rpc-port=" + rpcPort);
-			console.log(`Added --rpc-port=" + ${rpcPort}`);
-		}
+		rpcPort && args.push("--rpc-port=" + rpcPort);
 		args.push("--collator");
-		basePath ? args.push("--base-path=" + basePath) : args.push("--tmp");
-
-		if (name) {
-			args.push(`--${name.toLowerCase()}`);
-			console.log(`Added --${name.toLowerCase()}`);
-		}
-		if (onlyOneParachainNode) {
-			args.push("--force-authoring");
-			console.log(`Added --force-authoring`);
-		}
-		if (chain) {
-			args.push("--chain=" + chain);
-			console.log(`Added --chain=${chain}`);
-		}
+		args.push(basePath ? `--base-path=${basePath}` : '--tmp');
+		name && args.push(`--${name.toLowerCase()}`);
+		onlyOneParachainNode && args.push("--force-authoring");
+		paraChainSpecRawPath && args.push("--chain=" + paraChainSpecRawPath);
 
 		let flags_collator = null;
 		let flags_parachain = null;
@@ -238,20 +226,14 @@ export function startCollator(
 			flags_collator = flags ? flags.slice(split_index + 1) : null;
 		}
 
-		if (flags_parachain) {
-			// Add any additional flags to the CLI
-			args = args.concat(flags_parachain);
-			console.log(`Added ${flags_parachain} to parachain`);
-		}
+		// Add any additional flags to the CLI
+		flags_parachain && (args = args.concat(flags_parachain));
 
 		// Arguments for the relay chain node part of the collator binary.
-		args = args.concat(["--", "--chain=" + spec]);
+		args = args.concat(["--", `--chain=${relayChainSpecRawPath}`]);
 
-		if (flags_collator) {
-			// Add any additional flags to the CLI
-			args = args.concat(flags_collator);
-			console.log(`Added ${flags_collator} to collator`);
-		}
+		// Add any additional flags to the CLI
+		flags_collator && (args = args.concat(flags_collator));
 
 		p[wsPort] = spawnCmd(bin, args, runConfig.verbose);
 
@@ -280,15 +262,11 @@ export function startSimpleCollator(
 	return new Promise<void>(function (resolve) {
 		let args = [
 			"--tmp",
-			"--port=" + port,
-			"--chain=" + chainType,
+			`--port=${port}`,
 			"--execution=wasm",
 		];
 
-		if (!skip_id_arg) {
-			args.push("--parachain-id=" + id);
-			console.log(`Added --parachain-id=${id}`);
-		}
+		!skip_id_arg && args.push("--parachain-id=" + id);
 
 		p[port] = spawnCmd(bin, args, runConfig.verbose);
 
@@ -342,6 +320,7 @@ export function killAll() {
 }
 
 function spawnCmd(cmd: string, args: Array<string>, verbose: number) {
-	verbose > 0 && console.debug(`Running cmd: ${cmd} ${args.join(' ')}`);
+	verbose > 0 && console.debug(`Running: ${chalk.green(`${cmd} ${args.join(' ')}`)}`);
 	return spawn(cmd, args);
 }
+

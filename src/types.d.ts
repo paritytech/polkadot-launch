@@ -1,7 +1,7 @@
 export interface CollatorOptions {
 	name?: string;
-	chain?: string;
-	spec?: string;
+	relayChainSpecRawPath: string;
+	paraChainSpecRawPath: string;
 	flags?: string[];
 	basePath?: string;
 	onlyOneParachainNode?: boolean;

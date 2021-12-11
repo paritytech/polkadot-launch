@@ -58,14 +58,14 @@ const config = {
 					port: 31200,
 					flags,
 				},
-		// 		{
-		// 			wsPort: 9999,
-		// 			rpcPort: 9899,
-		// 			port: 31300,
-		// 			name: "bob",
-		// 			flags,
-		// 		},
-		// 	],
+				// {
+				// 	wsPort: 9999,
+				// 	rpcPort: 9899,
+				// 	port: 31300,
+				// 	name: "bob",
+				// 	flags,
+				// },
+			],
 		},
 		{
 			bin: "/home/jimmychu/remote-builds/substrate-parachain-template/target/release/parachain-collator",
@@ -84,21 +84,23 @@ const config = {
 		},
 	],
 	simpleParachains: [
-		// {
-		// 	bin: "./bin/adder-collator",
-		// 	id: "400",
-		// 	port: "31400",
-		// 	name: "alice",
-		// 	balance: "1000000000000000000000",
-		// },
+		{
+			bin: "/home/jimmychu/remote-builds/polkadot/target/release/adder-collator",
+			id: 400,
+			name: "alice",
+			balance: "1000000000000000000000",
+			// no `wsPort` for simpleParachains
+			// no `rpcPort` for simpleParachains
+			port: 31400,
+		},
 	],
 	hrmpChannels: [
-		// {
-		// 	sender: 200,
-		// 	recipient: 300,
-		// 	maxCapacity: 8,
-		// 	maxMessageSize: 512,
-		// },
+		{
+			sender: 200,
+			recipient: 300,
+			maxCapacity: 8,
+			maxMessageSize: 512,
+		},
 	],
 	types: {},
 	finalization: false,
