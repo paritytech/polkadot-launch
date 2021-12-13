@@ -7,6 +7,14 @@ describeParachain("Balance genesis", { chain: "rococo-local" }, (context) => {
 	it("should be accessible through web3", async function () {
 		const keyring = new Keyring({ type: "sr25519" });
 		const aliceRelay = keyring.addFromUri("//Alice");
+
+		//check parachain id
+		expect(
+			(
+				(await context._polkadotApiRelaychains[0].query.paras.parachains()) as any
+			)[0].toString()
+		).to.eq("1000");
+		// check genesis balance
 		expect(
 			(
 				await context.polkadotApiParaone.query.system.account(

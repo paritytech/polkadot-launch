@@ -145,9 +145,6 @@ export async function exportGenesisWasm(
 	chain?: string
 ): Promise<string> {
 	let args = ["export-genesis-wasm"];
-	if (chain) {
-		args.push("--chain=" + chain);
-	}
 
 	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
 	// advance. Hopefully, this generous limit will be enough.
@@ -162,13 +159,10 @@ export async function exportGenesisWasm(
 /// Export the genesis state aka genesis head.
 export async function exportGenesisState(
 	bin: string,
-	id?: string,
 	chain?: string
 ): Promise<string> {
 	let args = ["export-genesis-state"];
-	if (id) {
-		args.push("--parachain-id=" + id);
-	}
+
 	if (chain) {
 		args.push("--chain=" + chain);
 	}
@@ -186,7 +180,6 @@ export async function exportGenesisState(
 // Start a collator node for a parachain.
 export function startCollator(
 	bin: string,
-	id: string,
 	wsPort: number,
 	rpcPort: number | undefined,
 	port: number,
@@ -195,15 +188,7 @@ export function startCollator(
 	return new Promise<void>(function (resolve) {
 		// TODO: Make DB directory configurable rather than just `tmp`
 		let args = ["--ws-port=" + wsPort, "--port=" + port];
-		const {
-			basePath,
-			name,
-			skip_id_arg,
-			onlyOneParachainNode,
-			chain,
-			flags,
-			spec,
-		} = options;
+		const { basePath, name, onlyOneParachainNode, flags, spec } = options;
 
 		if (rpcPort) {
 			args.push("--rpc-port=" + rpcPort);
@@ -221,17 +206,10 @@ export function startCollator(
 			args.push(`--${name.toLowerCase()}`);
 			console.log(`Added --${name.toLowerCase()}`);
 		}
-		if (!skip_id_arg) {
-			args.push("--parachain-id=" + id);
-			console.log(`Added --parachain-id=${id}`);
-		}
+
 		if (onlyOneParachainNode) {
 			args.push("--force-authoring");
 			console.log(`Added --force-authoring`);
-		}
-		if (chain) {
-			args.push("--chain=" + chain);
-			console.log(`Added --chain=${chain}`);
 		}
 
 		let flags_collator = null;

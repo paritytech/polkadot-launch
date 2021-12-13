@@ -5,9 +5,9 @@ export const DISPLAY_LOG = process.env.PARACHAIN_LOG || false;
 export const PARACHAIN_LOG = process.env.PARACHAIN_LOG || "info";
 
 export const BINARY_PATH =
-	process.env.BINARY_PATH || `../bin/polkadot-collator-mac`;
+	process.env.BINARY_PATH || `../bin/polkadot-collator`;
 export const RELAY_BINARY_PATH =
-	process.env.RELAY_BINARY_PATH || `../bin/polkadot-relaychain-mac`;
+	process.env.RELAY_BINARY_PATH || `../bin/polkadot-relaychain`;
 export const SPAWNING_TIME = 20000;
 export const ETHAPI_CMD = process.env.ETHAPI_CMD || "";
 
