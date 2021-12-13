@@ -1,3 +1,11 @@
+export interface CollatorOptions {
+	name?: string;
+	spec?: string;
+	flags?: string[];
+	basePath?: string;
+	onlyOneParachainNode?: boolean;
+}
+
 export interface LaunchConfig {
 	relaychain: RelayChainConfig;
 	parachains: ParachainConfig[];
@@ -33,6 +41,9 @@ export interface HrmpChannelsConfig {
 	maxCapacity: number;
 	maxMessageSize: number;
 }
+interface ObjectJSON {
+	[key: string]: ObjectJSON | number | string;
+}
 export interface RelayChainConfig {
 	bin: string;
 	chain: string;
@@ -45,7 +56,7 @@ export interface RelayChainConfig {
 		port: number;
 		flags?: string[];
 	}[];
-	genesis?: JSON;
+	genesis?: JSON | ObjectJSON;
 }
 
 export interface ChainSpec {
