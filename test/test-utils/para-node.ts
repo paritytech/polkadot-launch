@@ -203,7 +203,10 @@ export async function startParachainNodes(options: ParachainOptions): Promise<{
 	process.once("exit", onProcessExit);
 	process.once("SIGINT", onProcessInterrupt);
 
-	await run(path.join(__dirname, "../"), launchConfig);
+	await run(path.join(__dirname, "../"), launchConfig, {
+		verbose: 0,
+		out: process.cwd(),
+	});
 
 	return {
 		relayPorts: new Array(numberOfParachains + 1).fill(0).map((_, i) => {
