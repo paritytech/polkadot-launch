@@ -141,7 +141,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 				name,
 				spec,
 				flags,
-				chain:paraChain,
+				chain: paraChain,
 				basePath,
 				onlyOneParachainNode: config.parachains.length === 1,
 			});
