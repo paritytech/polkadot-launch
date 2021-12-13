@@ -90,7 +90,9 @@ export async function getParachainIdFromSpec(
 	});
 
 	const spec = JSON.parse(data);
-	return spec.para_id;
+	
+	// Some parachains are still using snake_case format
+	return spec.paraId || spec.para_id;
 }
 
 // Spawn a new relay chain node.
