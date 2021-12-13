@@ -205,6 +205,10 @@ export function startCollator(
 		} else {
 			args.push("--tmp");
 		}
+		
+		if (chain) {
+			args.push("--chain=" + chain);
+		}
 
 		if (name) {
 			args.push(`--${name.toLowerCase()}`);
