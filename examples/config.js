@@ -57,7 +57,7 @@ const config = {
 					rpcPort: 9888,
 					port: 31200,
 					flags,
-				}
+				},
 			],
 		},
 		{
