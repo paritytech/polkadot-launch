@@ -3,6 +3,7 @@ export interface CollatorOptions {
 	spec?: string;
 	flags?: string[];
 	basePath?: string;
+	chain?:string;
 	onlyOneParachainNode?: boolean;
 }
 

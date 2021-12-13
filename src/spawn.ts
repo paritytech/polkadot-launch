@@ -146,6 +146,10 @@ export async function exportGenesisWasm(
 ): Promise<string> {
 	let args = ["export-genesis-wasm"];
 
+	if (chain) {
+		args.push("--chain=" + chain);
+	}
+
 	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
 	// advance. Hopefully, this generous limit will be enough.
 	let opts = { maxBuffer: 10 * 1024 * 1024 };

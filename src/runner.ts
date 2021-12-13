@@ -123,7 +123,7 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
-		const { id, resolvedId, balance } = parachain;
+		const { resolvedId, balance, chain: paraChain } = parachain;
 
 		const bin = resolve(config_dir, parachain.bin);
 		if (!fs.existsSync(bin)) {
@@ -137,11 +137,11 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 			console.log(
 				`Starting a Collator for parachain ${resolvedId}: ${account}, Collator port : ${port} wsPort : ${wsPort} rpcPort : ${rpcPort}`
 			);
-			const skip_id_arg = !id;
 			await startCollator(bin, wsPort, rpcPort, port, {
 				name,
 				spec,
 				flags,
+				chain:paraChain,
 				basePath,
 				onlyOneParachainNode: config.parachains.length === 1,
 			});
@@ -221,7 +221,7 @@ async function addParachainsToGenesis(
 			let genesisWasm: string;
 			try {
 				genesisState = await exportGenesisState(bin, chain);
-				genesisWasm = await exportGenesisWasm(bin);
+				genesisWasm = await exportGenesisWasm(bin, chain);
 			} catch (err) {
 				console.error(err);
 				process.exit(1);
