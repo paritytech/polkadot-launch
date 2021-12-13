@@ -44,26 +44,27 @@
 	"parachains": [
 		{
 			"bin": "./bin/polkadot-collator",
-			"id": "200",
+			"id": 200,
 			"balance": "1000000000000000000000",
 			"nodes": [
 				{
-					"wsPort": 9988,
-					"port": 31200,
 					"name": "alice",
+					"wsPort": 9988,
+					"rpcPort": 9888,
+					"port": 31200,
 					"flags": ["--", "--execution=wasm"]
 				}
 			]
 		},
 		{
 			"bin": "./bin/polkadot-collator",
-			"id": "300",
+			"id": 300,
 			"balance": "1000000000000000000000",
 			"nodes": [
 				{
+					"name": "alice",
 					"wsPort": 9999,
 					"port": 31300,
-					"name": "alice",
 					"flags": ["--", "--execution=wasm"]
 				}
 			]
@@ -72,10 +73,10 @@
 	"simpleParachains": [
 		{
 			"bin": "./bin/adder-collator",
-			"id": "400",
-			"port": "31400",
+			"id": 400,
 			"name": "alice",
-			"balance": "1000000000000000000000"
+			"balance": "1000000000000000000000",
+			"port": 31400
 		}
 	],
 	"hrmpChannels": [

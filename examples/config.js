@@ -3,7 +3,7 @@ const flags = ["--", "--execution=wasm"];
 
 const config = {
 	relaychain: {
-		bin: "/home/jimmychu/remote-builds/polkadot/target/release/polkadot",
+		bin: "./bin/polkadot",
 		chain: "rococo-local",
 		nodes: [
 			{
@@ -24,12 +24,12 @@ const config = {
 				rpcPort: 9866,
 				port: 30666,
 			},
-			// {
-			// 	name: "dave",
-			// 	wsPort: 9977,
-			// 	rpcPort: 9877,
-			// 	port: 30777,
-			// },
+			{
+				name: "dave",
+				wsPort: 9977,
+				rpcPort: 9877,
+				port: 30777,
+			},
 		],
 		genesis: {
 			runtime: {
@@ -46,7 +46,7 @@ const config = {
 	},
 	parachains: [
 		{
-			bin: "/home/jimmychu/remote-builds/substrate-parachain-template/target/release/parachain-collator",
+			bin: "./bin/polkadot-collator",
 			id: 200,
 			protocolId: "para-first",
 			balance: "1000000000000000000000",
@@ -57,24 +57,17 @@ const config = {
 					rpcPort: 9888,
 					port: 31200,
 					flags,
-				},
-				// {
-				// 	wsPort: 9999,
-				// 	rpcPort: 9899,
-				// 	port: 31300,
-				// 	name: "bob",
-				// 	flags,
-				// },
+				}
 			],
 		},
 		{
-			bin: "/home/jimmychu/remote-builds/substrate-parachain-template/target/release/parachain-collator",
+			bin: "./bin/polkadot-collator",
 			id: 300,
 			protocolId: "para-second",
 			balance: "1000000000000000000000",
 			nodes: [
 				{
-					name: "bob",
+					name: "alice",
 					wsPort: 9999,
 					rpcPort: 9899,
 					port: 31300,
@@ -85,7 +78,7 @@ const config = {
 	],
 	simpleParachains: [
 		{
-			bin: "/home/jimmychu/remote-builds/polkadot/target/release/adder-collator",
+			bin: "./bin/adder-collator",
 			id: 400,
 			name: "alice",
 			balance: "1000000000000000000000",
