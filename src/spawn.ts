@@ -148,6 +148,10 @@ export async function exportGenesisWasm(
 ): Promise<string> {
 	let args = ["export-genesis-wasm"];
 
+	if (chain) {
+		args.push("--chain=" + chain);
+	}
+
 	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
 	// advance. Hopefully, this generous limit will be enough.
 	let opts = { maxBuffer: 10 * 1024 * 1024 };
@@ -190,7 +194,8 @@ export function startCollator(
 	return new Promise<void>(function (resolve) {
 		// TODO: Make DB directory configurable rather than just `tmp`
 		let args = ["--ws-port=" + wsPort, "--port=" + port];
-		const { basePath, name, onlyOneParachainNode, flags, spec } = options;
+		const { basePath, name, onlyOneParachainNode, flags, spec, chain } =
+			options;
 
 		if (rpcPort) {
 			args.push("--rpc-port=" + rpcPort);
@@ -202,6 +207,10 @@ export function startCollator(
 			args.push("--base-path=" + basePath);
 		} else {
 			args.push("--tmp");
+		}
+
+		if (chain) {
+			args.push("--chain=" + chain);
 		}
 
 		if (name) {
