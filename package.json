@@ -1,6 +1,6 @@
 {
 	"name": "polkadot-launch",
-	"version": "1.10.0",
+	"version": "2.1.0",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
@@ -12,7 +12,8 @@
 		"start:debug": "node --inspect-brk -r ts-node/register src/cli.ts",
 		"lint": "prettier -v && prettier --check .",
 		"lint:write": "prettier --write .",
-		"para-test": "mocha -r ts-node/register 'test/tests/**/test-*.ts'"
+		"para-test": "mocha -r ts-node/register 'test/tests/**/test-*.ts'",
+		"para-test-no-ci": "mocha -r ts-node/register 'test/tests-no-ci/**/test-*.ts'"
 	},
 	"files": [
 		"dist"

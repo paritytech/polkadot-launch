@@ -110,7 +110,9 @@ export async function getParachainIdFromSpec(
 	});
 
 	const spec = JSON.parse(data);
-	return spec.para_id;
+	
+	// Some parachains are still using snake_case format
+	return spec.paraId || spec.para_id;
 }
 
 // Spawn a new relay chain node.
@@ -200,7 +202,6 @@ export async function exportGenesisState(
 // Start a collator node for a parachain.
 export function startCollator(
 	bin: string,
-	id: string,
 	wsPort: number,
 	rpcPort: number | undefined,
 	port: number,
