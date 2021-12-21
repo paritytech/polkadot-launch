@@ -20,11 +20,11 @@
 	],
 	"bin": "dist/cli.js",
 	"dependencies": {
-		"@polkadot/api": "^6.10.3",
-		"@polkadot/keyring": "^8.0.5",
-		"@polkadot/types": "^6.10.3",
-		"@polkadot/util": "^8.0.5",
-		"@polkadot/util-crypto": "^8.0.5",
+		"@polkadot/api": "^6.12.1",
+		"@polkadot/keyring": "^8.1.2",
+		"@polkadot/types": "^6.12.1",
+		"@polkadot/util": "^8.1.2",
+		"@polkadot/util-crypto": "^8.1.2",
 		"@types/chai": "^4.2.22",
 		"@types/mocha": "^9.0.0",
 		"chalk": "^4.1.2",
@@ -47,6 +47,5 @@
 		"web3": "^1.6.0",
 		"web3-core": "^1.6.0",
 		"web3-eth": "^1.6.0"
-	},
-	"packageManager": "yarn@3.1.1"
+	}
 }

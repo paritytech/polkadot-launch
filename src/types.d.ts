@@ -28,14 +28,14 @@ export interface ParachainNodeConfig {
 }
 export interface ParachainConfig {
 	bin: string;
-	id?: string;
+	id?: number;
 	balance: string;
 	chain?: string;
 	nodes: ParachainNodeConfig[];
 }
 export interface SimpleParachainConfig {
 	bin: string;
-	id: string;
+	id: number;
 	port: string;
 	balance: string;
 }
@@ -87,18 +87,18 @@ export interface ChainSpec {
 
 export interface GenesisParachain {
 	isSimple: boolean;
-	id?: string;
-	resolvedId: string;
+	id?: number;
+	resolvedId: number;
 	chain?: string;
 	protocolId?: string;
 	bin: string;
 }
 
 export interface ResolvedParachainConfig extends ParachainConfig {
-	resolvedId: string;
+	resolvedId: number;
 }
 export interface ResolvedSimpleParachainConfig extends SimpleParachainConfig {
-	resolvedId: string;
+	resolvedId: number;
 }
 export interface ResolvedLaunchConfig extends LaunchConfig {
 	parachains: ResolvedParachainConfig[];

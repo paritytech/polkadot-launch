@@ -415,7 +415,7 @@
     "@polkadot/util-crypto" "^8.1.2"
     rxjs "^7.4.0"
 
-"@polkadot/api@6.12.1", "@polkadot/api@^6.10.3":
+"@polkadot/api@6.12.1", "@polkadot/api@^6.12.1":
   version "6.12.1"
   resolved "https://registry.yarnpkg.com/@polkadot/api/-/api-6.12.1.tgz#685a2727eb532fdacd9b86f9ddf595d58be71ee4"
   integrity sha512-RVdTiA2WaEvproM3i6E9TKS1bfXpPd9Ly9lUG/kVLaspjKoIot9DJUDTl97TJ+7xr8LXGbXqm448Ud0hsEBV8Q==
@@ -432,7 +432,7 @@
     eventemitter3 "^4.0.7"
     rxjs "^7.4.0"
 
-"@polkadot/keyring@^8.0.5", "@polkadot/keyring@^8.1.2":
+"@polkadot/keyring@^8.1.2":
   version "8.2.2"
   resolved "https://registry.yarnpkg.com/@polkadot/keyring/-/keyring-8.2.2.tgz#7c5abaca88e8fa1a16c90be8fe74c1813c28997c"
   integrity sha512-GK8puQVtQJ67sVyq0WIWHPeRXfIcqz2ztgRHnGP4JEptS9NSFByQNq1EEpQnEUZwXu9CQfHz90eiLZc1BpC8lQ==
@@ -483,7 +483,7 @@
     "@polkadot/types" "6.12.1"
     "@polkadot/util" "^8.1.2"
 
-"@polkadot/types@6.12.1", "@polkadot/types@^6.10.3":
+"@polkadot/types@6.12.1", "@polkadot/types@^6.12.1":
   version "6.12.1"
   resolved "https://registry.yarnpkg.com/@polkadot/types/-/types-6.12.1.tgz#e5d6dff997740c3da947fa67abe2e1ec144c4757"
   integrity sha512-O37cAGUL0xiXTuO3ySweVh0OuFUD6asrd0TfuzGsEp3jAISWdElEHV5QDiftWq8J9Vf8BMgTcP2QLFbmSusxqA==
@@ -494,7 +494,7 @@
     "@polkadot/util-crypto" "^8.1.2"
     rxjs "^7.4.0"
 
-"@polkadot/util-crypto@8.2.2", "@polkadot/util-crypto@^8.0.5", "@polkadot/util-crypto@^8.1.2":
+"@polkadot/util-crypto@8.2.2", "@polkadot/util-crypto@^8.1.2":
   version "8.2.2"
   resolved "https://registry.yarnpkg.com/@polkadot/util-crypto/-/util-crypto-8.2.2.tgz#ccc5e5abec2431622dd5a2a885286633c2deb371"
   integrity sha512-bKFE6j1q2Dnz1o1QFvhX2QzkMLi9QHU4a5T7+El5J7OsOxGqssMAVHAmB+YoAuSLqPSQBmZa9CN23IiuJnfsbw==
@@ -511,7 +511,7 @@
     micro-base "^0.10.0"
     tweetnacl "^1.0.3"
 
-"@polkadot/util@8.2.2", "@polkadot/util@^8.0.5", "@polkadot/util@^8.1.2":
+"@polkadot/util@8.2.2", "@polkadot/util@^8.1.2":
   version "8.2.2"
   resolved "https://registry.yarnpkg.com/@polkadot/util/-/util-8.2.2.tgz#e3b30b90ade18032a28ac237dfa939adce43f2f4"
   integrity sha512-tiHe0rcQvofd3vUVCRmvfULAv9yBG7s/huv1ZLVY/JGT1JBDonc1HWU3Vdb5MvWpx2R+HHv19ORHyD/LiROE9A==

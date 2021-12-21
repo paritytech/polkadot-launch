@@ -171,14 +171,11 @@ export async function run(
 			await startCollator(
 				bin,
 				resolvedId,
-				wsPort,
 				rpcPort,
 				port,
 				{
 					name,
-					paraChainSpecRawPath: paraChainSpecRawPaths.get(
-						parseInt(resolvedId)
-					) as string,
+					paraChainSpecRawPath: paraChainSpecRawPaths.get(resolvedId) as string,
 					relayChainSpecRawPath,
 					flags,
 					basePath,
@@ -351,7 +348,7 @@ async function resolveParachainId(
 				runConfig
 			);
 			console.log(`  ✓ Read parachain id for ${parachain.bin}: ${paraId}`);
-			parachain.resolvedId = paraId.toString();
+			parachain.resolvedId = paraId;
 		}
 	}
 	for (const parachain of resolvedConfig.simpleParachains) {

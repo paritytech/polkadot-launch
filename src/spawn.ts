@@ -265,7 +265,7 @@ export function startCollator(
 
 export function startSimpleCollator(
 	bin: string,
-	id: string,
+	id: number,
 	chainType: string,
 	port: string,
 	skip_id_arg: boolean,
@@ -274,7 +274,7 @@ export function startSimpleCollator(
 	return new Promise<void>(function (resolve) {
 		let args = ["--tmp", `--port=${port}`, "--execution=wasm"];
 
-		!skip_id_arg && args.push("--parachain-id=" + id);
+		!skip_id_arg && args.push(`--parachain-id=${id}`);
 
 		p[port] = spawnCmd(bin, args, runConfig.verbose);
 

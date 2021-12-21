@@ -89,7 +89,7 @@ export async function addAuthority(spec: string, name: string) {
 // Add parachains to the chain spec at genesis.
 export async function addGenesisParachain(
 	spec: string,
-	para_id: string,
+	para_id: number,
 	head: string,
 	wasm: string,
 	parachain: boolean
@@ -111,7 +111,7 @@ export async function addGenesisParachain(
 	}
 	if (paras) {
 		let new_para = [
-			parseInt(para_id),
+			para_id,
 			{
 				genesis_head: head,
 				validation_code: wasm,
@@ -228,7 +228,7 @@ export async function addBootNodes(spec: any, addresses: any) {
 
 export async function updateParachainGenesis(
 	specPath: string,
-	paraId: string,
+	paraId: number,
 	protocolId?: string
 ) {
 	console.log(`specPath: ${specPath}, paraId: ${paraId}`);
