@@ -247,7 +247,7 @@ export async function updateParachainGenesis(
 	let data = JSON.stringify(chainSpec, null, 2);
 	fs.writeFileSync(specPath, data);
 
-	const protocolIdPrompt = protocolId ? ` and protocolId: ${protocolId}` : null;
+	const protocolIdPrompt = protocolId ? ` and protocolId: ${protocolId}` : '';
 
 	console.log(
 		`Updated Parachain Genesis for ParaId: ${paraId}${protocolIdPrompt}`

@@ -7,7 +7,7 @@ const filterConsole = require("filter-console");
 // Hide some warning messages that are coming from Polkadot JS API.
 // TODO: Make configurable.
 filterConsole([
-	`code: '1006' reason: 'connection failed'`,
+	`1006:: connection failed`,
 	`Unhandled promise rejections`,
 	`UnhandledPromiseRejectionWarning:`,
 	`Unknown types found`,

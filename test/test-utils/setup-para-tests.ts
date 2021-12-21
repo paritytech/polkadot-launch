@@ -55,7 +55,7 @@ export function describeParachain(
 
 		// Making sure the Moonbeam node has started
 		before("Starting Moonbeam Test Node", async function () {
-			this.timeout(300000);
+			this.timeout(180000);
 			const init = !DEBUG_MODE
 				? await startParachainNodes(options)
 				: {

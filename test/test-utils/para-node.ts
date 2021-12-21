@@ -152,7 +152,7 @@ export async function startParachainNodes(options: ParachainOptions): Promise<{
 		parachains: parachainArray.map((_, i) => {
 			return {
 				bin: BINARY_PATH,
-				id: (1000 * (i + 1)).toString(),
+				id: 1000 * (i + 1),
 				balance: "1000000000000000000000",
 				nodes: [
 					{
