@@ -90,8 +90,8 @@ An example of `genesis` is:
     "runtime_genesis_config": {
       "configuration": {
         "config": {
-          "validation_upgrade_frequency": 1,
-          "validation_upgrade_delay": 1
+          "validation_upgrade_frequency": 10,
+          "validation_upgrade_delay": 10
         }
       },
       "palletCollective": {
