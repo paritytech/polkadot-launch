@@ -16,16 +16,16 @@ const p: { [key: string]: ChildProcessWithoutNullStreams } = {};
 // Output the chainspec of a node.
 export async function generateChainSpec(
 	bin: string,
-	chainType: string,
+	chainType: string | undefined | null,
 	outPath: string,
 	runConfig: RunConfig
 ) {
 	return new Promise<void>(function (resolve, reject) {
 		let args = [
 			"build-spec",
-			`--chain=${chainType}`,
 			"--disable-default-bootnode",
 		];
+		typeof chainType === 'string' && args.push(`--chain=${chainType}`);
 		p["spec"] = spawnCmd(bin, args, runConfig.verbose);
 		let spec = fs.createWriteStream(path.resolve(outPath));
 
@@ -137,21 +137,14 @@ export function startNode(
 		"--node-key=" + nodeKey,
 		"--" + name.toLowerCase(),
 	];
-	if (rpcPort) {
-		args.push("--rpc-port=" + rpcPort);
-	}
+	typeof rpcPort === 'number' && args.push(`--rpc-port=${rpcPort}`);
 
-	if (basePath) {
-		args.push("--base-path=" + basePath);
-	} else {
-		args.push("--tmp");
-	}
+	typeof basePath === 'string'
+		? args.push("--base-path=" + basePath)
+		: args.push("--tmp");
 
-	if (flags) {
-		// Add any additional flags to the CLI
-		args = args.concat(flags);
-		console.log(`Added ${flags}`);
-	}
+	// Add any additional flags to the CLI
+	flags.length > 0 && (args = args.concat(flags));
 
 	p[name] = spawnCmd(bin, args, runConfig.verbose);
 	const logPath = path.resolve(runConfig.out, "logs", `${name}.log`);
@@ -229,8 +222,11 @@ export function startCollator(
 
 		let flags_collator = null;
 		let flags_parachain = null;
+		// `flags` can be undefined or a string array
 		let split_index = flags ? flags.findIndex((value) => value == "--") : -1;
 
+		// Logics for splitting flags into two parts: flags before the `--`, and those after that
+		// symbol.
 		if (split_index < 0) {
 			flags_parachain = flags;
 		} else {

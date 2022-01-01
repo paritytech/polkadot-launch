@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import path from "path";
+import process from "process";
 import fs from "fs";
 import { keys as libp2pKeys } from "libp2p-crypto";
 import { hexAddPrefix, hexStripPrefix, hexToU8a } from "@polkadot/util";
@@ -72,7 +73,8 @@ export async function run(
 	const config = await resolveParachainId(config_dir, rawConfig, runConfig);
 	var bootnodes = await generateNodeKeys(config);
 
-	const relay_chain_bin = path.resolve(config_dir, config.relaychain.bin);
+	// We use the current user path to start from, if `bin` is a relative path
+	const relay_chain_bin = path.resolve(process.cwd(), config.relaychain.bin);
 	if (!fs.existsSync(relay_chain_bin)) {
 		console.error("Relay chain binary does not exist: ", relay_chain_bin);
 		process.exit();
@@ -157,7 +159,7 @@ export async function run(
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
 		const { id, resolvedId, balance } = parachain;
-		const bin = path.resolve(config_dir, parachain.bin);
+		const bin = path.resolve(process.cwd(), parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
 			process.exit();
@@ -170,7 +172,7 @@ export async function run(
 			);
 			await startCollator(
 				bin,
-				resolvedId,
+				wsPort,
 				rpcPort,
 				port,
 				{
@@ -179,7 +181,7 @@ export async function run(
 					relayChainSpecRawPath,
 					flags,
 					basePath,
-					onlyOneParachainNode: config.parachains.length === 1,
+					onlyOneParachainNode: parachain.nodes.length === 1,
 				},
 				runConfig
 			);
@@ -196,7 +198,7 @@ export async function run(
 	if (config.simpleParachains) {
 		for (const simpleParachain of config.simpleParachains) {
 			const { id, resolvedId, port, balance } = simpleParachain;
-			const bin = path.resolve(config_dir, simpleParachain.bin);
+			const bin = path.resolve(process.cwd(), simpleParachain.bin);
 			if (!fs.existsSync(bin)) {
 				console.error("Simple parachain binary does not exist: ", bin);
 				process.exit();
@@ -252,8 +254,8 @@ async function addParachainsToGenesis(
 	let paraChainSpecRawPaths = new Map();
 
 	for (const parachain of paras) {
-		const { isSimple, id, resolvedId, protocolId, chain = "local" } = parachain;
-		const bin = path.resolve(config_dir, parachain.bin);
+		const { isSimple, id, resolvedId, protocolId, chain } = parachain;
+		const bin = path.resolve(process.cwd(), parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
 			process.exit();
@@ -340,7 +342,7 @@ async function resolveParachainId(
 		if (parachain.id) {
 			parachain.resolvedId = parachain.id;
 		} else {
-			const bin = path.resolve(config_dir, parachain.bin);
+			const bin = path.resolve(process.cwd(), parachain.bin);
 			const paraChainType = parachain.chain || "local";
 			const paraId = await getParachainIdFromSpec(
 				bin,
