@@ -21,11 +21,8 @@ export async function generateChainSpec(
 	runConfig: RunConfig
 ) {
 	return new Promise<void>(function (resolve, reject) {
-		let args = [
-			"build-spec",
-			"--disable-default-bootnode",
-		];
-		typeof chainType === 'string' && args.push(`--chain=${chainType}`);
+		let args = ["build-spec", "--disable-default-bootnode"];
+		typeof chainType === "string" && args.push(`--chain=${chainType}`);
 		p["spec"] = spawnCmd(bin, args, runConfig.verbose);
 		let spec = fs.createWriteStream(path.resolve(outPath));
 
@@ -137,9 +134,9 @@ export function startNode(
 		"--node-key=" + nodeKey,
 		"--" + name.toLowerCase(),
 	];
-	typeof rpcPort === 'number' && args.push(`--rpc-port=${rpcPort}`);
+	typeof rpcPort === "number" && args.push(`--rpc-port=${rpcPort}`);
 
-	typeof basePath === 'string'
+	typeof basePath === "string"
 		? args.push("--base-path=" + basePath)
 		: args.push("--tmp");
 
