@@ -38,10 +38,36 @@ cargo build --release -p polkadot-collator
 cp ./target/release/polkadot-collator ../polkadot-launch/bin/polkadot-collator
 ```
 
-## Use
+## Usage
+
+Help
+
+```
+polkadot-launch [options] <config_file>
+
+Launching Polkadot network locally
+
+Options:
+  -h, --help     Show help                                             [boolean]
+      --version  Show version number                                   [boolean]
+  -v, --verbose  Verbose logging                                         [count]
+  -o, --out      Folder that assets and logs output to                  [string]
+```
+
+Examples
 
 ```bash
-polkadot-launch config.json
+# Launch relay chain - parachains networks locally
+polkadot-launch examples/config.json
+
+# Show the help text
+polkadot-launch --help
+
+# Launch the networks with all asset output to the specified folder
+polkadot-launch -o out examples/config.json
+
+# In addition to above, the actual commands used to launch the networks are displayed
+polkadot-launch -vo out examples/config.json
 ```
 
 ### Configuration File
@@ -50,21 +76,23 @@ The required configuration file defines the properties of the network you want t
 You may use a json or a js file.
 
 You can see the examples:
-- [config.json](config.json)
-- [config.js](config.js)
+- [examples/config.json](examples/config.json)
+- [examples/config.js](examples/config.js)
 
-You may find the .js alternative more convenient if you need comments, trailing commas or if you prefer do dedup some portions of the config.
+You may find the .js alternative more convenient if you need comments, trailing commas, or if you prefer do dedup some portions of the config.
 
 #### `relaychain`
 
 - `bin`: The path of the [Polkadot relay chain binary](https://github.com/paritytech/polkadot/) used
-  to setup your test network. For example `<path/to/polkadot>/target/release/polkadot`.
+  to setup your test network. For example `<path/to/polkadot>/target/release/polkadot`. 
+  A relative path used here is resolved relative to the config file location.
 - `chain`: The chain you want to use to generate your spec (probably `rococo-local`).
 - `nodes`: An array of nodes that will be validators on the relay chain.
   - `name`: Must be one of `alice`, `bob`, `charlie`, or `dave`.
   - `wsPort`: The websocket port for this node.
+  - `rpcPort`: The RPC port for this node. 
   - `port`: The TCP port for this node.
-  - `nodeKey`: a secret key used for generating libp2p peer identifier. Optional.
+  - `nodeKey`: (Optional) A secret key used for generating libp2p peer identifier.
   - `basePath`: The directory used for the blockchain db and other outputs. When unspecified, we use
     `--tmp`.
   - `flags`: Any additional command line flags you want to add when starting your node.
@@ -75,11 +103,12 @@ These variable are fed directly into the Polkadot binary and used to spawn a nod
 
 ```bash
 <bin> \
-    --chain=<chain>-raw.json \
-    --tmp \
-    --ws-port=<wsPort> \
-    --port=<port> \
-    --<name> \
+  --chain=<chain>-raw.json \
+  --tmp \
+  --ws-port=<wsPort> \
+  --rpc-port=<rpcPort> \
+  --port=<port> \
+  --<name> \
 ```
 
 An example of `genesis` is:
@@ -116,10 +145,13 @@ All `genesis` properties can be found in the chainspec output:
 - `bin`: The path of the [collator node
   binary](https://github.com/substrate-developer-hub/substrate-parachain-template) used to create
   blocks for your parachain. For example
-  `<path/to/substrate-parachain-template>/target/release/polkadot-collator`.
-- `id`: The id to assign to this parachain. Must be unique.
+  `<path/to/substrate-parachain-template>/target/release/polkadot-collator`. 
+  A relative path used here is resolved relative to the config file location.
+- `id`: The ParaId to assign to this parachain. Must be unique.
+- `protocolId`: (Optional) The chain protocol ID.
 - `wsPort`: The websocket port for this node.
 - `port`: The TCP port for this node.
+- `rpcPort`: The RPC port for this node.
 - `balance`: (Optional) Configure a starting amount of balance on the relay chain for this chain's
   account ID.
 - `chain`: (Optional) Configure an alternative chain specification to be used for launching the
@@ -132,14 +164,15 @@ These variables are fed directly into the collator binary and used to spawn a no
 
 ```bash
 <bin> \
-    --tmp \
-    --ws-port=<wsPort> \
-    --port=<port> \
-    --parachain-id=<id> \
-    --validator \
-    --chain=<chain>
-    -- \
-    --chain=<relaychain.chain>-raw.json \
+  --tmp \
+  --ws-port=<wsPort> \
+  --rpc-port=<rpcPort> \
+  --port=<port> \
+  --parachain-id=<id> \
+  --validator \
+  --chain=<chain>
+  -- \
+  --chain=<relaychain.chain>-raw.json \
 ```
 
 #### `simpleParachains`
@@ -162,33 +195,13 @@ ways you need to open channels in both directions.
 
 ```json
 "hrmpChannels": [
-    {
-        "sender": "200",
-        "recipient": "300",
-        "maxCapacity": 8,
-        "maxMessageSize": 512
-    }
+  {
+    "sender": "200",
+    "recipient": "300",
+    "maxCapacity": 8,
+    "maxMessageSize": 512
+  }
 ]
-```
-
-#### `types`
-
-These are the Polkadot JS types you might need to include so that Polkadot JS will be able to
-interface properly with your runtime.
-
-```json
-"types": {
-    "HrmpChannelId": {
-        "sender": "u32",
-        "receiver": "u32"
-    }
-}
-```
-
-Or you can specify a path to the type definition json file instead:
-
-```json
-"types": "./typedefs.json"
 ```
 
 #### `finalization`

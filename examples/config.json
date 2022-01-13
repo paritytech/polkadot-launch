@@ -45,6 +45,7 @@
 		{
 			"bin": "../bin/polkadot-collator",
 			"id": 200,
+			"protocolId": "para-first",
 			"balance": "1000000000000000000000",
 			"nodes": [
 				{
@@ -59,11 +60,13 @@
 		{
 			"bin": "../bin/polkadot-collator",
 			"id": 300,
+			"protocolId": "para-second",
 			"balance": "1000000000000000000000",
 			"nodes": [
 				{
 					"name": "alice",
 					"wsPort": 9999,
+					"rpcPort": 9899,
 					"port": 31300,
 					"flags": ["--", "--execution=wasm"]
 				}

@@ -136,7 +136,9 @@ export async function run(
 	}
 
 	// Connect to the first relay chain node to submit the extrinsic.
-	let relayChainApi: ApiPromise = await connect(config.relaychain.nodes[0].wsPort);
+	let relayChainApi: ApiPromise = await connect(
+		config.relaychain.nodes[0].wsPort
+	);
 
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
