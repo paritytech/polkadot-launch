@@ -66,7 +66,7 @@ polkadot-launch --help
 # Launch the networks with all asset output to the specified folder
 polkadot-launch -o out examples/config.json
 
-# In addition to above, the actual commands used to launch the networks are displayed
+# In addition to the above, the actual commands used to launch the networks are displayed
 polkadot-launch -vo out examples/config.json
 ```
 
