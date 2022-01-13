@@ -41,26 +41,11 @@ import type {
 	GenesisParachain,
 } from "./types";
 
-function loadTypeDef(types: string | object): object {
-	if (typeof types === "string") {
-		// Treat types as a json file path
-		try {
-			const rawdata = fs.readFileSync(types, { encoding: "utf-8" });
-			return JSON.parse(rawdata);
-		} catch {
-			console.error("failed to load parachain typedef file");
-			process.exit(1);
-		}
-	} else {
-		return types;
-	}
-}
-
 // keep track of registered parachains
 let registeredParachains: { [key: string]: boolean } = {};
 
 export async function run(
-	config_dir: string,
+	configDir: string,
 	rawConfig: LaunchConfig,
 	runConfig: RunConfig
 ) {
@@ -70,11 +55,11 @@ export async function run(
 	if (!checkConfig(rawConfig)) {
 		return;
 	}
-	const config = await resolveParachainId(config_dir, rawConfig, runConfig);
+	const config = await resolveParachainId(configDir, rawConfig, runConfig);
 	var bootnodes = await generateNodeKeys(config);
 
-	// We use the current user path to start from, if `bin` is a relative path
-	const relay_chain_bin = path.resolve(process.cwd(), config.relaychain.bin);
+	// If `bin` is a relative path, the path is resolved from the config file location
+	const relay_chain_bin = path.resolve(configDir, config.relaychain.bin);
 	if (!fs.existsSync(relay_chain_bin)) {
 		console.error("Relay chain binary does not exist: ", relay_chain_bin);
 		process.exit();
@@ -103,7 +88,7 @@ export async function run(
 	}
 
 	const paraChainSpecRawPaths = await addParachainsToGenesis(
-		config_dir,
+		configDir,
 		relayChainSpecPath,
 		config.parachains,
 		config.simpleParachains,
@@ -151,15 +136,12 @@ export async function run(
 	}
 
 	// Connect to the first relay chain node to submit the extrinsic.
-	let relayChainApi: ApiPromise = await connect(
-		config.relaychain.nodes[0].wsPort,
-		loadTypeDef(config.types)
-	);
+	let relayChainApi: ApiPromise = await connect(config.relaychain.nodes[0].wsPort);
 
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
 		const { id, resolvedId, balance } = parachain;
-		const bin = path.resolve(process.cwd(), parachain.bin);
+		const bin = path.resolve(configDir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
 			process.exit();
@@ -198,7 +180,7 @@ export async function run(
 	if (config.simpleParachains) {
 		for (const simpleParachain of config.simpleParachains) {
 			const { id, resolvedId, port, balance } = simpleParachain;
-			const bin = path.resolve(process.cwd(), simpleParachain.bin);
+			const bin = path.resolve(configDir, simpleParachain.bin);
 			if (!fs.existsSync(bin)) {
 				console.error("Simple parachain binary does not exist: ", bin);
 				process.exit();
@@ -235,7 +217,7 @@ export async function run(
 }
 
 async function addParachainsToGenesis(
-	config_dir: string,
+	configDir: string,
 	spec: string,
 	parachains: ResolvedParachainConfig[],
 	simpleParachains: ResolvedSimpleParachainConfig[],
@@ -255,7 +237,7 @@ async function addParachainsToGenesis(
 
 	for (const parachain of paras) {
 		const { isSimple, id, resolvedId, protocolId, chain } = parachain;
-		const bin = path.resolve(process.cwd(), parachain.bin);
+		const bin = path.resolve(configDir, parachain.bin);
 		if (!fs.existsSync(bin)) {
 			console.error("Parachain binary does not exist: ", bin);
 			process.exit();
@@ -332,7 +314,7 @@ async function addHrmpChannelsToGenesis(
 
 // Resolves parachain id from chain spec if not specified
 async function resolveParachainId(
-	config_dir: string,
+	configDir: string,
 	config: LaunchConfig,
 	runConfig: RunConfig
 ): Promise<ResolvedLaunchConfig> {
@@ -342,7 +324,7 @@ async function resolveParachainId(
 		if (parachain.id) {
 			parachain.resolvedId = parachain.id;
 		} else {
-			const bin = path.resolve(process.cwd(), parachain.bin);
+			const bin = path.resolve(configDir, parachain.bin);
 			const paraChainType = parachain.chain || "local";
 			const paraId = await getParachainIdFromSpec(
 				bin,

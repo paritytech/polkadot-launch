@@ -1,6 +1,6 @@
 {
 	"relaychain": {
-		"bin": "./bin/polkadot",
+		"bin": "../bin/polkadot",
 		"chain": "rococo-local",
 		"nodes": [
 			{
@@ -43,7 +43,7 @@
 	},
 	"parachains": [
 		{
-			"bin": "./bin/polkadot-collator",
+			"bin": "../bin/polkadot-collator",
 			"id": 200,
 			"balance": "1000000000000000000000",
 			"nodes": [
@@ -57,7 +57,7 @@
 			]
 		},
 		{
-			"bin": "./bin/polkadot-collator",
+			"bin": "../bin/polkadot-collator",
 			"id": 300,
 			"balance": "1000000000000000000000",
 			"nodes": [
@@ -72,7 +72,7 @@
 	],
 	"simpleParachains": [
 		{
-			"bin": "./bin/adder-collator",
+			"bin": "../bin/adder-collator",
 			"id": 400,
 			"name": "alice",
 			"balance": "1000000000000000000000",
@@ -87,6 +87,5 @@
 			"maxMessageSize": 512
 		}
 	],
-	"types": {},
 	"finalization": false
 }

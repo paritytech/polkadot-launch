@@ -11,7 +11,6 @@ export interface LaunchConfig {
 	parachains: ParachainConfig[];
 	simpleParachains: SimpleParachainConfig[];
 	hrmpChannels: HrmpChannelsConfig[];
-	types: any;
 	finalization: boolean;
 }
 export interface RunConfig {

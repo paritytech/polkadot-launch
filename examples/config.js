@@ -3,7 +3,7 @@ const flags = ["--", "--execution=wasm"];
 
 const config = {
 	relaychain: {
-		bin: "./bin/polkadot",
+		bin: "../bin/polkadot",
 		chain: "rococo-local",
 		nodes: [
 			{
@@ -46,7 +46,7 @@ const config = {
 	},
 	parachains: [
 		{
-			bin: "./bin/polkadot-collator",
+			bin: "../bin/polkadot-collator",
 			id: 200,
 			protocolId: "para-first",
 			balance: "1000000000000000000000",
@@ -58,18 +58,25 @@ const config = {
 					port: 31200,
 					flags,
 				},
+				{
+					name: "bob",
+					wsPort: 9989,
+					rpcPort: 9889,
+					port: 31201,
+					flags,
+				},
 			],
 		},
 		{
-			bin: "./bin/polkadot-collator",
+			bin: "../bin/polkadot-collator",
 			id: 300,
 			protocolId: "para-second",
 			balance: "1000000000000000000000",
 			nodes: [
 				{
 					name: "alice",
-					wsPort: 9999,
-					rpcPort: 9899,
+					wsPort: 9990,
+					rpcPort: 9890,
 					port: 31300,
 					flags,
 				},
@@ -77,15 +84,15 @@ const config = {
 		},
 	],
 	simpleParachains: [
-		{
-			bin: "./bin/adder-collator",
-			id: 400,
-			name: "alice",
-			balance: "1000000000000000000000",
-			// no `wsPort` for simpleParachains
-			// no `rpcPort` for simpleParachains
-			port: 31400,
-		},
+		// {
+		// 	bin: "../bin/adder-collator",
+		// 	id: 400,
+		// 	name: "alice",
+		// 	balance: "1000000000000000000000",
+		// 	// no `wsPort` for simpleParachains
+		// 	// no `rpcPort` for simpleParachains
+		// 	port: 31400,
+		// },
 	],
 	hrmpChannels: [
 		{
@@ -95,7 +102,6 @@ const config = {
 			maxMessageSize: 512,
 		},
 	],
-	types: {},
 	finalization: false,
 };
 
