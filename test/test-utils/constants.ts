@@ -5,7 +5,7 @@ export const DISPLAY_LOG = process.env.PARACHAIN_LOG || false;
 export const PARACHAIN_LOG = process.env.PARACHAIN_LOG || "info";
 
 export const BINARY_PATH =
-	process.env.BINARY_PATH || `../bin/polkadot-collator`;
+	process.env.BINARY_PATH || `../bin/polkadot-parachain`;
 export const RELAY_BINARY_PATH =
 	process.env.RELAY_BINARY_PATH || `../bin/polkadot-relaychain`;
 export const SPAWNING_TIME = 20000;
