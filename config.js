@@ -42,7 +42,7 @@ var config = {
 	},
 	parachains: [
 		{
-			bin: "./bin/polkadot-collator",
+			bin: "./bin/polkadot-parachain",
 			id: "200",
 			balance: "1000000000000000000000",
 			nodes: [
@@ -55,7 +55,7 @@ var config = {
 			],
 		},
 		{
-			bin: "./bin/polkadot-collator",
+			bin: "./bin/polkadot-parachain",
 			id: "300",
 			balance: "1000000000000000000000",
 			nodes: [
