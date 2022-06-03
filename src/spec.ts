@@ -40,32 +40,40 @@ export async function prepareChainSpecs(
 		console.error("Relay chain binary does not exist: ", relay_chain_bin);
 		process.exit();
 	}
-	const chain = config.relaychain.chain;
 
-	const spec = resolve(config_dir, `${chain}.json`);
-	const spec_raw = resolve(config_dir, `${chain}-raw.json`);
+	// Check if "chain" is an existing file path.
+	let chain = config.relaychain.chain;
+	let chainSpecPath = resolve(config_dir, `${chain ? chain : "null"}`);
+	if (!fs.existsSync(chainSpecPath)) {
+		// We only have a chain name.
+		const spec = resolve(config_dir, `${chain}.json`);
+		const spec_raw = resolve(config_dir, `${chain}-raw.json`);
 
-	await generateChainSpec(relay_chain_bin, chain, spec);
-	// -- Start Relay Chain Spec Modify --
-	clearAuthorities(spec);
-	for (const node of config.relaychain.nodes) {
-		await addAuthority(spec, node.name);
+		await generateChainSpec(relay_chain_bin, chain, spec);
+		// -- Start Relay Chain Spec Modify --
+		clearAuthorities(spec);
+		for (const node of config.relaychain.nodes) {
+			await addAuthority(spec, node.name);
+		}
+		if (config.relaychain.genesis) {
+			await changeGenesisConfig(spec, config.relaychain.genesis);
+		}
+
+		config = await addParachainsToGenesis(config_dir, spec, config);
+
+		if (config.hrmpChannels) {
+			await addHrmpChannelsToGenesis(spec, config.hrmpChannels);
+		}
+		addBootNodes(spec, bootnodes);
+
+		// -- End Chain Spec Modify --
+		await generateChainSpecRaw(relay_chain_bin, spec, spec_raw);
+
+		config.relayChainSpecRawPath = spec_raw;
+	} else {
+		console.log("Using Realy chain spec file: ", chain);
+		config.relayChainSpecRawPath = chainSpecPath;
 	}
-	if (config.relaychain.genesis) {
-		await changeGenesisConfig(spec, config.relaychain.genesis);
-	}
-
-	config = await addParachainsToGenesis(config_dir, spec, config);
-
-	if (config.hrmpChannels) {
-		await addHrmpChannelsToGenesis(spec, config.hrmpChannels);
-	}
-	addBootNodes(spec, bootnodes);
-
-	// -- End Chain Spec Modify --
-	await generateChainSpecRaw(relay_chain_bin, spec, spec_raw);
-
-	config.relayChainSpecRawPath = spec_raw;
 
 	return config;
 }
@@ -383,18 +391,21 @@ async function generateParachainSpec(
 		let genesisState: string;
 		let genesisWasm: string;
 		try {
-			parachain_spec = resolve(
-				config_dir,
-				`parachain${chain ? "-" + chain : ""}-${resolvedId}.json`
-			);
-			parachain_spec_raw = resolve(
-				config_dir,
-				`parachain${chain ? "-" + chain : ""}-${resolvedId}-raw.json`
-			);
-
-			await generateChainSpec(bin, "", parachain_spec);
-			await updateParachainId(parachain_spec, parseInt(resolvedId));
-			await generateChainSpecRaw(bin, parachain_spec, parachain_spec_raw);
+			// Check if "chain" is an existing file path.
+			let chainSpecPath = resolve(config_dir, `${chain ? chain : "null"}`);
+			if (!fs.existsSync(chainSpecPath)) {
+				parachain_spec = resolve(
+					config_dir,
+					`parachain${chain ? "-" + chain : ""}-${resolvedId}.json`
+				);
+				parachain_spec_raw = resolve(
+					config_dir,
+					`parachain${chain ? "-" + chain : ""}-${resolvedId}-raw.json`
+				);
+				await generateChainSpec(bin, "", parachain_spec);
+				await updateParachainId(parachain_spec, parseInt(resolvedId));
+				await generateChainSpecRaw(bin, parachain_spec, parachain_spec_raw);
+			} else parachain_spec_raw = chainSpecPath;
 
 			genesisState = await exportGenesisState(bin, parachain_spec_raw);
 			genesisWasm = await exportGenesisWasm(bin, parachain_spec_raw);

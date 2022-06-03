@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { startNode, startCollator, startSimpleCollator } from "./spawn";
-import { connect, setBalance } from "./rpc";
+import { connect, registerParachain, setBalance } from "./rpc";
 import { checkConfig } from "./check";
 import { prepareChainSpecs } from "./spec";
 import { parachainAccount } from "./parachain";
@@ -10,6 +10,7 @@ import { ApiPromise } from "@polkadot/api";
 import { resolve } from "path";
 import fs from "fs";
 import type { LaunchConfig } from "./types";
+import { exportGenesisWasm, exportGenesisState } from "./spawn";
 
 function loadTypeDef(types: string | object): object {
 	if (typeof types === "string") {
@@ -65,20 +66,36 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
-		const { resolvedId, balance } = parachain;
+		const { bin, resolvedId, balance, chain, nodes } = parachain;
+
+		let chainSpecPath = resolve(config_dir, `${chain ? chain : "null"}`);
+		if (!fs.existsSync(chainSpecPath)) {
+			chainSpecPath = parachain.chainSpecRawPath;
+		} else {
+			// SUDO registering Parachain.
+			const genesisState = await exportGenesisState(bin, chainSpecPath);
+			const genesisWasm = await exportGenesisWasm(bin, chainSpecPath);
+			await registerParachain(
+				relayChainApi,
+				resolvedId,
+				genesisWasm,
+				genesisState,
+				config.finalization
+			);
+		}
 
 		let account = parachainAccount(resolvedId);
 
-		for (const node of parachain.nodes) {
+		for (const node of nodes) {
 			const { wsPort, port, flags, name, basePath, rpcPort } = node;
 			console.log(
 				`Starting a Collator for parachain ${resolvedId}: ${account}, Collator port : ${port} wsPort : ${wsPort} rpcPort : ${rpcPort}`
 			);
-			await startCollator(config_dir, parachain.bin, wsPort, rpcPort, port, {
+			await startCollator(config_dir, bin, wsPort, rpcPort, port, {
 				name,
 				spec: config.relayChainSpecRawPath,
 				flags,
-				chain: parachain.chainSpecRawPath,
+				chain: chainSpecPath,
 				basePath,
 				onlyOneParachainNode: parachain.nodes.length === 1,
 			});
