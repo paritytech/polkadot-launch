@@ -84,11 +84,14 @@ export interface ChainSpec {
 
 export interface ResolvedParachainConfig extends ParachainConfig {
 	resolvedId: string;
+	chainSpecRawPath: string;
 }
 export interface ResolvedSimpleParachainConfig extends SimpleParachainConfig {
 	resolvedId: string;
+	chainSpecRawPath: string;
 }
 export interface ResolvedLaunchConfig extends LaunchConfig {
+	relayChainSpecRawPath: string;
 	parachains: ResolvedParachainConfig[];
 	simpleParachains: ResolvedSimpleParachainConfig[];
 }

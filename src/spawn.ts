@@ -5,6 +5,7 @@ import {
 } from "child_process";
 import util from "util";
 import fs from "fs";
+import { resolve as pathResolve } from "path";
 import { CollatorOptions } from "./types";
 
 // This tracks all the processes that we spawn from this file.
@@ -14,12 +15,14 @@ const p: { [key: string]: ChildProcessWithoutNullStreams } = {};
 const execFile = util.promisify(ex);
 
 // Output the chainspec of a node.
-export async function generateChainSpec(bin: string, chain: string) {
+export async function generateChainSpec(bin: string, chain: string, outputPath: string) {
 	return new Promise<void>(function (resolve, reject) {
-		let args = ["build-spec", "--chain=" + chain, "--disable-default-bootnode"];
+		let args = ["build-spec", "--disable-default-bootnode"];
+
+		if (chain) args.push("--chain=" + chain);
 
 		p["spec"] = spawn(bin, args);
-		let spec = fs.createWriteStream(`${chain}.json`);
+		let spec = fs.createWriteStream(outputPath);
 
 		// `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
 		// before we resolve the promise.
@@ -38,13 +41,15 @@ export async function generateChainSpec(bin: string, chain: string) {
 }
 
 // Output the chainspec of a node using `--raw` from a JSON file.
-export async function generateChainSpecRaw(bin: string, chain: string) {
+export async function generateChainSpecRaw(bin: string, chain: string, outputPath: string) {
 	console.log(); // Add a newline in output
 	return new Promise<void>(function (resolve, reject) {
-		let args = ["build-spec", "--chain=" + chain + ".json", "--raw"];
+		let args = ["build-spec", "--raw"];
+
+		if (chain) args.push("--chain=" + chain);
 
 		p["spec"] = spawn(bin, args);
-		let spec = fs.createWriteStream(`${chain}-raw.json`);
+		let spec = fs.createWriteStream(outputPath);
 
 		// `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
 		// before we resolve the promise.
@@ -98,6 +103,7 @@ export async function getParachainIdFromSpec(
 // Spawn a new relay chain node.
 // `name` must be `alice`, `bob`, `charlie`, etc... (hardcoded in Substrate).
 export function startNode(
+	config_dir: string,
 	bin: string,
 	name: string,
 	wsPort: number,
@@ -108,6 +114,13 @@ export function startNode(
 	flags?: string[],
 	basePath?: string
 ) {
+	bin = pathResolve(config_dir, bin);
+
+	if (!fs.existsSync(bin)) {
+		console.error("Relay chain binary does not exist: ", bin);
+		process.exit();
+	}
+
 	// TODO: Make DB directory configurable rather than just `tmp`
 	let args = [
 		"--chain=" + spec,
@@ -134,7 +147,7 @@ export function startNode(
 
 	p[name] = spawn(bin, args);
 
-	let log = fs.createWriteStream(`${name}.log`);
+	let log = fs.createWriteStream(`${config_dir}/${name}.log`);
 
 	p[name].stdout.pipe(log);
 	p[name].stderr.pipe(log);
@@ -185,6 +198,7 @@ export async function exportGenesisState(
 
 // Start a collator node for a parachain.
 export function startCollator(
+	config_dir: string,
 	bin: string,
 	wsPort: number,
 	rpcPort: number | undefined,
@@ -192,6 +206,13 @@ export function startCollator(
 	options: CollatorOptions
 ) {
 	return new Promise<void>(function (resolve) {
+		bin = pathResolve(config_dir, bin);
+
+		if (!fs.existsSync(bin)) {
+			console.error("Parachain binary does not exist: ", bin);
+			process.exit();
+		}
+
 		// TODO: Make DB directory configurable rather than just `tmp`
 		let args = ["--ws-port=" + wsPort, "--port=" + port];
 		const { basePath, name, onlyOneParachainNode, flags, spec, chain } =
@@ -251,7 +272,7 @@ export function startCollator(
 
 		p[wsPort] = spawn(bin, args);
 
-		let log = fs.createWriteStream(`${wsPort}.log`);
+		let log = fs.createWriteStream(`${config_dir}/${wsPort}.log`);
 
 		p[wsPort].stdout.pipe(log);
 		p[wsPort].stderr.on("data", function (chunk) {
@@ -268,6 +289,7 @@ export function startCollator(
 }
 
 export function startSimpleCollator(
+	config_dir: string,
 	bin: string,
 	id: string,
 	spec: string,
@@ -275,17 +297,26 @@ export function startSimpleCollator(
 	skip_id_arg?: boolean
 ) {
 	return new Promise<void>(function (resolve) {
+
+		bin = pathResolve(config_dir, bin);
+
+		if (!fs.existsSync(bin)) {
+			console.error("Simple Parachain binary does not exist: ", bin);
+			process.exit();
+		}
+
 		let args = [
 			"--tmp",
 			"--port=" + port,
 			"--chain=" + spec,
-			"--execution=wasm",
+			"--execution=wasm"
 		];
 
-		if (!skip_id_arg) {
-			args.push("--parachain-id=" + id);
-			console.log(`Added --parachain-id=${id}`);
-		}
+		// TODO: Remove (?)
+		// if (!skip_id_arg) {
+		// 	args.push("--parachain-id=" + id);
+		// 	console.log(`Added --parachain-id=${id}`);
+		// }
 
 		p[port] = spawn(bin, args);
 

@@ -28,7 +28,7 @@ describeParachain(
 						aliceRelay.addressRaw
 					)
 				).data.free.toHuman()
-			).to.eq("1,152,921,504,606,846,976");
+			).to.eq("1,152,921,504,606,847,000");
 		});
 	}
 );
