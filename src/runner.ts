@@ -1,10 +1,6 @@
 #!/usr/bin/env node
 
-import {
-	startNode,
-	startCollator,
-	startSimpleCollator,
-} from "./spawn";
+import { startNode, startCollator, startSimpleCollator } from "./spawn";
 import { connect, setBalance } from "./rpc";
 import { checkConfig } from "./check";
 import { prepareChainSpecs } from "./spec";
@@ -31,7 +27,6 @@ function loadTypeDef(types: string | object): object {
 }
 
 export async function run(config_dir: string, rawConfig: LaunchConfig) {
-
 	// Verify that the `config.json` has all the expected properties.
 	if (!checkConfig(rawConfig)) {
 		return;
@@ -109,7 +104,14 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 			let account = parachainAccount(resolvedId);
 			console.log(`Starting Parachain ${resolvedId}: ${account}`);
 			const skipIdArg = !id;
-			await startSimpleCollator(config_dir, bin, resolvedId, simpleParachain.chainSpecRawPath, port, skipIdArg);
+			await startSimpleCollator(
+				config_dir,
+				bin,
+				resolvedId,
+				simpleParachain.chainSpecRawPath,
+				port,
+				skipIdArg
+			);
 
 			// Allow time for the TX to complete, avoiding nonce issues.
 			// TODO: Handle nonce directly instead of this.

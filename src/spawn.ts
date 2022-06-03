@@ -15,7 +15,11 @@ const p: { [key: string]: ChildProcessWithoutNullStreams } = {};
 const execFile = util.promisify(ex);
 
 // Output the chainspec of a node.
-export async function generateChainSpec(bin: string, chain: string, outputPath: string) {
+export async function generateChainSpec(
+	bin: string,
+	chain: string,
+	outputPath: string
+) {
 	return new Promise<void>(function (resolve, reject) {
 		let args = ["build-spec", "--disable-default-bootnode"];
 
@@ -41,7 +45,11 @@ export async function generateChainSpec(bin: string, chain: string, outputPath: 
 }
 
 // Output the chainspec of a node using `--raw` from a JSON file.
-export async function generateChainSpecRaw(bin: string, chain: string, outputPath: string) {
+export async function generateChainSpecRaw(
+	bin: string,
+	chain: string,
+	outputPath: string
+) {
 	console.log(); // Add a newline in output
 	return new Promise<void>(function (resolve, reject) {
 		let args = ["build-spec", "--raw"];
@@ -297,7 +305,6 @@ export function startSimpleCollator(
 	skip_id_arg?: boolean
 ) {
 	return new Promise<void>(function (resolve) {
-
 		bin = pathResolve(config_dir, bin);
 
 		if (!fs.existsSync(bin)) {
@@ -309,7 +316,7 @@ export function startSimpleCollator(
 			"--tmp",
 			"--port=" + port,
 			"--chain=" + spec,
-			"--execution=wasm"
+			"--execution=wasm",
 		];
 
 		// TODO: Remove (?)

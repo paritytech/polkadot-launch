@@ -1,5 +1,9 @@
 import { Keyring } from "@polkadot/api";
-import { cryptoWaitReady, encodeAddress, randomAsHex } from "@polkadot/util-crypto";
+import {
+	cryptoWaitReady,
+	encodeAddress,
+	randomAsHex,
+} from "@polkadot/util-crypto";
 
 import {
 	generateChainSpec,
@@ -25,7 +29,6 @@ export async function prepareChainSpecs(
 	config_dir: string,
 	rawConfig: LaunchConfig
 ): Promise<ResolvedLaunchConfig> {
-
 	// We need to reset that variable when running a new network
 	registeredParachains = {};
 
@@ -38,7 +41,7 @@ export async function prepareChainSpecs(
 		process.exit();
 	}
 	const chain = config.relaychain.chain;
-	
+
 	const spec = resolve(config_dir, `${chain}.json`);
 	const spec_raw = resolve(config_dir, `${chain}-raw.json`);
 
@@ -360,7 +363,11 @@ async function addHrmpChannelsToGenesis(
 // keep track of registered parachains
 let registeredParachains: { [key: string]: boolean } = {};
 
-async function generateParachainSpec(config_dir: string, spec: string, parachain: any) {
+async function generateParachainSpec(
+	config_dir: string,
+	spec: string,
+	parachain: any
+) {
 	const { resolvedId, chain } = parachain;
 	const bin = resolve(config_dir, parachain.bin);
 	if (!fs.existsSync(bin)) {
@@ -375,8 +382,14 @@ async function generateParachainSpec(config_dir: string, spec: string, parachain
 		let genesisState: string;
 		let genesisWasm: string;
 		try {
-			parachain_spec = resolve(config_dir, `parachain${chain ? "-" + chain : ""}-${resolvedId}.json`);
-			parachain_spec_raw = resolve(config_dir, `parachain${chain ? "-" + chain : ""}-${resolvedId}-raw.json`);
+			parachain_spec = resolve(
+				config_dir,
+				`parachain${chain ? "-" + chain : ""}-${resolvedId}.json`
+			);
+			parachain_spec_raw = resolve(
+				config_dir,
+				`parachain${chain ? "-" + chain : ""}-${resolvedId}-raw.json`
+			);
 
 			await generateChainSpec(bin, "", parachain_spec);
 			await updateParachainId(parachain_spec, parseInt(resolvedId));
@@ -384,7 +397,6 @@ async function generateParachainSpec(config_dir: string, spec: string, parachain
 
 			genesisState = await exportGenesisState(bin, parachain_spec_raw);
 			genesisWasm = await exportGenesisWasm(bin, parachain_spec_raw);
-
 		} catch (err) {
 			console.error(err);
 			process.exit(1);
