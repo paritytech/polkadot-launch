@@ -95,18 +95,14 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 	if (config.simpleParachains) {
 		for (const simpleParachain of config.simpleParachains) {
 			const { id, resolvedId, port, balance } = simpleParachain;
-			const bin = resolve(config_dir, simpleParachain.bin);
-			if (!fs.existsSync(bin)) {
-				console.error("Simple parachain binary does not exist: ", bin);
-				process.exit();
-			}
 
 			let account = parachainAccount(resolvedId);
 			console.log(`Starting Parachain ${resolvedId}: ${account}`);
 			const skipIdArg = !id;
 			await startSimpleCollator(
 				config_dir,
-				bin,
+				simpleParachain.bin,
+				config.relayChainSpecRawPath,
 				resolvedId,
 				simpleParachain.chainSpecRawPath,
 				port,

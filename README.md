@@ -28,7 +28,7 @@ and building them with the specific flags below:
 git clone https://github.com/paritytech/polkadot
 cd polkadot
 cargo build --release
-cp ./target/release/polkadot ../polkadot-launch/bin/polkadot-relaychain
+cp ./target/release/polkadot ../polkadot-launch/examples/bin/polkadot-relaychain
 ```
 
 and
@@ -37,13 +37,13 @@ and
 git clone https://github.com/paritytech/cumulus
 cd cumulus
 cargo build --release -p polkadot-parachain
-cp ./target/release/polkadot-parachain ../polkadot-launch/bin/polkadot-parachain
+cp ./target/release/polkadot-parachain ../polkadot-launch/examples/bin/polkadot-parachain
 ```
 
 ## Use
 
 ```bash
-polkadot-launch config.json
+polkadot-launch examples/config.json
 ```
 
 ### Configuration File
@@ -52,8 +52,8 @@ The required configuration file defines the properties of the network you want t
 You may use a json or a js file.
 
 You can see the examples:
-- [config.json](config.json)
-- [config.js](config.js)
+- [config.json](examples/config.json)
+- [config.js](examples/config.js)
 
 You may find the .js alternative more convenient if you need comments, trailing commas or if you prefer do dedup some portions of the config.
 
@@ -235,7 +235,7 @@ yarn
 Start the application with:
 
 ```bash
-yarn start config.json
+yarn start examples/config.json
 ```
 
 When you have finished your changes, make a [pull

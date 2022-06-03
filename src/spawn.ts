@@ -299,8 +299,9 @@ export function startCollator(
 export function startSimpleCollator(
 	config_dir: string,
 	bin: string,
-	id: string,
 	spec: string,
+	id: string,
+	chain: string,
 	port: string,
 	skip_id_arg?: boolean
 ) {
@@ -315,8 +316,10 @@ export function startSimpleCollator(
 		let args = [
 			"--tmp",
 			"--port=" + port,
-			"--chain=" + spec,
+			"--chain=" + chain,
 			"--execution=wasm",
+			"--",
+			"--chain=" + spec,
 		];
 
 		// TODO: Remove (?)
@@ -327,7 +330,7 @@ export function startSimpleCollator(
 
 		p[port] = spawn(bin, args);
 
-		let log = fs.createWriteStream(`${port}.log`);
+		let log = fs.createWriteStream(`${config_dir}/${port}.log`);
 
 		p[port].stdout.pipe(log);
 		p[port].stderr.on("data", function (chunk) {

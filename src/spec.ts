@@ -54,12 +54,13 @@ export async function prepareChainSpecs(
 	if (config.relaychain.genesis) {
 		await changeGenesisConfig(spec, config.relaychain.genesis);
 	}
+
+	config = await addParachainsToGenesis(config_dir, spec, config);
+
 	if (config.hrmpChannels) {
 		await addHrmpChannelsToGenesis(spec, config.hrmpChannels);
 	}
 	addBootNodes(spec, bootnodes);
-
-	config = await addParachainsToGenesis(config_dir, spec, config);
 
 	// -- End Chain Spec Modify --
 	await generateChainSpecRaw(relay_chain_bin, spec, spec_raw);

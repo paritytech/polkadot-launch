@@ -40,7 +40,7 @@
 	"parachains": [
 		{
 			"bin": "./bin/polkadot-parachain",
-			"id": "2000",
+			"id": "200",
 			"balance": "1000000000000000000000",
 			"nodes": [
 				{
@@ -53,7 +53,7 @@
 		},
 		{
 			"bin": "./bin/polkadot-parachain",
-			"id": "2002",
+			"id": "300",
 			"balance": "1000000000000000000000",
 			"nodes": [
 				{
@@ -63,6 +63,23 @@
 					"flags": ["--", "--execution=wasm"]
 				}
 			]
+		}
+	],
+	"simpleParachains": [
+		{
+			"bin": "./bin/adder-collator",
+			"id": "400",
+			"port": "31400",
+			"name": "alice",
+			"balance": "1000000000000000000000"
+		}
+	],
+	"hrmpChannels": [
+		{
+			"sender": 200,
+			"recipient": 300,
+			"maxCapacity": 8,
+			"maxMessageSize": 512
 		}
 	],
 	"types": {},
