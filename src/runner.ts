@@ -64,14 +64,18 @@ export async function run(config_dir: string, rawConfig: LaunchConfig) {
 		loadTypeDef(config.types)
 	);
 
+	const registeredParachains = JSON.parse(
+		(await relayChainApi.query.paras.parachains()) as any
+	);
+
 	// Then launch each parachain
 	for (const parachain of config.parachains) {
-		const { bin, resolvedId, balance, chain, nodes } = parachain;
+		const { resolvedId, balance, nodes } = parachain;
 
-		let chainSpecPath = resolve(config_dir, `${chain ? chain : "null"}`);
-		if (!fs.existsSync(chainSpecPath)) {
-			chainSpecPath = parachain.chainSpecRawPath;
-		} else {
+		const bin = resolve(config_dir, parachain.bin);
+		let chainSpecPath = resolve(config_dir, parachain.chainSpecRawPath);
+
+		if (!(resolvedId in registeredParachains)) {
 			// SUDO registering Parachain.
 			const genesisState = await exportGenesisState(bin, chainSpecPath);
 			const genesisWasm = await exportGenesisWasm(bin, chainSpecPath);

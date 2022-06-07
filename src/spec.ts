@@ -17,6 +17,7 @@ import type {
 	LaunchConfig,
 	HrmpChannelsConfig,
 	ResolvedLaunchConfig,
+	ResolvedParachainConfig,
 } from "./types";
 
 import { keys as libp2pKeys } from "libp2p-crypto";
@@ -41,6 +42,13 @@ export async function prepareChainSpecs(
 		process.exit();
 	}
 
+	for (const parachain of config.parachains || []) {
+		await generateParachainSpec(config_dir, parachain);
+	}
+	for (const simpleParachains of config.simpleParachains || []) {
+		await generateParachainSpec(config_dir, simpleParachains);
+	}
+
 	// Check if "chain" is an existing file path.
 	let chain = config.relaychain.chain;
 	let chainSpecPath = resolve(config_dir, `${chain ? chain : "null"}`);
@@ -50,6 +58,7 @@ export async function prepareChainSpecs(
 		const spec_raw = resolve(config_dir, `${chain}-raw.json`);
 
 		await generateChainSpec(relay_chain_bin, chain, spec);
+
 		// -- Start Relay Chain Spec Modify --
 		clearAuthorities(spec);
 		for (const node of config.relaychain.nodes) {
@@ -59,14 +68,19 @@ export async function prepareChainSpecs(
 			await changeGenesisConfig(spec, config.relaychain.genesis);
 		}
 
-		config = await addParachainsToGenesis(config_dir, spec, config);
+		await addParachainsToGenesis(config_dir, spec, config.parachains || []);
+		await addParachainsToGenesis(
+			config_dir,
+			spec,
+			config.simpleParachains || []
+		);
 
 		if (config.hrmpChannels) {
 			await addHrmpChannelsToGenesis(spec, config.hrmpChannels);
 		}
 		addBootNodes(spec, bootnodes);
-
 		// -- End Chain Spec Modify --
+
 		await generateChainSpecRaw(relay_chain_bin, spec, spec_raw);
 
 		config.relayChainSpecRawPath = spec_raw;
@@ -347,10 +361,21 @@ async function resolveParachainId(
 		if (parachain.id) {
 			parachain.resolvedId = parachain.id;
 		} else {
-			const bin = resolve(config_dir, parachain.bin);
-			const paraId = await getParachainIdFromSpec(bin, parachain.chain);
-			console.log(`  ✓ Read parachain id for ${parachain.bin}: ${paraId}`);
-			parachain.resolvedId = paraId.toString();
+			let chainSpecPath = resolve(
+				config_dir,
+				`${parachain.chain ? parachain.chain : "null"}`
+			);
+			if (fs.existsSync(chainSpecPath)) {
+				const spec = JSON.parse(fs.readFileSync(chainSpecPath));
+				parachain.resolvedId = spec.paraId || spec.para_id;
+			} else {
+				const bin = resolve(config_dir, parachain.bin);
+				const paraId = await getParachainIdFromSpec(bin, parachain.chain);
+				parachain.resolvedId = paraId.toString();
+			}
+			console.log(
+				`  ✓ Read parachain id for ${parachain.bin}: ${parachain.resolvedId}`
+			);
 		}
 	}
 	for (const parachain of resolvedConfig.simpleParachains) {
@@ -372,71 +397,70 @@ async function addHrmpChannelsToGenesis(
 // keep track of registered parachains
 let registeredParachains: { [key: string]: boolean } = {};
 
-async function generateParachainSpec(
-	config_dir: string,
-	spec: string,
-	parachain: any
-) {
+async function generateParachainSpec(config_dir: string, parachain: any) {
 	const { resolvedId, chain } = parachain;
 	const bin = resolve(config_dir, parachain.bin);
 	if (!fs.existsSync(bin)) {
 		console.error("Simple/Parachain binary does not exist: ", bin);
 		process.exit();
 	}
-	// If it isn't registered yet, register the parachain in genesis
-	if (!registeredParachains[resolvedId]) {
-		// Get the information required to register the parachain in genesis.
-		let parachain_spec: string;
-		let parachain_spec_raw: string;
-		let genesisState: string;
-		let genesisWasm: string;
-		try {
-			// Check if "chain" is an existing file path.
-			let chainSpecPath = resolve(config_dir, `${chain ? chain : "null"}`);
-			if (!fs.existsSync(chainSpecPath)) {
-				parachain_spec = resolve(
-					config_dir,
-					`parachain${chain ? "-" + chain : ""}-${resolvedId}.json`
-				);
-				parachain_spec_raw = resolve(
-					config_dir,
-					`parachain${chain ? "-" + chain : ""}-${resolvedId}-raw.json`
-				);
-				await generateChainSpec(bin, "", parachain_spec);
-				await updateParachainId(parachain_spec, parseInt(resolvedId));
-				await generateChainSpecRaw(bin, parachain_spec, parachain_spec_raw);
-			} else parachain_spec_raw = chainSpecPath;
-
-			genesisState = await exportGenesisState(bin, parachain_spec_raw);
-			genesisWasm = await exportGenesisWasm(bin, parachain_spec_raw);
-		} catch (err) {
-			console.error(err);
-			process.exit(1);
-		}
-
-		await addGenesisParachain(
-			spec,
-			resolvedId,
-			genesisState,
-			genesisWasm,
-			true
-		);
-		registeredParachains[resolvedId] = true;
-		parachain.chainSpecRawPath = parachain_spec_raw;
+	// Get the information required to register the parachain in genesis.
+	let parachain_spec: string;
+	let parachain_spec_raw: string;
+	try {
+		// Check if "chain" is an existing file path.
+		let chainSpecPath = resolve(config_dir, `${chain ? chain : "null"}`);
+		if (!fs.existsSync(chainSpecPath)) {
+			parachain_spec = resolve(
+				config_dir,
+				`parachain${chain ? "-" + chain : ""}-${resolvedId}.json`
+			);
+			parachain_spec_raw = resolve(
+				config_dir,
+				`parachain${chain ? "-" + chain : ""}-${resolvedId}-raw.json`
+			);
+			await generateChainSpec(bin, "", parachain_spec);
+			await updateParachainId(parachain_spec, parseInt(resolvedId));
+			await generateChainSpecRaw(bin, parachain_spec, parachain_spec_raw);
+		} else parachain_spec_raw = chainSpecPath;
+	} catch (err) {
+		console.error(err);
+		process.exit(1);
 	}
+	parachain.chainSpecRawPath = parachain_spec_raw;
 }
 
 async function addParachainsToGenesis(
 	config_dir: string,
 	spec: string,
-	config: ResolvedLaunchConfig
-): Promise<ResolvedLaunchConfig> {
+	parachains: any
+) {
 	console.log("\n⛓ Adding Genesis Parachains");
-	for (const parachain of config.parachains) {
-		await generateParachainSpec(config_dir, spec, parachain);
+	for (const parachain of parachains) {
+		const { resolvedId } = parachain;
+		const bin = resolve(config_dir, parachain.bin);
+		if (!fs.existsSync(bin)) {
+			console.error("Simple/Parachain binary does not exist: ", bin);
+			process.exit();
+		}
+		// If it isn't registered yet, register the parachain in genesis
+		if (!registeredParachains[resolvedId]) {
+			const genesisState = await exportGenesisState(
+				bin,
+				parachain.chainSpecRawPath
+			);
+			const genesisWasm = await exportGenesisWasm(
+				bin,
+				parachain.chainSpecRawPath
+			);
+			await addGenesisParachain(
+				spec,
+				resolvedId,
+				genesisState,
+				genesisWasm,
+				true
+			);
+			registeredParachains[resolvedId] = true;
+		}
 	}
-	for (const simpleParachainhain of config.simpleParachains) {
-		await generateParachainSpec(config_dir, spec, simpleParachainhain);
-	}
-	return config;
 }
