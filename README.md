@@ -203,6 +203,8 @@ polkadot-launch wait for finalization.
 This tool just automates the steps needed to spin up multiple relay chain nodes and parachain nodes
 in order to create a local test network.
 
+You can add the `-v` or `--verbose` flag to see what processes it is invoking and with which arguments.
+
 - [`child_process`](https://nodejs.org/api/child_process.html) is used to execute commands on your
   node:
   - We build a fresh chain spec using the `chain` parameter specified in your config.

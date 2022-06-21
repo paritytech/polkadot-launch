@@ -17,7 +17,7 @@ const execFile = util.promisify(ex);
 export async function generateChainSpec(bin: string, chain: string) {
 	return new Promise<void>(function (resolve, reject) {
 		let args = ["build-spec", "--chain=" + chain, "--disable-default-bootnode"];
-
+		verbose(bin, args);
 		p["spec"] = spawn(bin, args);
 		let spec = fs.createWriteStream(`${chain}.json`);
 
@@ -44,6 +44,7 @@ export async function generateChainSpecRaw(bin: string, chain: string) {
 		let args = ["build-spec", "--chain=" + chain + ".json", "--raw"];
 
 		p["spec"] = spawn(bin, args);
+		verbose(bin, args);
 		let spec = fs.createWriteStream(`${chain}-raw.json`);
 
 		// `pipe` since it deals with flushing and  we need to guarantee that the data is flushed
@@ -74,6 +75,7 @@ export async function getParachainIdFromSpec(
 		let data = "";
 
 		p["spec"] = spawn(bin, args);
+		verbose(bin, args);
 		p["spec"].stdout.on("data", (chunk) => {
 			data += chunk;
 		});
@@ -131,7 +133,7 @@ export function startNode(
 		args = args.concat(flags);
 		console.log(`Added ${flags}`);
 	}
-
+	verbose(bin, args);
 	p[name] = spawn(bin, args);
 
 	let log = fs.createWriteStream(`${name}.log`);
@@ -155,6 +157,7 @@ export async function exportGenesisWasm(
 	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
 	// advance. Hopefully, this generous limit will be enough.
 	let opts = { maxBuffer: 10 * 1024 * 1024 };
+	verbose(bin, args);
 	let { stdout, stderr } = await execFile(bin, args, opts);
 	if (stderr) {
 		console.error(stderr);
@@ -176,6 +179,7 @@ export async function exportGenesisState(
 	// wasm files are typically large and `exec` requires us to supply the maximum buffer size in
 	// advance. Hopefully, this generous limit will be enough.
 	let opts = { maxBuffer: 5 * 1024 * 1024 };
+	verbose(bin, args);
 	let { stdout, stderr } = await execFile(bin, args, opts);
 	if (stderr) {
 		console.error(stderr);
@@ -248,7 +252,7 @@ export function startCollator(
 			args = args.concat(flags_collator);
 			console.log(`Added ${flags_collator} to collator`);
 		}
-
+		verbose(bin, args);
 		p[wsPort] = spawn(bin, args);
 
 		let log = fs.createWriteStream(`${wsPort}.log`);
@@ -286,7 +290,7 @@ export function startSimpleCollator(
 			args.push("--parachain-id=" + id);
 			console.log(`Added --parachain-id=${id}`);
 		}
-
+		verbose(bin, args);
 		p[port] = spawn(bin, args);
 
 		let log = fs.createWriteStream(`${port}.log`);
@@ -318,7 +322,7 @@ export function purgeChain(bin: string, spec: string) {
 
 	// Avoid prompt to confirm.
 	args.push("-y");
-
+	verbose(bin, args);
 	p["purge"] = spawn(bin, args);
 
 	p["purge"].stdout.on("data", function (chunk) {
@@ -330,6 +334,16 @@ export function purgeChain(bin: string, spec: string) {
 		let message = chunk.toString();
 		console.log(message);
 	});
+}
+
+function verbose(bin: string, args: string[]) {
+	if (process.argv.includes("--verbose") || process.argv.includes("-v")) {
+		for (var arg in args) {
+			bin += " ";
+			bin += args[arg];
+		}
+		console.log("\x1b[33m " + bin + " \x1b[0m");
+	}
 }
 
 // Kill all processes spawned and tracked by this file.
