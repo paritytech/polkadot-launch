@@ -1,5 +1,5 @@
 import Web3 from "web3";
-import '@polkadot/api-augment'
+import "@polkadot/api-augment";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { JsonRpcResponse } from "web3-core-helpers";
 import { ethers } from "ethers";
@@ -24,7 +24,8 @@ export async function customWeb3Request(
 			(error: Error | null, result: JsonRpcResponse) => {
 				if (error) {
 					reject(
-						`Failed to send custom request (${method} (${params.join(",")})): ${error.message || error.toString()
+						`Failed to send custom request (${method} (${params.join(",")})): ${
+							error.message || error.toString()
 						}`
 					);
 				}
