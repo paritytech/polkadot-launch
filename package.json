@@ -1,6 +1,6 @@
 {
 	"name": "polkadot-launch",
-	"version": "2.2.1",
+	"version": "2.3.0",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"author": "Shawn Tabrizi <shawntabrizi@gmail.com>",
