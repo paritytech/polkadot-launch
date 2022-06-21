@@ -17,7 +17,9 @@ npm i polkadot-launch -g
 ## Binary Files
 
 To use polkadot-launch, you need to have binary files for a `polkadot` relay chain and a
-`polkadot-collator` in the bin folder.
+`polkadot-parachain` in the bin folder.
+
+> If you are on an Apple M1 ARM chip, make sure you are using the `stable-aarch64-apple-darwin` toolchain to compile the binaries.
 
 You can generate these files by cloning the `rococo-v1` branch of these projects in the same root as the polkadot-launch repo
 and building them with the specific flags below:
@@ -34,8 +36,8 @@ and
 ```
 git clone https://github.com/paritytech/cumulus
 cd cumulus
-cargo build --release -p polkadot-collator
-cp ./target/release/polkadot-collator ../polkadot-launch/bin/polkadot-collator
+cargo build --release -p polkadot-parachain
+cp ./target/release/polkadot-parachain ../polkadot-launch/bin/polkadot-parachain
 ```
 
 ## Use
@@ -116,7 +118,7 @@ All `genesis` properties can be found in the chainspec output:
 - `bin`: The path of the [collator node
   binary](https://github.com/substrate-developer-hub/substrate-parachain-template) used to create
   blocks for your parachain. For example
-  `<path/to/substrate-parachain-template>/target/release/polkadot-collator`.
+  `<path/to/substrate-parachain-template>/target/release/polkadot-parachain`.
 - `id`: The id to assign to this parachain. Must be unique.
 - `wsPort`: The websocket port for this node.
 - `port`: The TCP port for this node.
