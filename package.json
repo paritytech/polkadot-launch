@@ -15,11 +15,12 @@
 		"para-test-no-ci": "mocha -r ts-node/register 'test/tests-no-ci/**/test-*.ts'"
 	},
 	"dependencies": {
-		"@polkadot/api": "^6.10.3",
-		"@polkadot/keyring": "^8.0.5",
-		"@polkadot/types": "^6.10.3",
-		"@polkadot/util": "^8.0.5",
-		"@polkadot/util-crypto": "^8.0.5",
+		"@polkadot/api": "^8.9.1",
+		"@polkadot/api-augment": "^8.9.1",
+		"@polkadot/keyring": "^9.5.1",
+		"@polkadot/types": "^8.9.1",
+		"@polkadot/util": "^9.5.1",
+		"@polkadot/util-crypto": "^9.5.1",
 		"@types/chai": "^4.2.22",
 		"@types/mocha": "^9.0.0",
 		"chai": "^4.3.4",

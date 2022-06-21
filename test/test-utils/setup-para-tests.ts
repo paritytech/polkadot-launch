@@ -1,3 +1,4 @@
+import '@polkadot/api-augment'
 import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
 import {
@@ -59,20 +60,20 @@ export function describeParachain(
 			const init = !DEBUG_MODE
 				? await startParachainNodes(options)
 				: {
-						paraPorts: [
-							{
-								parachainId: 1000,
-								ports: [
-									{
-										p2pPort: 19931,
-										wsPort: 19933,
-										rpcPort: 19932,
-									},
-								],
-							},
-						],
-						relayPorts: [],
-				  };
+					paraPorts: [
+						{
+							parachainId: 1000,
+							ports: [
+								{
+									p2pPort: 19931,
+									wsPort: 19933,
+									rpcPort: 19932,
+								},
+							],
+						},
+					],
+					relayPorts: [],
+				};
 			// Context is given prior to this assignement, so doing
 			// context = init.context will fail because it replace the variable;
 
@@ -142,11 +143,11 @@ export function describeParachain(
 			context.ethers = await context.createEthers();
 			debug(
 				`Setup ready [${
-					//@ts-ignore
-					/:([0-9]+)$/.exec((context.web3.currentProvider as any).host)[1]
+				//@ts-ignore
+				/:([0-9]+)$/.exec((context.web3.currentProvider as any).host)[1]
 				}] for ${
-					//@ts-ignore
-					this.currentTest.title
+				//@ts-ignore
+				this.currentTest.title
 				}`
 			);
 		});
