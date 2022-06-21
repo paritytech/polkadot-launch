@@ -1,3 +1,4 @@
+import "@polkadot/api-augment";
 import { Keyring } from "@polkadot/api";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import { encodeAddress } from "@polkadot/util-crypto";

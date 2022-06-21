@@ -1,3 +1,4 @@
+import "@polkadot/api-augment";
 import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
 import {

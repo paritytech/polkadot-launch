@@ -4,11 +4,18 @@
 		"esModuleInterop": true,
 		"target": "ES2020",
 		"module": "commonjs",
-		"lib": ["esnext"],
+		"lib": [
+			"esnext",
+			"dom"
+		],
 		"outDir": "dist",
 		"resolveJsonModule": true,
 		"strict": true,
 		"declaration": true
 	},
-	"exclude": ["node_modules", "dist", "test"]
+	"exclude": [
+		"node_modules",
+		"dist",
+		"test"
+	]
 }

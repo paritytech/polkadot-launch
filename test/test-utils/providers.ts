@@ -1,4 +1,5 @@
 import Web3 from "web3";
+import "@polkadot/api-augment";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { JsonRpcResponse } from "web3-core-helpers";
 import { ethers } from "ethers";
