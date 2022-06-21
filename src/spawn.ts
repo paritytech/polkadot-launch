@@ -337,13 +337,12 @@ export function purgeChain(bin: string, spec: string) {
 }
 
 function verbose(bin: string, args: string[]) {
-	if (process.argv.includes("--verbose") || process.argv.includes("-v")) 
-	{
-		for(var arg in args) {
-			bin += " "
+	if (process.argv.includes("--verbose") || process.argv.includes("-v")) {
+		for (var arg in args) {
+			bin += " ";
 			bin += args[arg];
 		}
-		console.log('\x1b[33m ' +bin+ ' \x1b[0m');
+		console.log("\x1b[33m " + bin + " \x1b[0m");
 	}
 }
 
